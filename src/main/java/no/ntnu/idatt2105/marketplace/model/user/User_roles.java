@@ -1,27 +1,27 @@
-package no.ntnu.idatt2105.marketplace.model;
+package no.ntnu.idatt2105.marketplace.model.user;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "user_roles")
-public class user_roles {
+public class User_roles {
 
   @OneToOne
   @JoinColumn(name = "role_id", nullable = false)
-  private role role;
+  private Role role;
 
   @OneToOne
   @JoinColumn(name = "users_id", nullable = false)
-  private user user;
+  private User user;
 
 
   @Id
   private int id;
 
   // constructor
-  public user_roles() {}
+  public User_roles() {}
 
-  public user_roles(int id, role role, user user) {
+  public User_roles(int id, Role role, User user) {
     this.id = id;
     this.role = role;
     this.user = user;
@@ -30,19 +30,19 @@ public class user_roles {
   // setters  and getters
 
 
-  public role getRole() {
+  public Role getRole() {
     return role;
   }
 
-  public void setRole(role role) {
+  public void setRole(Role role) {
     this.role = role;
   }
 
-  public user getUser() {
+  public User getUser() {
     return user;
   }
 
-  public void setUser(user user) {
+  public void setUser(User user) {
     this.user = user;
   }
 

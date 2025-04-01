@@ -1,12 +1,14 @@
-package no.ntnu.idatt2105.marketplace.model;
+package no.ntnu.idatt2105.marketplace.model.other;
 
 import jakarta.persistence.*;
 
 import java.util.Date;
+import no.ntnu.idatt2105.marketplace.model.listing.Listing;
+import no.ntnu.idatt2105.marketplace.model.user.User;
 
 @Entity
 @Table(name = "offer")
-public class offer {
+public class Offer {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,11 +16,11 @@ public class offer {
 
   @OneToOne
   @JoinColumn(name = "users_id", nullable = false)
-  private user buyer_id;
+  private User buyer_id;
 
   @OneToOne
   @JoinColumn(name = "listing_id", nullable = false)
-  private listing listing_id;
+  private Listing listing_id;
 
 
   @Column(nullable = false)
@@ -34,9 +36,9 @@ public class offer {
   private Date updated_at;
 
   // constructor
-  public offer() {}
+  public Offer() {}
 
-  public offer(int id, user buyer_id, listing listing_id, float current_offer, int status, Date created_at, Date updated_at) {
+  public Offer(int id, User buyer_id, Listing listing_id, float current_offer, int status, Date created_at, Date updated_at) {
     this.id = id;
     this.buyer_id = buyer_id;
     this.listing_id = listing_id;
@@ -57,19 +59,19 @@ public class offer {
     this.id = id;
   }
 
-  public user getBuyer_id() {
+  public User getBuyer_id() {
     return buyer_id;
   }
 
-  public void setBuyer_id(user buyer_id) {
+  public void setBuyer_id(User buyer_id) {
     this.buyer_id = buyer_id;
   }
 
-  public listing getListing_id() {
+  public Listing getListing_id() {
     return listing_id;
   }
 
-  public void setListing_id(listing listing_id) {
+  public void setListing_id(Listing listing_id) {
     this.listing_id = listing_id;
   }
 

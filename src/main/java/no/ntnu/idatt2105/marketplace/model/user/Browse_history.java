@@ -1,12 +1,13 @@
-package no.ntnu.idatt2105.marketplace.model;
+package no.ntnu.idatt2105.marketplace.model.user;
 
 import jakarta.persistence.*;
 
 import java.util.Date;
+import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 
 @Entity
 @Table(name = "browse_history")
-public class browse_history {
+public class Browse_history {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,19 +15,19 @@ public class browse_history {
 
   @OneToOne
   @JoinColumn(name = "user_id", nullable = false)
-  private user user_id;
+  private User user_id;
 
   @OneToOne
   @JoinColumn(name = "listing_id", nullable = false)
-  private listing listing_id;
+  private Listing listing_id;
 
   @Column(nullable = false)
   private Date search_date;
 
   // constructor
-  public browse_history() {}
+  public Browse_history() {}
 
-  public browse_history(int id, user user_id, listing listing_id, Date search_date) {
+  public Browse_history(int id, User user_id, Listing listing_id, Date search_date) {
     this.id = id;
     this.user_id = user_id;
     this.listing_id = listing_id;
@@ -43,19 +44,19 @@ public class browse_history {
     this.id = id;
   }
 
-  public user getUser_id() {
+  public User getUser_id() {
     return user_id;
   }
 
-  public void setUser_id(user user_id) {
+  public void setUser_id(User user_id) {
     this.user_id = user_id;
   }
 
-  public listing getListing_id() {
+  public Listing getListing_id() {
     return listing_id;
   }
 
-  public void setListing_id(listing listing_id) {
+  public void setListing_id(Listing listing_id) {
     this.listing_id = listing_id;
   }
 
