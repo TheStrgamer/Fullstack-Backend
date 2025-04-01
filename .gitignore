@@ -1,2 +1,4 @@
 .idea/*
 marketplace.iml
+.DS_Store
+.env

@@ -7,9 +7,11 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import java.util.Date;
 import no.ntnu.idatt2105.marketplace.model.user.User;
+import io.github.cdimascio.dotenv.Dotenv;
+
 public class JWT_token {
 
-  private static final String SECRET_KEY = "MonkeyKeyForJWTThatWillNotMakeMeAsStrongAsLimaButItWillEncryptShit"; //would put in .env but lazy
+  private static final String SECRET_KEY =  Dotenv.load().get("SECRET_KEY");
   private static final long EXPIRATION_TIME = 5 * 60 * 1000;
 
   private String generateJwtToken(User user) {
