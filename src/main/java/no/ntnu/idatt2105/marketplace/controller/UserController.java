@@ -28,9 +28,10 @@ public class UserController {
   public String authenticate(String email, String password) {
     Optional<User> user = userRepo.findByEmail(email);
     if (user.isEmpty() || !hasher.checkPassword(password, user.get().getPassword())) {
+      System.out.println("No user found with given email and password");
       return null;
     }
-
+    System.out.println("User found with given email and password");
     return jwt.generateJwtToken(user.get());
   }
 
