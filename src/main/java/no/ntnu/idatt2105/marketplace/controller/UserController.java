@@ -26,7 +26,7 @@ public class UserController {
   private final JWT_token jwt = new JWT_token();
 
   public String authenticate(String email, String password) {
-    Optional<User> user = userRepo.findUserByEmail(email);
+    Optional<User> user = userRepo.findByEmail(email);
     if (user.isEmpty() || !hasher.checkPassword(password, user.get().getPassword())) {
       return null;
     }
@@ -36,7 +36,7 @@ public class UserController {
 
   public int register(User user) {
     user.setPassword(hasher.hashPassword(user.getPassword()));
-    if (userRepo.findUserByEmail(user.getEmail()).isPresent()) { //TODO add check for other unique fields
+    if (userRepo.findByEmail(user.getEmail()).isPresent()) { //TODO add check for other unique fields
       System.out.println("User already exists");
       return 1;
     }
