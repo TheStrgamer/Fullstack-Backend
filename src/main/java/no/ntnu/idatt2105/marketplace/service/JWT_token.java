@@ -11,14 +11,13 @@ import java.util.Date;
 
 import io.jsonwebtoken.security.Keys;
 import no.ntnu.idatt2105.marketplace.model.user.User;
-import io.github.cdimascio.dotenv.Dotenv;
 
 public class JWT_token {
 
   private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
   private static final long EXPIRATION_TIME = 5 * 60 * 1000;
 
-  private String generateJwtToken(User user) {
+  public String generateJwtToken(User user) {
     return Jwts.builder()
         .setSubject(user.getEmail())
         .setIssuedAt(new Date())
@@ -39,7 +38,7 @@ public class JWT_token {
     return false;
   }
 
-  public String extractUsernameFromJwt(String token) {
+  public String extractEmailFromJwt(String token) {
     try {
       Claims claims = Jwts.parser()
           .setSigningKey(key)
@@ -51,7 +50,7 @@ public class JWT_token {
     }
   }
   public User getUserByToken(String token) {
-    String username = extractUsernameFromJwt(token);
+    String email = extractEmailFromJwt(token);
     return null; //TODO: implement this
   }
 }
