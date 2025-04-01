@@ -5,13 +5,17 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
+
+import java.security.Key;
 import java.util.Date;
+
+import io.jsonwebtoken.security.Keys;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class JWT_token {
 
-  private static final String SECRET_KEY =  Dotenv.load().get("SECRET_KEY");
+  private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
   private static final long EXPIRATION_TIME = 5 * 60 * 1000;
 
   private String generateJwtToken(User user) {
@@ -19,13 +23,13 @@ public class JWT_token {
         .setSubject(user.getEmail())
         .setIssuedAt(new Date())
         .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-        .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+        .signWith(key)
         .compact();
   }
 
   public boolean validateJwtToken(String token) {
     try {
-      Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
+      Jwts.parser().setSigningKey(key).parseClaimsJws(token);
       return true;
     } catch (ExpiredJwtException e) {
       System.out.println("Token expired");
@@ -38,7 +42,7 @@ public class JWT_token {
   public String extractUsernameFromJwt(String token) {
     try {
       Claims claims = Jwts.parser()
-          .setSigningKey(SECRET_KEY)
+          .setSigningKey(key)
           .parseClaimsJws(token)
           .getBody();
       return claims.getSubject();
