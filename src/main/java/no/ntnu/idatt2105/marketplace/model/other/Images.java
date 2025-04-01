@@ -1,6 +1,9 @@
 package no.ntnu.idatt2105.marketplace.model.other;
 
 import jakarta.persistence.*;
+import java.util.List;
+import no.ntnu.idatt2105.marketplace.model.listing.Categories;
+import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 
 @Entity
 @Table(name = "images")
@@ -12,6 +15,11 @@ public class Images {
 
   @Column(unique = true, nullable = false)
   private String filepath_to_image;
+
+  @ManyToOne
+  @JoinColumn(name = "listing_id")
+  private Listing listing;
+
 
   // constructor
   public Images() {}

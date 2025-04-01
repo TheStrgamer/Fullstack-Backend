@@ -1,6 +1,7 @@
 package no.ntnu.idatt2105.marketplace.model.user;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "role")
@@ -12,6 +13,9 @@ public class Role {
 
   @Column(unique = true, nullable = false)
   private String name;
+
+  @ManyToMany(mappedBy = "roles")
+  private List<User> users;
 
   // constructor
   public Role() {}
@@ -37,5 +41,9 @@ public class Role {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public List<User> getUsers() {
+    return users;
   }
 }
