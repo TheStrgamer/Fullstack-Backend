@@ -1,10 +1,11 @@
-package no.ntnu.idatt2105.marketplace.model;
+package no.ntnu.idatt2105.marketplace.model.user;
 
 import jakarta.persistence.*;
+import no.ntnu.idatt2105.marketplace.model.other.Images;
 
 @Entity
 @Table(name = "users")
-public class user {
+public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,14 +28,14 @@ public class user {
 
   @OneToOne
   @JoinColumn(name = "images_id", unique = true)
-  private images profile_picture;
+  private Images profile_picture;
 
 
   // Constructor
 
-  public user () {}
+  public User() {}
 
-  public user(String email, String password, String firstname, String surname, String phonenumber, images profile_picture) {
+  public User(String email, String password, String firstname, String surname, String phonenumber, Images profile_picture) {
     this.email = email;
     this.password = password;
     this.firstname = firstname;
@@ -93,11 +94,11 @@ public class user {
     this.phonenumber = phonenumber;
   }
 
-  public images getProfile_picture() {
+  public Images getProfile_picture() {
     return profile_picture;
   }
 
-  public void setProfile_picture(images profile_picture) {
+  public void setProfile_picture(Images profile_picture) {
     this.profile_picture = profile_picture;
   }
 }

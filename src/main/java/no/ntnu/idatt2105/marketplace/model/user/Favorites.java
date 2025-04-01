@@ -1,26 +1,27 @@
-package no.ntnu.idatt2105.marketplace.model;
+package no.ntnu.idatt2105.marketplace.model.user;
 
 import jakarta.persistence.*;
+import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 
 @Entity
 @Table(name = "favorites")
-public class favorites {
+public class Favorites {
 
   @Id
   private int id;
 
   @OneToOne
   @JoinColumn(name = "users_id", nullable = false)
-  private user user_id;
+  private User user_id;
 
   @OneToOne
   @JoinColumn(name = "listing_id", nullable = false)
-  private listing listing_id;
+  private Listing listing_id;
 
   // constructor
-  public favorites() {}
+  public Favorites() {}
 
-  public favorites(int id, user user_id, listing listing_id) {
+  public Favorites(int id, User user_id, Listing listing_id) {
     this.id = id;
     this.user_id = user_id;
     this.listing_id = listing_id;
@@ -35,19 +36,19 @@ public class favorites {
     this.id = id;
   }
 
-  public user getUser_id() {
+  public User getUser_id() {
     return user_id;
   }
 
-  public void setUser_id(user user_id) {
+  public void setUser_id(User user_id) {
     this.user_id = user_id;
   }
 
-  public listing getListing_id() {
+  public Listing getListing_id() {
     return listing_id;
   }
 
-  public void setListing_id(listing listing_id) {
+  public void setListing_id(Listing listing_id) {
     this.listing_id = listing_id;
   }
 }

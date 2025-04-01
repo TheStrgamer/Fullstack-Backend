@@ -1,10 +1,10 @@
-package no.ntnu.idatt2105.marketplace.model;
+package no.ntnu.idatt2105.marketplace.model.user;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "role")
-public class role {
+public class Role {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,8 +14,8 @@ public class role {
   private String name;
 
   // constructor
-  public role() {}
-  public role(int id, String name) {
+  public Role() {}
+  public Role(int id, String name) {
     this.id = id;
     this.name = name;
   }

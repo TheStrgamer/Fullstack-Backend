@@ -1,10 +1,10 @@
-package no.ntnu.idatt2105.marketplace.model;
+package no.ntnu.idatt2105.marketplace.model.other;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "images")
-public class images {
+public class Images {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,8 +14,8 @@ public class images {
   private String filepath_to_image;
 
   // constructor
-  public images() {}
-  public images(int id, String filepath_to_image) {
+  public Images() {}
+  public Images(int id, String filepath_to_image) {
     this.id = id;
     this.filepath_to_image = filepath_to_image;
   }

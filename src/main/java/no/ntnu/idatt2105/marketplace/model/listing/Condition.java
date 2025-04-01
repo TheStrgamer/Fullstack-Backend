@@ -1,10 +1,10 @@
-package no.ntnu.idatt2105.marketplace.model;
+package no.ntnu.idatt2105.marketplace.model.listing;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "condition")
-public class condition {
+public class Condition {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,9 +15,9 @@ public class condition {
 
 
   // constructor
-  public condition() {}
+  public Condition() {}
 
-  public condition(int id, String name) {
+  public Condition(int id, String name) {
     this.id = id;
     this.name = name;
   }

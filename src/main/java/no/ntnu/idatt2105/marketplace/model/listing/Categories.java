@@ -1,9 +1,9 @@
-package no.ntnu.idatt2105.marketplace.model;
+package no.ntnu.idatt2105.marketplace.model.listing;
 
 import jakarta.persistence.*;
 
 @Entity(name = "categories")
-public class categories {
+public class Categories {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,12 +17,12 @@ public class categories {
 
   @ManyToOne
   @JoinColumn(name = "categories_id")
-  private categories parent_category;
+  private Categories parent_category;
 
   // constructor
-  public categories() {}
+  public Categories() {}
 
-  public categories(int id, String name, String description, categories parent_category){
+  public Categories(int id, String name, String description, Categories parent_category){
     this.id = id;
     this.name = name;
     this.description = description;
@@ -56,11 +56,11 @@ public class categories {
     this.description = description;
   }
 
-  public categories getParent_category() {
+  public Categories getParent_category() {
     return parent_category;
   }
 
-  public void setParent_category(categories parent_category) {
+  public void setParent_category(Categories parent_category) {
     this.parent_category = parent_category;
   }
 }

@@ -1,12 +1,13 @@
-package no.ntnu.idatt2105.marketplace.model;
+package no.ntnu.idatt2105.marketplace.model.listing;
 
 import jakarta.persistence.*;
 
 import java.util.Date;
+import no.ntnu.idatt2105.marketplace.model.user.User;
 
 @Entity
 @Table(name = "listing")
-public class listing {
+public class Listing {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,15 +15,15 @@ public class listing {
 
   @OneToOne
   @JoinColumn(name = "users_id", nullable = false)
-  private user user_id;
+  private User user_id;
 
   @OneToOne
   @JoinColumn(name = "categories_id")
-  private categories category;
+  private Categories category;
 
   @OneToOne
   @JoinColumn(name = "condition_id")
-  private condition condition;
+  private Condition condition;
 
   @Column (nullable = false)
   private String title;
@@ -55,9 +56,9 @@ public class listing {
   private double longitude;
 
   // constructor
-  public listing() {}
+  public Listing() {}
 
-  public listing(int id, user user_id, categories category, condition condition, String title, int sale_status, int price, String brief_description, String full_description, String size, Date created_at, Date updated_at, double latitude, double longitude) {
+  public Listing(int id, User user_id, Categories category, Condition condition, String title, int sale_status, int price, String brief_description, String full_description, String size, Date created_at, Date updated_at, double latitude, double longitude) {
     this.id = id;
     this.user_id = user_id;
     this.category = category;
@@ -88,27 +89,27 @@ public class listing {
     this.id = id;
   }
 
-  public user getUser_id() {
+  public User getUser_id() {
     return user_id;
   }
 
-  public void setUser_id(user user_id) {
+  public void setUser_id(User user_id) {
     this.user_id = user_id;
   }
 
-  public categories getCategory() {
+  public Categories getCategory() {
     return category;
   }
 
-  public void setCategory(categories category) {
+  public void setCategory(Categories category) {
     this.category = category;
   }
 
-  public no.ntnu.idatt2105.marketplace.model.condition getCondition() {
+  public Condition getCondition() {
     return condition;
   }
 
-  public void setCondition(no.ntnu.idatt2105.marketplace.model.condition condition) {
+  public void setCondition(Condition condition) {
     this.condition = condition;
   }
 
