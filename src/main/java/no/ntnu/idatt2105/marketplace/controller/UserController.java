@@ -66,7 +66,7 @@ public class UserController {
     return jwt.validateJwtToken(sessionToken);
   }
 
-  @GetMapping("/")
+  @GetMapping("/") //TODO: remove this endpoint, for testing purposes only
   public Iterable<User> getAllUsers() {
     return userRepo.findAll();
   }
