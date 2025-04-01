@@ -44,8 +44,8 @@ public class UserController {
     return 0;
   }
 
-  @PostMapping("/add")
-  public int addUser(@RequestBody User user) {
+  @PostMapping("/register")
+  public int registerUser(@RequestBody User user) {
     return register(user);
   }
 
@@ -64,6 +64,11 @@ public class UserController {
     }
     String sessionToken = authorizationHeader.substring(7);
     return jwt.validateJwtToken(sessionToken);
+  }
+
+  @GetMapping("/")
+  public Iterable<User> getAllUsers() {
+    return userRepo.findAll();
   }
 
 

@@ -4,3 +4,4 @@ marketplace.iml
 .env
 *.db
 target/*
+data/database/*
