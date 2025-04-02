@@ -10,6 +10,7 @@ import java.security.Key;
 import java.util.Date;
 
 import io.jsonwebtoken.security.Keys;
+import no.ntnu.idatt2105.marketplace.exception.TokenExpiredException;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 import org.springframework.stereotype.Service;
 
@@ -27,18 +28,16 @@ public class JWT_token {
         .compact();
   }
 
-  public boolean validateJwtToken(String token) {
+  public void validateJwtToken(String token) {
     try {
       Jwts.parser().setSigningKey(key).parseClaimsJws(token);
-      return true;
     } catch (ExpiredJwtException e) {
-      System.out.println("Token expired");
+      throw new TokenExpiredException("Token has expired");
     } catch (UnsupportedJwtException | MalformedJwtException e) {
-      System.out.println("Invalid token format");
+      throw new IllegalArgumentException("Token is invalid");
     } catch (IllegalArgumentException e) {
-      System.out.println("Token is empty or null");
+      throw new IllegalArgumentException("Token is empty");
     }
-    return false;
   }
 
 

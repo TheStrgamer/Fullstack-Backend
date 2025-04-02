@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import no.ntnu.idatt2105.marketplace.exception.TokenExpiredException;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,11 +62,19 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
   }
 
   private String validateTokenAndGetUserEmail(final String token) {
-    if (jwtTokenService.validateJwtToken(token)) {
+    try {
+      jwtTokenService.validateJwtToken(token);
       return jwtTokenService.extractEmailFromJwt(token);
-    } else {
-      LOGGER.warn("Token is invalid or expired.");
+    } catch (TokenExpiredException e) {
+      LOGGER.warn("Token has expired.");
       return null;
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Token is invalid.");
+      return null;
+    } catch (Exception e) {
+      LOGGER.warn("Token is empty.");
+      return null;
+
     }
   }
 
