@@ -25,8 +25,6 @@ public class Role {
   }
 
   //getters and setters
-
-
   public int getId() {
     return id;
   }

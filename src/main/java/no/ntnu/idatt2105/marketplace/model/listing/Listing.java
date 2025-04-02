@@ -19,17 +19,14 @@ public class Listing {
 
   @ManyToOne
   @JoinColumn(name = "creator", nullable = false)
-  @JsonBackReference
   private User creator;
 
   @ManyToOne
   @JoinColumn(name = "category", nullable = false)
-  @JsonBackReference
   private Categories category;
 
   @ManyToOne
   @JoinColumn(name = "condition", nullable = false)
-  @JsonBackReference
   private Condition condition;
 
   @Column (nullable = false)

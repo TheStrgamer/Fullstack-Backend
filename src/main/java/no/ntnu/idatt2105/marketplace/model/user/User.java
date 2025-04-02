@@ -10,7 +10,7 @@ import no.ntnu.idatt2105.marketplace.model.other.Offer;
 @Table(name = "users")
 public class User {
 
-  private static final long userHistorySize = 10;
+  private static final long userHistoryMaxSize = 10;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -158,7 +158,7 @@ public class User {
   }
 
   public void addHistory(Listing listing) {
-    if (history.size() >= userHistorySize) {
+    if (history.size() >= userHistoryMaxSize) {
       history.remove(0);
     }
     history.add(listing);
@@ -179,5 +179,6 @@ public class User {
   public void removeOffer(Offer offer) {
     offers.remove(offer);
   }
+
 }
 
