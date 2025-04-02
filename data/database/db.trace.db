@@ -124,295 +124,36 @@ alter table if exists user add constraint FK6yu1xm81x792lsjos6hi7w42w foreign ke
 2025-03-31 15:53:50.262248+02:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists user_roles add constraint FK55itppkw3i07do3h7qoclqd4k foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
 alter table if exists user_roles add constraint FK55itppkw3i07do3h7qoclqd4k foreign key (user_id) references user [42001-232]
-2025-04-01 11:12:25 jdbc[3]: exception
-java.sql.SQLClientInfoException: Client info name 'ApplicationName' not supported.
-	at org.h2.jdbc.JdbcConnection.setClientInfo(JdbcConnection.java:1573)
-	at com.intellij.database.remote.jdbc.impl.RemoteConnectionImpl.setClientInfo(RemoteConnectionImpl.java:469)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(UnicastServerRef.java:360)
-	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:200)
-	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:197)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:714)
-	at java.rmi/sun.rmi.transport.Transport.serviceCall(Transport.java:196)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:598)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:844)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:721)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:720)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
-	at java.base/java.lang.Thread.run(Thread.java:1583)
-2025-04-01 11:12:26 jdbc[3]: exception
-java.sql.SQLClientInfoException: Client info name 'ApplicationName' not supported.
-	at org.h2.jdbc.JdbcConnection.setClientInfo(JdbcConnection.java:1573)
-	at com.intellij.database.remote.jdbc.impl.RemoteConnectionImpl.setClientInfo(RemoteConnectionImpl.java:469)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(UnicastServerRef.java:360)
-	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:200)
-	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:197)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:714)
-	at java.rmi/sun.rmi.transport.Transport.serviceCall(Transport.java:196)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:598)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:844)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:721)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:720)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
-	at java.base/java.lang.Thread.run(Thread.java:1583)
-2025-04-01 11:39:39 jdbc[3]: exception
-java.sql.SQLClientInfoException: Client info name 'ApplicationName' not supported.
-	at org.h2.jdbc.JdbcConnection.setClientInfo(JdbcConnection.java:1573)
-	at com.intellij.database.remote.jdbc.impl.RemoteConnectionImpl.setClientInfo(RemoteConnectionImpl.java:469)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(UnicastServerRef.java:360)
-	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:200)
-	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:197)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:714)
-	at java.rmi/sun.rmi.transport.Transport.serviceCall(Transport.java:196)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:598)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:844)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:721)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:720)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
-	at java.base/java.lang.Thread.run(Thread.java:1583)
-2025-04-01 11:41:20 jdbc[4]: exception
-java.sql.SQLClientInfoException: Client info name 'ApplicationName' not supported.
-	at org.h2.jdbc.JdbcConnection.setClientInfo(JdbcConnection.java:1573)
-	at com.intellij.database.remote.jdbc.impl.RemoteConnectionImpl.setClientInfo(RemoteConnectionImpl.java:469)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(UnicastServerRef.java:360)
-	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:200)
-	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:197)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:714)
-	at java.rmi/sun.rmi.transport.Transport.serviceCall(Transport.java:196)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:598)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:844)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:721)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:720)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
-	at java.base/java.lang.Thread.run(Thread.java:1583)
-2025-04-01 11:41:28 jdbc[5]: exception
-java.sql.SQLClientInfoException: Client info name 'ApplicationName' not supported.
-	at org.h2.jdbc.JdbcConnection.setClientInfo(JdbcConnection.java:1573)
-	at com.intellij.database.remote.jdbc.impl.RemoteConnectionImpl.setClientInfo(RemoteConnectionImpl.java:469)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(UnicastServerRef.java:360)
-	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:200)
-	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:197)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:714)
-	at java.rmi/sun.rmi.transport.Transport.serviceCall(Transport.java:196)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:598)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:844)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:721)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:720)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
-	at java.base/java.lang.Thread.run(Thread.java:1583)
-2025-04-01 11:43:56 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "INSERT INTO listing (\000a    id,\000a    title,\000a    brief_description,\000a    full_description,\000a    price,\000a    sale_status,\000a    size,\000a    created_at,\000a    updated_at,\000a    latitude,\000a    longitude,\000a    categories_id,\000a    condition_id,\000a[*])\000aVALUES\000a    (1, 'Genuine Leather Vintage Motorcycle Jacket',\000a     'Classic black leather motorcycle jacket from the 90s, minimal wear',\000a     'Classic black leather motorcycle jacket from the 90s, minimal wear. Great vintage condition with authentic detailing and sturdy zippers. Perfect for motorcycle enthusiasts or vintage fashion lovers.',\000a     199, 1, 'L',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     40.7128, -74.0060, 3, 2,),\000a\000a    (2, 'Trek Mountain Bike - Great Condition',\000a     '2022 Trek Marlin 7, barely used, comes with water bottle holder',\000a     '2022 Trek Marlin 7, barely used, comes with water bottle holder. Front suspension, disc brakes, and Shimano components. Perfect for trails or commuting with excellent handling.',\000a     450, 1, 'Medium Frame',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     34.0522, -118.2437, 5, 1),\000a\000a    (3, 'iPhone 13 Pro - 256GB - Midnight Blue',\000a     'Used for 1 year, minor scratches, 89% battery health, includes charger and case',\000a     'Used for 1 year, minor scratches, 89% battery health, includes charger and case. Unlocked for all carriers. Face ID works perfectly and all features function as expected.',\000a     699, 1, '6.1 inch',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     41.8781, -87.6298, 7, 2),\000a\000a    (4, 'IKEA MALM Desk - White',\000a     'White IKEA MALM desk, assembled, 2 years old, some minor scratches',\000a     'White IKEA MALM desk, assembled, 2 years old, some minor scratches. Solid construction with plenty of workspace. Drawer slides smoothly. Must pick up, cannot deliver.',\000a     75, 1, '142x65cm',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     51.5074, -0.1278, 2, 2),\000a\000a    (5, 'Yamaha FG800 Acoustic Guitar',\000a     'Beautiful Yamaha acoustic guitar, rich sound, includes soft case and extra strings',\000a     'Beautiful Yamaha acoustic guitar, rich sound, includes soft case and extra strings. Well maintained with great intonation and action. Perfect for beginners or intermediate players.',\000a     220, 1, 'Full Size',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     48.8566, 2.3522, 6, 1),\000a\000a    (6, 'Vintage Mahogany Coffee Table - Mid-Century',\000a     'Authentic mid-century mahogany coffee table, some wear consistent with age',\000a     'Authentic mid-century mahogany coffee table, some wear consistent with age. Beautiful grain and solid construction. Tapered legs with brass feet. A true vintage piece.',\000a     325, 2, '120x60x45cm',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     35.6762, 139.6503, 2, 3),\000a\000a    (7, 'PlayStation 5 Disc Edition with Extra Controller',\000a     'PS5 disc version, bought 6 months ago, includes 2 controllers and 3 games',\000a     'PS5 disc version, bought 6 months ago, includes 2 controllers and 3 games. In perfect working condition. Games included are Spider-Man, God of War, and FIFA 23.',\000a     450, 1, 'Standard',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     37.7749, -122.4194, 1, 1),\000a\000a    (8, 'Canon EOS Rebel T7 DSLR Camera Kit',\000a     'Complete kit with 18-55mm lens, carrying case, 32GB SD card, and extra battery',\000a     'Complete kit with 18-55mm lens, carrying case, 32GB SD card, and extra battery. Perfect starter DSLR with low shutter count. Original packaging included.',\000a     380, 1, 'Standard',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     52.5200, 13.4050, 1, 2),\000a\000a    (9, 'Collection of 50+ Classic Rock Vinyl Records',\000a     'Collection includes albums from Pink Floyd, Led Zeppelin, The Rolling Stones, and more',\000a     'Collection includes albums from Pink Floyd, Led Zeppelin, The Rolling Stones, and more. All in playable condition with original sleeves. Some collector editions included.',\000a     275, 1, '12 inch',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     55.7558, 37.6173, 8, 2),\000a\000a    (10, 'MacBook Pro 2021 14-inch M1 Pro',\000a     'M1 Pro chip, 16GB RAM, 512GB SSD, AppleCare+ until 2024, includes charger and case',\000a     'M1 Pro chip, 16GB RAM, 512GB SSD, AppleCare+ until 2024, includes charger and case. Like-new condition with no scratches. Original box and packaging included.',\000a     1499, 3, '14 inch',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     25.2744, 55.3089, 4, 1)"; expected "identifier"; SQL statement:
-INSERT INTO listing (
-    id,
-    title,
-    brief_description,
-    full_description,
-    price,
-    sale_status,
-    size,
-    created_at,
-    updated_at,
-    latitude,
-    longitude,
-    categories_id,
-    condition_id,
-)
-VALUES
-    (1, 'Genuine Leather Vintage Motorcycle Jacket',
-     'Classic black leather motorcycle jacket from the 90s, minimal wear',
-     'Classic black leather motorcycle jacket from the 90s, minimal wear. Great vintage condition with authentic detailing and sturdy zippers. Perfect for motorcycle enthusiasts or vintage fashion lovers.',
-     199, 1, 'L',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     40.7128, -74.0060, 3, 2,),
-
-    (2, 'Trek Mountain Bike - Great Condition',
-     '2022 Trek Marlin 7, barely used, comes with water bottle holder',
-     '2022 Trek Marlin 7, barely used, comes with water bottle holder. Front suspension, disc brakes, and Shimano components. Perfect for trails or commuting with excellent handling.',
-     450, 1, 'Medium Frame',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     34.0522, -118.2437, 5, 1),
-
-    (3, 'iPhone 13 Pro - 256GB - Midnight Blue',
-     'Used for 1 year, minor scratches, 89% battery health, includes charger and case',
-     'Used for 1 year, minor scratches, 89% battery health, includes charger and case. Unlocked for all carriers. Face ID works perfectly and all features function as expected.',
-     699, 1, '6.1 inch',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     41.8781, -87.6298, 7, 2),
-
-    (4, 'IKEA MALM Desk - White',
-     'White IKEA MALM desk, assembled, 2 years old, some minor scratches',
-     'White IKEA MALM desk, assembled, 2 years old, some minor scratches. Solid construction with plenty of workspace. Drawer slides smoothly. Must pick up, cannot deliver.',
-     75, 1, '142x65cm',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     51.5074, -0.1278, 2, 2),
-
-    (5, 'Yamaha FG800 Acoustic Guitar',
-     'Beautiful Yamaha acoustic guitar, rich sound, includes soft case and extra strings',
-     'Beautiful Yamaha acoustic guitar, rich sound, includes soft case and extra strings. Well maintained with great intonation and action. Perfect for beginners or intermediate players.',
-     220, 1, 'Full Size',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     48.8566, 2.3522, 6, 1),
-
-    (6, 'Vintage Mahogany Coffee Table - Mid-Century',
-     'Authentic mid-century mahogany coffee table, some wear consistent with age',
-     'Authentic mid-century mahogany coffee table, some wear consistent with age. Beautiful grain and solid construction. Tapered legs with brass feet. A true vintage piece.',
-     325, 2, '120x60x45cm',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     35.6762, 139.6503, 2, 3),
-
-    (7, 'PlayStation 5 Disc Edition with Extra Controller',
-     'PS5 disc version, bought 6 months ago, includes 2 controllers and 3 games',
-     'PS5 disc version, bought 6 months ago, includes 2 controllers and 3 games. In perfect working condition. Games included are Spider-Man, God of War, and FIFA 23.',
-     450, 1, 'Standard',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     37.7749, -122.4194, 1, 1),
-
-    (8, 'Canon EOS Rebel T7 DSLR Camera Kit',
-     'Complete kit with 18-55mm lens, carrying case, 32GB SD card, and extra battery',
-     'Complete kit with 18-55mm lens, carrying case, 32GB SD card, and extra battery. Perfect starter DSLR with low shutter count. Original packaging included.',
-     380, 1, 'Standard',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     52.5200, 13.4050, 1, 2),
-
-    (9, 'Collection of 50+ Classic Rock Vinyl Records',
-     'Collection includes albums from Pink Floyd, Led Zeppelin, The Rolling Stones, and more',
-     'Collection includes albums from Pink Floyd, Led Zeppelin, The Rolling Stones, and more. All in playable condition with original sleeves. Some collector editions included.',
-     275, 1, '12 inch',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     55.7558, 37.6173, 8, 2),
-
-    (10, 'MacBook Pro 2021 14-inch M1 Pro',
-     'M1 Pro chip, 16GB RAM, 512GB SSD, AppleCare+ until 2024, includes charger and case',
-     'M1 Pro chip, 16GB RAM, 512GB SSD, AppleCare+ until 2024, includes charger and case. Like-new condition with no scratches. Original box and packaging included.',
-     1499, 3, '14 inch',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     25.2744, 55.3089, 4, 1) [42001-220]
-2025-04-01 11:45:37 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "INSERT INTO listing (\000a    title,\000a    brief_description,\000a    full_description,\000a    price,\000a    sale_status,\000a    size,\000a    created_at,\000a    updated_at,\000a    latitude,\000a    longitude,\000a    categories_id,\000a    condition_id,\000a[*])\000aVALUES\000a    ('Genuine Leather Vintage Motorcycle Jacket',\000a     'Classic black leather motorcycle jacket from the 90s, minimal wear',\000a     'Classic black leather motorcycle jacket from the 90s, minimal wear. Great vintage condition with authentic detailing and sturdy zippers. Perfect for motorcycle enthusiasts or vintage fashion lovers.',\000a     199, 1, 'L',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     40.7128, -74.0060, 3, 2,),\000a\000a    ('Trek Mountain Bike - Great Condition',\000a     '2022 Trek Marlin 7, barely used, comes with water bottle holder',\000a     '2022 Trek Marlin 7, barely used, comes with water bottle holder. Front suspension, disc brakes, and Shimano components. Perfect for trails or commuting with excellent handling.',\000a     450, 1, 'Medium Frame',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     34.0522, -118.2437, 5, 1),\000a\000a    ('iPhone 13 Pro - 256GB - Midnight Blue',\000a     'Used for 1 year, minor scratches, 89% battery health, includes charger and case',\000a     'Used for 1 year, minor scratches, 89% battery health, includes charger and case. Unlocked for all carriers. Face ID works perfectly and all features function as expected.',\000a     699, 1, '6.1 inch',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     41.8781, -87.6298, 7, 2),\000a\000a    ('IKEA MALM Desk - White',\000a     'White IKEA MALM desk, assembled, 2 years old, some minor scratches',\000a     'White IKEA MALM desk, assembled, 2 years old, some minor scratches. Solid construction with plenty of workspace. Drawer slides smoothly. Must pick up, cannot deliver.',\000a     75, 1, '142x65cm',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     51.5074, -0.1278, 2, 2),\000a\000a    ('Yamaha FG800 Acoustic Guitar',\000a     'Beautiful Yamaha acoustic guitar, rich sound, includes soft case and extra strings',\000a     'Beautiful Yamaha acoustic guitar, rich sound, includes soft case and extra strings. Well maintained with great intonation and action. Perfect for beginners or intermediate players.',\000a     220, 1, 'Full Size',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     48.8566, 2.3522, 6, 1),\000a\000a    ('Vintage Mahogany Coffee Table - Mid-Century',\000a     'Authentic mid-century mahogany coffee table, some wear consistent with age',\000a     'Authentic mid-century mahogany coffee table, some wear consistent with age. Beautiful grain and solid construction. Tapered legs with brass feet. A true vintage piece.',\000a     325, 2, '120x60x45cm',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     35.6762, 139.6503, 2, 3),\000a\000a    ('PlayStation 5 Disc Edition with Extra Controller',\000a     'PS5 disc version, bought 6 months ago, includes 2 controllers and 3 games',\000a     'PS5 disc version, bought 6 months ago, includes 2 controllers and 3 games. In perfect working condition. Games included are Spider-Man, God of War, and FIFA 23.',\000a     450, 1, 'Standard',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     37.7749, -122.4194, 1, 1),\000a\000a    ('Canon EOS Rebel T7 DSLR Camera Kit',\000a     'Complete kit with 18-55mm lens, carrying case, 32GB SD card, and extra battery',\000a     'Complete kit with 18-55mm lens, carrying case, 32GB SD card, and extra battery. Perfect starter DSLR with low shutter count. Original packaging included.',\000a     380, 1, 'Standard',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     52.5200, 13.4050, 1, 2),\000a\000a    ('Collection of 50+ Classic Rock Vinyl Records',\000a     'Collection includes albums from Pink Floyd, Led Zeppelin, The Rolling Stones, and more',\000a     'Collection includes albums from Pink Floyd, Led Zeppelin, The Rolling Stones, and more. All in playable condition with original sleeves. Some collector editions included.',\000a     275, 1, '12 inch',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     55.7558, 37.6173, 8, 2),\000a\000a    ('MacBook Pro 2021 14-inch M1 Pro',\000a     'M1 Pro chip, 16GB RAM, 512GB SSD, AppleCare+ until 2024, includes charger and case',\000a     'M1 Pro chip, 16GB RAM, 512GB SSD, AppleCare+ until 2024, includes charger and case. Like-new condition with no scratches. Original box and packaging included.',\000a     1499, 3, '14 inch',\000a     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,\000a     25.2744, 55.3089, 4, 1)"; expected "identifier"; SQL statement:
-INSERT INTO listing (
-    title,
-    brief_description,
-    full_description,
-    price,
-    sale_status,
-    size,
-    created_at,
-    updated_at,
-    latitude,
-    longitude,
-    categories_id,
-    condition_id,
-)
-VALUES
-    ('Genuine Leather Vintage Motorcycle Jacket',
-     'Classic black leather motorcycle jacket from the 90s, minimal wear',
-     'Classic black leather motorcycle jacket from the 90s, minimal wear. Great vintage condition with authentic detailing and sturdy zippers. Perfect for motorcycle enthusiasts or vintage fashion lovers.',
-     199, 1, 'L',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     40.7128, -74.0060, 3, 2,),
-
-    ('Trek Mountain Bike - Great Condition',
-     '2022 Trek Marlin 7, barely used, comes with water bottle holder',
-     '2022 Trek Marlin 7, barely used, comes with water bottle holder. Front suspension, disc brakes, and Shimano components. Perfect for trails or commuting with excellent handling.',
-     450, 1, 'Medium Frame',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     34.0522, -118.2437, 5, 1),
-
-    ('iPhone 13 Pro - 256GB - Midnight Blue',
-     'Used for 1 year, minor scratches, 89% battery health, includes charger and case',
-     'Used for 1 year, minor scratches, 89% battery health, includes charger and case. Unlocked for all carriers. Face ID works perfectly and all features function as expected.',
-     699, 1, '6.1 inch',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     41.8781, -87.6298, 7, 2),
-
-    ('IKEA MALM Desk - White',
-     'White IKEA MALM desk, assembled, 2 years old, some minor scratches',
-     'White IKEA MALM desk, assembled, 2 years old, some minor scratches. Solid construction with plenty of workspace. Drawer slides smoothly. Must pick up, cannot deliver.',
-     75, 1, '142x65cm',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     51.5074, -0.1278, 2, 2),
-
-    ('Yamaha FG800 Acoustic Guitar',
-     'Beautiful Yamaha acoustic guitar, rich sound, includes soft case and extra strings',
-     'Beautiful Yamaha acoustic guitar, rich sound, includes soft case and extra strings. Well maintained with great intonation and action. Perfect for beginners or intermediate players.',
-     220, 1, 'Full Size',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     48.8566, 2.3522, 6, 1),
-
-    ('Vintage Mahogany Coffee Table - Mid-Century',
-     'Authentic mid-century mahogany coffee table, some wear consistent with age',
-     'Authentic mid-century mahogany coffee table, some wear consistent with age. Beautiful grain and solid construction. Tapered legs with brass feet. A true vintage piece.',
-     325, 2, '120x60x45cm',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     35.6762, 139.6503, 2, 3),
-
-    ('PlayStation 5 Disc Edition with Extra Controller',
-     'PS5 disc version, bought 6 months ago, includes 2 controllers and 3 games',
-     'PS5 disc version, bought 6 months ago, includes 2 controllers and 3 games. In perfect working condition. Games included are Spider-Man, God of War, and FIFA 23.',
-     450, 1, 'Standard',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     37.7749, -122.4194, 1, 1),
-
-    ('Canon EOS Rebel T7 DSLR Camera Kit',
-     'Complete kit with 18-55mm lens, carrying case, 32GB SD card, and extra battery',
-     'Complete kit with 18-55mm lens, carrying case, 32GB SD card, and extra battery. Perfect starter DSLR with low shutter count. Original packaging included.',
-     380, 1, 'Standard',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     52.5200, 13.4050, 1, 2),
-
-    ('Collection of 50+ Classic Rock Vinyl Records',
-     'Collection includes albums from Pink Floyd, Led Zeppelin, The Rolling Stones, and more',
-     'Collection includes albums from Pink Floyd, Led Zeppelin, The Rolling Stones, and more. All in playable condition with original sleeves. Some collector editions included.',
-     275, 1, '12 inch',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     55.7558, 37.6173, 8, 2),
-
-    ('MacBook Pro 2021 14-inch M1 Pro',
-     'M1 Pro chip, 16GB RAM, 512GB SSD, AppleCare+ until 2024, includes charger and case',
-     'M1 Pro chip, 16GB RAM, 512GB SSD, AppleCare+ until 2024, includes charger and case. Like-new condition with no scratches. Original box and packaging included.',
-     1499, 3, '14 inch',
-     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
-     25.2744, 55.3089, 4, 1) [42001-220]
-2025-04-01 11:49:38 jdbc[6]: exception
-java.sql.SQLClientInfoException: Client info name 'ApplicationName' not supported.
-	at org.h2.jdbc.JdbcConnection.setClientInfo(JdbcConnection.java:1573)
-	at com.intellij.database.remote.jdbc.impl.RemoteConnectionImpl.setClientInfo(RemoteConnectionImpl.java:469)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(UnicastServerRef.java:360)
-	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:200)
-	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:197)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:714)
-	at java.rmi/sun.rmi.transport.Transport.serviceCall(Transport.java:196)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:598)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:844)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:721)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
-	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:720)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
-	at java.base/java.lang.Thread.run(Thread.java:1583)
-2025-04-01 11:54:32 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "INSERT INTO users (id, email, firstname, password, phonenumber, surname)\000aVALUES\000a    (110, 'jennifer.clark@example.com', 'Jennifer', 'hashed_password_10', '555-789-0123', 'Clark',[*])"; expected "DEFAULT, INTERSECTS (, NOT, EXISTS, UNIQUE, INTERSECTS"; SQL statement:
-INSERT INTO users (id, email, firstname, password, phonenumber, surname)
-VALUES
-    (110, 'jennifer.clark@example.com', 'Jennifer', 'hashed_password_10', '555-789-0123', 'Clark',) [42001-220]
+2025-04-01 13:13:45.379464+02:00 database: close
+org.h2.message.DbException: IO Exception: "Closing" [90028-232]
+	at org.h2.message.DbException.get(DbException.java:212)
+	at org.h2.mvstore.db.Store.close(Store.java:374)
+	at org.h2.engine.Database.closeOpenFilesAndUnlock(Database.java:1292)
+	at org.h2.engine.Database.closeImpl(Database.java:1254)
+	at org.h2.engine.Database.close(Database.java:1173)
+	at org.h2.engine.Database.onShutdown(Database.java:1158)
+	at org.h2.engine.OnExitDatabaseCloser.onShutdown(OnExitDatabaseCloser.java:85)
+	at org.h2.engine.OnExitDatabaseCloser.run(OnExitDatabaseCloser.java:114)
+Caused by: org.h2.jdbc.JdbcSQLNonTransientException: IO Exception: "Closing" [90028-232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:566)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	... 8 more
+Caused by: org.h2.mvstore.MVStoreException: java.lang.AssertionError [2.3.232/3]
+	at org.h2.mvstore.DataUtils.newMVStoreException(DataUtils.java:996)
+	at org.h2.mvstore.MVStore.executeFilestoreOperation(MVStore.java:926)
+	at org.h2.mvstore.RandomAccessStore.compactMoveChunks(RandomAccessStore.java:463)
+	at org.h2.mvstore.RandomAccessStore.compactStore(RandomAccessStore.java:443)
+	at org.h2.mvstore.FileStore.compactStore(FileStore.java:890)
+	at org.h2.mvstore.FileStore.stop(FileStore.java:275)
+	at org.h2.mvstore.MVStore.closeStore(MVStore.java:693)
+	at org.h2.mvstore.MVStore.close(MVStore.java:643)
+	at org.h2.mvstore.db.Store.close(Store.java:364)
+	... 6 more
+Caused by: java.lang.AssertionError
+	at org.h2.mvstore.RandomAccessStore.moveChunkInside(RandomAccessStore.java:630)
+	at org.h2.mvstore.RandomAccessStore.compactMoveChunks(RandomAccessStore.java:569)
+	at org.h2.mvstore.RandomAccessStore.compactMoveChunks(RandomAccessStore.java:481)
+	at org.h2.mvstore.RandomAccessStore.lambda$compactMoveChunks$1(RandomAccessStore.java:468)
+	at org.h2.mvstore.FileStore.executeFileStoreOperation(FileStore.java:1893)
+	at org.h2.mvstore.MVStore.executeFilestoreOperation(MVStore.java:922)
+	... 13 more
