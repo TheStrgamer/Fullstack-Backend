@@ -1,2 +1,7 @@
 .idea/*
 marketplace.iml
+.DS_Store
+.env
+*.db
+target/*
+data/database/*
