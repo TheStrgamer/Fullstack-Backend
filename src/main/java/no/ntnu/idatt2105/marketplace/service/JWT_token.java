@@ -11,15 +11,21 @@ import java.util.Date;
 
 import io.jsonwebtoken.security.Keys;
 import no.ntnu.idatt2105.marketplace.model.user.User;
+import no.ntnu.idatt2105.marketplace.repo.UserRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class JWT_token {
 
-  private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-  private static final long EXPIRATION_TIME = 5 * 60 * 1000;
+  @Autowired
+  private UserRepo userRepo;
+  private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+  private static final long EXPIRATION_TIME = 15 * 60 * 1000;
 
   public String generateJwtToken(User user) {
     return Jwts.builder()
-        .setSubject(user.getEmail())
+        .setSubject(user.getIdAsString())
         .setIssuedAt(new Date())
         .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
         .signWith(key)
@@ -33,12 +39,15 @@ public class JWT_token {
     } catch (ExpiredJwtException e) {
       System.out.println("Token expired");
     } catch (UnsupportedJwtException | MalformedJwtException e) {
-      System.out.println("Invalid token");
+      System.out.println("Invalid token format");
+    } catch (IllegalArgumentException e) {
+      System.out.println("Token is empty or null");
     }
     return false;
   }
 
-  public String extractEmailFromJwt(String token) {
+
+  public String extractIdFromJwt(String token) {
     try {
       Claims claims = Jwts.parser()
           .setSigningKey(key)
@@ -50,7 +59,10 @@ public class JWT_token {
     }
   }
   public User getUserByToken(String token) {
-    String email = extractEmailFromJwt(token);
-    return null; //TODO: implement this
+    String id = extractIdFromJwt(token);
+    if (id == null) {
+      return null;
+    }
+    return userRepo.findById(Integer.parseInt(id)).orElse(null);
   }
 }

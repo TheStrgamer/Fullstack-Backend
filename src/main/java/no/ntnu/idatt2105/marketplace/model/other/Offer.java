@@ -14,13 +14,13 @@ public class Offer {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
 
-  @OneToOne
-  @JoinColumn(name = "users_id", nullable = false)
-  private User buyer_id;
+  @ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User buyer;
 
-  @OneToOne
+  @ManyToOne
   @JoinColumn(name = "listing_id", nullable = false)
-  private Listing listing_id;
+  private Listing listing;
 
 
   @Column(nullable = false)
@@ -40,8 +40,8 @@ public class Offer {
 
   public Offer(int id, User buyer_id, Listing listing_id, float current_offer, int status, Date created_at, Date updated_at) {
     this.id = id;
-    this.buyer_id = buyer_id;
-    this.listing_id = listing_id;
+    this.buyer = buyer_id;
+    this.listing = listing_id;
     this.current_offer = current_offer;
     this.status = status;
     this.created_at = created_at;
@@ -60,19 +60,14 @@ public class Offer {
   }
 
   public User getBuyer_id() {
-    return buyer_id;
+    return buyer;
   }
-
-  public void setBuyer_id(User buyer_id) {
-    this.buyer_id = buyer_id;
-  }
-
   public Listing getListing_id() {
-    return listing_id;
+    return listing;
   }
 
   public void setListing_id(Listing listing_id) {
-    this.listing_id = listing_id;
+    this.listing = listing_id;
   }
 
   public float getCurrent_offer() {
@@ -85,10 +80,6 @@ public class Offer {
 
   public Date getCreated_at() {
     return created_at;
-  }
-
-  public void setCreated_at(Date created_at) {
-    this.created_at = created_at;
   }
 
   public Date getUpdated_at() {
