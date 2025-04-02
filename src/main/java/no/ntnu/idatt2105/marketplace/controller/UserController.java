@@ -1,17 +1,17 @@
 package no.ntnu.idatt2105.marketplace.controller;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+
+import jdk.jshell.spi.ExecutionControlProvider;
+import no.ntnu.idatt2105.marketplace.dto.user.*;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
-import no.ntnu.idatt2105.marketplace.service.BCryptHasher;
-import no.ntnu.idatt2105.marketplace.service.JWT_token;
+import no.ntnu.idatt2105.marketplace.service.security.BCryptHasher;
+import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
+import no.ntnu.idatt2105.marketplace.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import no.ntnu.idatt2105.marketplace.model.user.User;
 
@@ -21,6 +21,9 @@ public class UserController {
 
   @Autowired
   private UserRepo userRepo;
+
+  @Autowired
+  private UserService userService;
 
   private final BCryptHasher hasher = new BCryptHasher();
   private final JWT_token jwt = new JWT_token();
@@ -54,6 +57,17 @@ public class UserController {
   public String login(@RequestBody User user) {
     System.out.println("Logging in user: " + user.getEmail() + " " + user.getPassword());
     return authenticate(user.getEmail(), user.getPassword());
+  }
+
+  @PutMapping("/update/{id}")
+  public ResponseEntity<?> update(@PathVariable int id, @RequestBody UserUpdate userUpdate) {
+    try {
+      User updatedUser = userService.updateUser(id, userUpdate);
+      return ResponseEntity.ok(updatedUser);
+
+    } catch (Exception e) {
+      return ResponseEntity.status(404).body(e.getMessage());
+    }
   }
 
   @GetMapping("/validate")
