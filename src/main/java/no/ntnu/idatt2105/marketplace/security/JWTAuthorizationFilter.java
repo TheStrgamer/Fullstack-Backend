@@ -14,7 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.io.IOException;
 import java.util.Collections;
 
-import no.ntnu.idatt2105.marketplace.service.JWT_token;
+import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 
 public class JWTAuthorizationFilter extends OncePerRequestFilter {

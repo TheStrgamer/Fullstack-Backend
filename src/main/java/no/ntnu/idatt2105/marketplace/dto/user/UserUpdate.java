@@ -2,8 +2,6 @@ package no.ntnu.idatt2105.marketplace.dto.user;
 
 import no.ntnu.idatt2105.marketplace.model.other.Images;
 
-import javax.print.DocFlavor;
-
 public class UserUpdate {
 
   private String firstname;

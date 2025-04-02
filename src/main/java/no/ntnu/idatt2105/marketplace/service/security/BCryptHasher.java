@@ -1,4 +1,4 @@
-package no.ntnu.idatt2105.marketplace.service;
+package no.ntnu.idatt2105.marketplace.service.security;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class BCryptHasher {
