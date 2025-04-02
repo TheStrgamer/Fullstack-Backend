@@ -1,6 +1,7 @@
 package no.ntnu.idatt2105.marketplace.model.listing;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "condition")
@@ -12,6 +13,10 @@ public class Condition {
 
   @Column (nullable = false, unique = true)
   private String name;
+
+  @OneToMany(mappedBy = "condition")
+  private List<Listing> listings;
+
 
 
   // constructor

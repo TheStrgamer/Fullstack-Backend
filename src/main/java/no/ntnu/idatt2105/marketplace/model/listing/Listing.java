@@ -1,8 +1,12 @@
 package no.ntnu.idatt2105.marketplace.model.listing;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.List;
+import no.ntnu.idatt2105.marketplace.model.other.Images;
+import no.ntnu.idatt2105.marketplace.model.other.Offer;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 
 @Entity
@@ -13,16 +17,16 @@ public class Listing {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
 
-  @OneToOne
-  @JoinColumn(name = "users_id", nullable = false)
-  private User user_id;
+  @ManyToOne
+  @JoinColumn(name = "creator", nullable = false)
+  private User creator;
 
-  @OneToOne
-  @JoinColumn(name = "categories_id")
+  @ManyToOne
+  @JoinColumn(name = "category", nullable = false)
   private Categories category;
 
-  @OneToOne
-  @JoinColumn(name = "condition_id")
+  @ManyToOne
+  @JoinColumn(name = "condition", nullable = false)
   private Condition condition;
 
   @Column (nullable = false)
@@ -55,12 +59,24 @@ public class Listing {
   @Column (nullable = false)
   private double longitude;
 
+  @ManyToMany(mappedBy = "favorites")
+  private List<User> user_favorites;
+
+  @ManyToMany(mappedBy = "history")
+  private List<User> user_history;
+
+  @OneToMany(mappedBy = "listing")
+  private List<Offer> offers;
+
+  @OneToMany(mappedBy = "listing")
+  private List<Images> images;
+
   // constructor
   public Listing() {}
 
   public Listing(int id, User user_id, Categories category, Condition condition, String title, int sale_status, int price, String brief_description, String full_description, String size, Date created_at, Date updated_at, double latitude, double longitude) {
     this.id = id;
-    this.user_id = user_id;
+    this.creator = user_id;
     this.category = category;
     this.condition = condition;
     this.title = title;
@@ -89,12 +105,8 @@ public class Listing {
     this.id = id;
   }
 
-  public User getUser_id() {
-    return user_id;
-  }
-
-  public void setUser_id(User user_id) {
-    this.user_id = user_id;
+  public User getCreator() {
+    return creator;
   }
 
   public Categories getCategory() {
@@ -192,4 +204,17 @@ public class Listing {
   public void setLongitude(double longitude) {
     this.longitude = longitude;
   }
+
+  public List<Images> getImages() {
+    return images;
+  }
+
+  public void addImage(Images image) {
+    images.add(image);
+  }
+
+  public void removeImage(Images image) {
+    images.remove(image);
+  }
+
 }
