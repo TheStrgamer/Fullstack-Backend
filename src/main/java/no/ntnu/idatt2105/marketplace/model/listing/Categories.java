@@ -1,6 +1,7 @@
 package no.ntnu.idatt2105.marketplace.model.listing;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity(name = "categories")
 public class Categories {
@@ -19,6 +20,9 @@ public class Categories {
   @JoinColumn(name = "categories_id")
   private Categories parent_category;
 
+  @OneToMany(mappedBy = "category")
+  private List<Listing> listings;
+
   // constructor
   public Categories() {}
 
@@ -30,7 +34,6 @@ public class Categories {
   }
 
   // gettes and setters
-
 
   public int getId() {
     return id;
@@ -62,5 +65,9 @@ public class Categories {
 
   public void setParent_category(Categories parent_category) {
     this.parent_category = parent_category;
+  }
+
+  public List<Listing> getListings() {
+    return listings;
   }
 }
