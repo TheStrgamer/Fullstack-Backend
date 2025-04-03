@@ -34,6 +34,7 @@ public class JWT_token {
             .signWith(key)
             .compact();
     return new TokenResponseObject(token, expirationDate.getTime());
+  }
 
   public void validateJwtToken(String token) {
     try {
