@@ -11,11 +11,12 @@ import java.util.Date;
 
 import io.jsonwebtoken.security.Keys;
 import no.ntnu.idatt2105.marketplace.model.user.User;
+import org.springframework.stereotype.Service;
 
+@Service
 public class JWT_token {
-
-  private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-  private static final long EXPIRATION_TIME = 5 * 60 * 1000;
+  private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+  private static final long EXPIRATION_TIME = 15 * 60 * 1000;
 
   public String generateJwtToken(User user) {
     return Jwts.builder()
@@ -33,10 +34,13 @@ public class JWT_token {
     } catch (ExpiredJwtException e) {
       System.out.println("Token expired");
     } catch (UnsupportedJwtException | MalformedJwtException e) {
-      System.out.println("Invalid token");
+      System.out.println("Invalid token format");
+    } catch (IllegalArgumentException e) {
+      System.out.println("Token is empty or null");
     }
     return false;
   }
+
 
   public String extractEmailFromJwt(String token) {
     try {
