@@ -40,4 +40,9 @@ public class ListingController {
     public List<Listing> getListingCategories() {
         return listingRepo.findAll();
     }
+
+    @GetMapping("/conditions")
+    public List<Listing> getListingConditions() {
+        return listingRepo.findAll();
+    }
 }
