@@ -61,7 +61,6 @@ public class UserController {
   }
 
 
-
   public String authenticate(String email, String password) {
     Optional<User> user = userRepo.findByEmail(email);
     if (user.isEmpty() || !hasher.checkPassword(password, user.get().getPassword())) {
@@ -97,17 +96,6 @@ public class UserController {
     return authenticate(user.getEmail(), user.getPassword());
   }
 
-  @PutMapping("/update/{id}")
-  public ResponseEntity<?> update(@PathVariable int id, @RequestBody UserUpdate userUpdate) {
-    try {
-      User updatedUser = userService.updateUser(id, userUpdate);
-      return ResponseEntity.ok(updatedUser);
-
-    } catch (Exception e) {
-      return ResponseEntity.status(404).body(e.getMessage());
-    }
-  }
-
   @GetMapping("/validate")
   public boolean validate(@RequestHeader("Authorization") String authorizationHeader) {
     if (!authorizationHeader.startsWith("Bearer ")) {
@@ -119,11 +107,29 @@ public class UserController {
     return jwt.validateJwtToken(sessionToken);
   }
 
+  @PutMapping("/update/{id}")
+  public ResponseEntity<?> update(@PathVariable int id, @RequestBody UserUpdate userUpdate) {
+    try {
+      User updatedUser = userService.updateUser(id, userUpdate);
+      return ResponseEntity.status(HttpStatus.OK).build();
+
+    } catch (Exception e) {
+      System.out.println("Error: " + e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  /**
+   * getUserInfo function that is mapped to the /my_account endpoint.
+   * goal: return userinfo to display on profile
+   * @param authorizationHeader header field containing the token used for verifying the user
+   * @return user info as an UserResponseObject
+   */
   @PostMapping("/my_account")
-  public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String authorizationHeader) {
+  public ResponseEntity<UserResponseObject> getUserInfo(@RequestHeader("Authorization") String authorizationHeader) {
     if (!authorizationHeader.startsWith("Bearer ")) {
       System.out.println("Invalid Authorization header");
-      return ResponseEntity.status(401).body("Invalid token");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     String token = authorizationHeader.substring(7);
@@ -133,23 +139,29 @@ public class UserController {
     Optional<User> user = userRepo.findByEmail(email);
 
     if (user.isEmpty()) {
-      return ResponseEntity.status(404).body("No User Found");
+      System.out.println("No user found with given email");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+    UserResponseObject response = new UserResponseObject(user.get(), true);
 
-    return ResponseEntity.ok(user.get());
+    return ResponseEntity.ok(response);
   }
 
   // TODO: REMOVE, ONLY FOR DEBUG
   @GetMapping("")
-  public ResponseEntity<?> getUserInfoByEmail(@RequestParam String email) {
+  public ResponseEntity<UserResponseObject> getUserInfoByEmail(@RequestParam String email) {
     Optional<User> user = userRepo.findByEmail(email);
 
     if (user.isEmpty()) {
-      return ResponseEntity.status(404).body("No User Found");
+      System.out.println("No user found with given email");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     user.get().setPassword("");
-    return ResponseEntity.ok(user.get());
+
+    UserResponseObject response = new UserResponseObject(user.get(), true);
+
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/") //TODO: remove this endpoint, for testing purposes only
