@@ -7,6 +7,7 @@ import no.ntnu.idatt2105.marketplace.exception.PhonenumberNotAvailibleException;
 import no.ntnu.idatt2105.marketplace.exception.TokenExpiredException;
 import no.ntnu.idatt2105.marketplace.exception.UserNotFoundException;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
+import no.ntnu.idatt2105.marketplace.responseobjects.TokenResponseObject;
 import no.ntnu.idatt2105.marketplace.responseobjects.UserResponseObject;
 import no.ntnu.idatt2105.marketplace.service.BCryptHasher;
 import no.ntnu.idatt2105.marketplace.service.JWT_token;
@@ -61,7 +62,7 @@ public class UserController {
     return validateEmail(user.getEmail()) && validatePassword(user.getPassword()) && validatePhoneNumber(user.getPhonenumber()) && validateName(user.getFirstname()) && validateName(user.getSurname());
   }
 
-  public String authenticate(String email, String password) {
+  public TokenResponseObject authenticate(String email, String password) {
     Optional<User> user = userRepo.findByEmail(email);
     if (user.isEmpty()) {
       throw new UserNotFoundException("No user found with given email and password");
@@ -108,9 +109,9 @@ public class UserController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<String> login(@RequestBody User user) {
+  public ResponseEntity<?> login(@RequestBody User user) {
     System.out.println("Logging in user with: " + user.getEmail() + " " + user.getPassword());
-    String token;
+    TokenResponseObject token;
     try {
       token = authenticate(user.getEmail(), user.getPassword());
     }
