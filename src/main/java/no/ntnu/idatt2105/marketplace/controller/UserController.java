@@ -70,7 +70,7 @@ public class UserController {
     if (!hasher.checkPassword(password, user.get().getPassword())) {
       throw new IncorrectPasswordException("Incorrect password for given email");
     }
-    System.out.println("User found with given email and password");
+    System.out.println("User with id " + user.get().getIdAsString() + " found with given email and password");
     return jwt.generateJwtToken(user.get());
   }
 
@@ -151,10 +151,10 @@ public class UserController {
   public Iterable<User> getAllUsers() {
     return userRepo.findAll();
   }
-  @GetMapping("/{email}/info")
+  @GetMapping("/{id}/info")
   public ResponseEntity<UserResponseObject> getUserInfo(
       @RequestHeader("Authorization") String authorizationHeader,
-      @PathVariable String email) {
+      @PathVariable String id) {
     try {
       if (!authorizationHeader.startsWith("Bearer ")) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -164,10 +164,10 @@ public class UserController {
 
       jwt.validateJwtToken(sessionToken);
 
-      String requesterEmail = jwt.extractEmailFromJwt(sessionToken);
-      boolean userRequestingSelf = requesterEmail.equals(email);
+    String requesterId = jwt.extractIdFromJwt(sessionToken);
+    boolean userRequestingSelf = requesterId.equals(id);
 
-      Optional<User> user = userRepo.findByEmail(email);
+      Optional<User> user = userRepo.findById(Integer.parseInt(id));
       if (user.isEmpty()) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
       }
