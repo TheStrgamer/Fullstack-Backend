@@ -1,6 +1,11 @@
 package no.ntnu.idatt2105.marketplace.controller;
 
 import java.util.Optional;
+import no.ntnu.idatt2105.marketplace.exception.EmailNotAvailibleException;
+import no.ntnu.idatt2105.marketplace.exception.IncorrectPasswordException;
+import no.ntnu.idatt2105.marketplace.exception.PhonenumberNotAvailibleException;
+import no.ntnu.idatt2105.marketplace.exception.TokenExpiredException;
+import no.ntnu.idatt2105.marketplace.exception.UserNotFoundException;
 import java.util.concurrent.ExecutionException;
 
 import jdk.jshell.spi.ExecutionControlProvider;
@@ -47,11 +52,17 @@ public class UserController {
   private boolean validateEmail(String email) {
     return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
   }
+  private boolean verifyEmailNotInUse(String email) {
+    return userRepo.findByEmail(email).isEmpty();
+  }
   private boolean validatePassword(String password) {
     return !password.isEmpty();
   }
   private boolean validatePhoneNumber(String phoneNumber) {
     return phoneNumber.matches("^\\d{8}$");
+  }
+  private boolean verifyPhoneNumberNotInUse(String phoneNumber) {
+    return userRepo.findByPhonenumber(phoneNumber).isEmpty();
   }
   private boolean validateName(String name) {
     return name.matches("^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$");
@@ -61,50 +72,90 @@ public class UserController {
   }
 
 
+
   public String authenticate(String email, String password) {
     Optional<User> user = userRepo.findByEmail(email);
-    if (user.isEmpty() || !hasher.checkPassword(password, user.get().getPassword())) {
-      System.out.println("No user found with given email and password");
-      return null;
+    if (user.isEmpty()) {
+      throw new UserNotFoundException("No user found with given email and password");
+    }
+    if (!hasher.checkPassword(password, user.get().getPassword())) {
+      throw new IncorrectPasswordException("Incorrect password for given email");
     }
     System.out.println("User found with given email and password");
     return jwt.generateJwtToken(user.get());
   }
 
   public int register(User user) {
+    if (!verifyEmailNotInUse(user.getEmail())) {
+      System.out.println("Email is already in use");
+      throw new EmailNotAvailibleException("Email is already in use");
+    }
+    if (!verifyPhoneNumberNotInUse(user.getPhonenumber())) {
+      System.out.println("Phone number is already in use");
+      throw new PhonenumberNotAvailibleException("Phone number is already in use");
+    }
     if (!validateUser(user)) {
       System.out.println("Invalid user data");
-      return 1;
+      throw new IllegalArgumentException("Invalid user data");
     }
     user.setPassword(hasher.hashPassword(user.getPassword()));
-    if (userRepo.findByEmail(user.getEmail()).isPresent()) { //TODO add check for other unique fields
-      System.out.println("User already exists");
-      return 1;
-    }
     userRepo.save(user);
     return 0;
   }
 
   @PostMapping("/register")
-  public int registerUser(@RequestBody User user) {
-    return register(user);
+  public ResponseEntity<String> registerUser(@RequestBody User user) {
+    try {
+      register(user);
+      return ResponseEntity.ok("User registered successfully");
+    }
+    catch (IllegalArgumentException e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid user data");
+    } catch (EmailNotAvailibleException e) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already in use");
+    } catch (PhonenumberNotAvailibleException e) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).body("Phone number is already in use");
+    }
+
   }
 
   @PostMapping("/login")
-  public String login(@RequestBody User user) {
-    System.out.println("Logging in user: " + user.getEmail() + " " + user.getPassword());
-    return authenticate(user.getEmail(), user.getPassword());
+  public ResponseEntity<String> login(@RequestBody User user) {
+    System.out.println("Logging in user with: " + user.getEmail() + " " + user.getPassword());
+    String token;
+    try {
+      token = authenticate(user.getEmail(), user.getPassword());
+    }
+    catch (IncorrectPasswordException e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password for given email");
+    }
+    catch (UserNotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No user found with given email and password");
+    }
+    catch (IllegalArgumentException e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid user data");
+    }
+    return ResponseEntity.ok(token);
   }
 
   @GetMapping("/validate")
-  public boolean validate(@RequestHeader("Authorization") String authorizationHeader) {
-    if (!authorizationHeader.startsWith("Bearer ")) {
-      System.out.println("Invalid Authorization header");
-
-      return false;
+  public ResponseEntity<Boolean> validate(@RequestHeader("Authorization") String authorizationHeader) {
+    try {
+      if (!authorizationHeader.startsWith("Bearer ")) {
+        System.out.println("Invalid Authorization header");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      }
+      String sessionToken = authorizationHeader.substring(7);
+      jwt.validateJwtToken(sessionToken);
+      return ResponseEntity.ok(true);
+    } catch (TokenExpiredException e) {
+      System.out.println("Token has expired");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-    String sessionToken = authorizationHeader.substring(7);
-    return jwt.validateJwtToken(sessionToken);
+    catch (IllegalArgumentException e) {
+      System.out.println("Invalid token");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
   }
 
   @PutMapping("/update/{id}")
@@ -172,30 +223,32 @@ public class UserController {
   public ResponseEntity<UserResponseObject> getUserInfo(
       @RequestHeader("Authorization") String authorizationHeader,
       @PathVariable String email) {
+    try {
+      if (!authorizationHeader.startsWith("Bearer ")) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      }
 
-    if (!authorizationHeader.startsWith("Bearer ")) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      String sessionToken = authorizationHeader.substring(7);
+
+      jwt.validateJwtToken(sessionToken);
+
+      String requesterEmail = jwt.extractEmailFromJwt(sessionToken);
+      boolean userRequestingSelf = requesterEmail.equals(email);
+
+      Optional<User> user = userRepo.findByEmail(email);
+      if (user.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+      }
+      UserResponseObject response = new UserResponseObject(user.get(), userRequestingSelf);
+      return ResponseEntity.ok(response);
     }
-
-    String sessionToken = authorizationHeader.substring(7);
-
-    boolean validToken = jwt.validateJwtToken(sessionToken);
-    if (!validToken) {
+    catch (TokenExpiredException e) {
+      System.out.println("Token has expired");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    } catch (IllegalArgumentException e) {
       System.out.println("Invalid token");
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-
-    String requesterEmail = jwt.extractEmailFromJwt(sessionToken);
-    boolean userRequestingSelf = requesterEmail.equals(email);
-
-    Optional<User> user = userRepo.findByEmail(email);
-    if (user.isEmpty()) {
-      System.out.println("No user found with given email");
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-
-    UserResponseObject response = new UserResponseObject(user.get(), userRequestingSelf);
-    return ResponseEntity.ok(response);
   }
 
 
