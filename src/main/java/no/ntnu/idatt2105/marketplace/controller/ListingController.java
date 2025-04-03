@@ -35,4 +35,9 @@ public class ListingController {
             return new ResponseEntity<>("Invalid ID format", HttpStatus.BAD_REQUEST);
         }
     }
+
+    @GetMapping("/categories")
+    public List<Listing> getListingCategories() {
+        return listingRepo.findAll();
+    }
 }
