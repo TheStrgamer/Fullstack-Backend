@@ -81,6 +81,39 @@ public class UserController {
     return jwt.validateJwtToken(sessionToken);
   }
 
+  @PostMapping("/my_account")
+  public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String authorizationHeader) {
+    if (!authorizationHeader.startsWith("Bearer ")) {
+      System.out.println("Invalid Authorization header");
+      return ResponseEntity.status(401).body("Invalid token");
+    }
+
+    String token = authorizationHeader.substring(7);
+
+    String email = jwt.extractEmailFromJwt(token);
+
+    Optional<User> user = userRepo.findByEmail(email);
+
+    if (user.isEmpty()) {
+      return ResponseEntity.status(404).body("No User Found");
+    }
+
+    return ResponseEntity.ok(user.get());
+  }
+
+  // TODO: REMOVE, ONLY FOR DEBUG
+  @GetMapping("")
+  public ResponseEntity<?> getUserInfoByEmail(@RequestParam String email) {
+    Optional<User> user = userRepo.findByEmail(email);
+
+    if (user.isEmpty()) {
+      return ResponseEntity.status(404).body("No User Found");
+    }
+
+    user.get().setPassword("");
+    return ResponseEntity.ok(user.get());
+  }
+
   @GetMapping("/") //TODO: remove this endpoint, for testing purposes only
   public Iterable<User> getAllUsers() {
     return userRepo.findAll();
