@@ -10,6 +10,8 @@ public interface UserRepo extends JpaRepository<User, Integer> {
   // get user by email
   Optional<User> findByEmail(String email);
 
+  Optional<User> findByPhonenumber(String phonenumber);
+
   // save function to save user in bd is included by default
   // usage: UserRepo.save(userObj)
 
