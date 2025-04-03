@@ -11,13 +11,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import java.io.IOException;
 import java.util.Collections;
-
 import no.ntnu.idatt2105.marketplace.service.JWT_token;
-import no.ntnu.idatt2105.marketplace.model.user.User;
-
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
   private static final Logger LOGGER = LogManager.getLogger(JWTAuthorizationFilter.class);
@@ -38,17 +34,16 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
       return;
     }
 
-    String userEmail = validateTokenAndGetUserEmail(token);
-    if (userEmail == null) {
+    String userId = validateTokenAndGetUserId(token);
+    if (userId == null) {
       LOGGER.warn("Invalid or expired token, user not authenticated.");
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
       return;
     }
 
-    LOGGER.info("Token validated for user: {}", userEmail);
+    LOGGER.info("Token validated for user: {}", userId);
 
-    setAuthentication(userEmail);
-
+    setAuthentication(userId);
     filterChain.doFilter(request, response);
   }
 
@@ -61,10 +56,10 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
     return header.substring(7);
   }
 
-  private String validateTokenAndGetUserEmail(final String token) {
+  private String validateTokenAndGetUserId(final String token) {
     try {
       jwtTokenService.validateJwtToken(token);
-      return jwtTokenService.extractEmailFromJwt(token);
+      return jwtTokenService.extractIdFromJwt(token);
     } catch (TokenExpiredException e) {
       LOGGER.warn("Token has expired.");
       return null;
@@ -74,17 +69,15 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
     } catch (Exception e) {
       LOGGER.warn("Token is empty.");
       return null;
-
     }
   }
 
-  private void setAuthentication(String userEmail) {
-    User user = jwtTokenService.getUserByToken(userEmail);
+  private void setAuthentication(String userId) {
     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-        userEmail, null, Collections.emptyList()
+        userId, null, Collections.emptyList()
     );
     SecurityContextHolder.getContext().setAuthentication(auth);
 
-    LOGGER.info("Authentication set for user: {}", userEmail);
+    LOGGER.info("Authentication set for user with id: {}", userId);
   }
 }
