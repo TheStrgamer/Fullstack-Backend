@@ -1,6 +1,10 @@
 package no.ntnu.idatt2105.marketplace.controller;
 
+import no.ntnu.idatt2105.marketplace.model.listing.Categories;
+import no.ntnu.idatt2105.marketplace.model.listing.Condition;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
+import no.ntnu.idatt2105.marketplace.repo.CategoriesRepo;
+import no.ntnu.idatt2105.marketplace.repo.ConditionRepo;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +21,12 @@ import java.util.List;
 public class ListingController {
     @Autowired
     private ListingRepo listingRepo;
+
+    @Autowired
+    private CategoriesRepo CategoriesRepo;
+
+    @Autowired
+    private ConditionRepo ConditionRepo;
 
     @GetMapping("/all")
     public List<Listing> getAllListings() {
@@ -37,12 +47,12 @@ public class ListingController {
     }
 
     @GetMapping("/categories")
-    public List<Listing> getListingCategories() {
-        return listingRepo.findAll();
+    public List<Categories> getListingCategories() {
+        return CategoriesRepo.findAll();
     }
 
     @GetMapping("/conditions")
-    public List<Listing> getListingConditions() {
-        return listingRepo.findAll();
+    public List<Condition> getListingConditions() {
+        return ConditionRepo.findAll();
     }
 }
