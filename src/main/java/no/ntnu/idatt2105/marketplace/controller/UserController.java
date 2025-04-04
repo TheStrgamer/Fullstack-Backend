@@ -14,6 +14,7 @@ import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import no.ntnu.idatt2105.marketplace.service.security.BCryptHasher;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import no.ntnu.idatt2105.marketplace.service.user.UserService;
+import no.ntnu.idatt2105.marketplace.responseobjects.TokenResponseObject;
 import no.ntnu.idatt2105.marketplace.responseobjects.UserResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -71,9 +72,7 @@ public class UserController {
     return validateEmail(user.getEmail()) && validatePassword(user.getPassword()) && validatePhoneNumber(user.getPhonenumber()) && validateName(user.getFirstname()) && validateName(user.getSurname());
   }
 
-
-
-  public String authenticate(String email, String password) {
+  public TokenResponseObject authenticate(String email, String password) {
     Optional<User> user = userRepo.findByEmail(email);
     if (user.isEmpty()) {
       throw new UserNotFoundException("No user found with given email and password");
@@ -81,7 +80,7 @@ public class UserController {
     if (!hasher.checkPassword(password, user.get().getPassword())) {
       throw new IncorrectPasswordException("Incorrect password for given email");
     }
-    System.out.println("User found with given email and password");
+    System.out.println("User with id " + user.get().getIdAsString() + " found with given email and password");
     return jwt.generateJwtToken(user.get());
   }
 
@@ -120,9 +119,9 @@ public class UserController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<String> login(@RequestBody User user) {
+  public ResponseEntity<?> login(@RequestBody User user) {
     System.out.println("Logging in user with: " + user.getEmail() + " " + user.getPassword());
-    String token;
+    TokenResponseObject token;
     try {
       token = authenticate(user.getEmail(), user.getPassword());
     }
@@ -167,9 +166,8 @@ public class UserController {
       }
 
       String token = authorizationHeader.substring(7);
-      String email = jwt.extractEmailFromJwt(token);
 
-      int user_id = userRepo.findByEmail(email).get().getId();
+      int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
 
       userService.updateUser(user_id, userUpdate);
       return ResponseEntity.status(HttpStatus.OK).build();
@@ -195,9 +193,9 @@ public class UserController {
 
     String token = authorizationHeader.substring(7);
 
-    String email = jwt.extractEmailFromJwt(token);
+    int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
 
-    Optional<User> user = userRepo.findByEmail(email);
+    Optional<User> user = userRepo.findById(user_id);
 
     if (user.isEmpty()) {
       System.out.println("No user found with given email");
@@ -229,10 +227,10 @@ public class UserController {
   public Iterable<User> getAllUsers() {
     return userRepo.findAll();
   }
-  @GetMapping("/{email}/info")
+  @GetMapping("/{id}/info")
   public ResponseEntity<UserResponseObject> getUserInfo(
       @RequestHeader("Authorization") String authorizationHeader,
-      @PathVariable String email) {
+      @PathVariable String id) {
     try {
       if (!authorizationHeader.startsWith("Bearer ")) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -242,10 +240,10 @@ public class UserController {
 
       jwt.validateJwtToken(sessionToken);
 
-      String requesterEmail = jwt.extractEmailFromJwt(sessionToken);
-      boolean userRequestingSelf = requesterEmail.equals(email);
+    String requesterId = jwt.extractIdFromJwt(sessionToken);
+    boolean userRequestingSelf = requesterId.equals(id);
 
-      Optional<User> user = userRepo.findByEmail(email);
+      Optional<User> user = userRepo.findById(Integer.parseInt(id));
       if (user.isEmpty()) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
       }

@@ -3,6 +3,7 @@ package no.ntnu.idatt2105.marketplace.model.listing;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import no.ntnu.idatt2105.marketplace.model.other.Images;
@@ -60,16 +61,20 @@ public class Listing {
   private double longitude;
 
   @ManyToMany(mappedBy = "favorites")
-  private List<User> user_favorites;
+  //private List<User> user_favorites;
+  private List<User> user_favorites = new ArrayList<>(); //unngå nullpointer
 
   @ManyToMany(mappedBy = "history")
-  private List<User> user_history;
+  //private List<User> user_history;
+  private List<User> user_history = new ArrayList<>(); //unngå nullpointer
 
   @OneToMany(mappedBy = "listing")
-  private List<Offer> offers;
+  //private List<Offer> offers;
+  private List<Offer> offers = new ArrayList<>(); //unngå nullpointer
 
   @OneToMany(mappedBy = "listing")
-  private List<Images> images;
+  //private List<Images> images;
+  private List<Images> images = new ArrayList<>(); //unngå nullpointer
 
   // constructor
   public Listing() {}

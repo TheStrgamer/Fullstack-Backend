@@ -14,8 +14,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
+            .headers(headers -> headers.frameOptions(frame -> frame.disable())) // tillat H2 console i iframe
             .cors(cors -> {})
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("api/users/register",
+                "api/users/login",
+                "api/users/",
+                "/api/listings/all",
+                "/api/listings/id/**",
+                "/h2-console/**" )// for databasetilgang
+                .permitAll()
                 .requestMatchers("api/users/register", "api/users/login", "api/users/", "/api/listings/all", "/api/listings/id/**",  "api/users").permitAll()
                 .anyRequest().authenticated()
             )

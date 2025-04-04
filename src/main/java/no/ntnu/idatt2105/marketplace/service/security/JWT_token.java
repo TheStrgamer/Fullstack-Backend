@@ -12,20 +12,28 @@ import java.util.Date;
 import io.jsonwebtoken.security.Keys;
 import no.ntnu.idatt2105.marketplace.exception.TokenExpiredException;
 import no.ntnu.idatt2105.marketplace.model.user.User;
+import no.ntnu.idatt2105.marketplace.responseobjects.TokenResponseObject;
+import no.ntnu.idatt2105.marketplace.repo.UserRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JWT_token {
+
+  @Autowired
+  private UserRepo userRepo;
   private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
   private static final long EXPIRATION_TIME = 15 * 60 * 1000;
 
-  public String generateJwtToken(User user) {
-    return Jwts.builder()
-        .setSubject(user.getEmail())
-        .setIssuedAt(new Date())
-        .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-        .signWith(key)
-        .compact();
+  public TokenResponseObject generateJwtToken(User user) {
+    Date expirationDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
+    String token = Jwts.builder()
+            .setSubject(user.getEmail())
+            .setIssuedAt(new Date())
+            .setExpiration(expirationDate)
+            .signWith(key)
+            .compact();
+    return new TokenResponseObject(token, expirationDate.getTime());
   }
 
   public void validateJwtToken(String token) {
@@ -41,7 +49,7 @@ public class JWT_token {
   }
 
 
-  public String extractEmailFromJwt(String token) {
+  public String extractIdFromJwt(String token) {
     try {
       Claims claims = Jwts.parser()
           .setSigningKey(key)
@@ -53,7 +61,10 @@ public class JWT_token {
     }
   }
   public User getUserByToken(String token) {
-    String email = extractEmailFromJwt(token);
-    return null; //TODO: implement this
+    String id = extractIdFromJwt(token);
+    if (id == null) {
+      return null;
+    }
+    return userRepo.findById(Integer.parseInt(id)).orElse(null);
   }
 }
