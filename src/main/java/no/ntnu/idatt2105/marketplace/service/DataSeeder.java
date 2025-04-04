@@ -6,6 +6,7 @@ import no.ntnu.idatt2105.marketplace.model.other.Images;
 import no.ntnu.idatt2105.marketplace.model.user.Role;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.*;
+import no.ntnu.idatt2105.marketplace.service.security.BCryptHasher;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 

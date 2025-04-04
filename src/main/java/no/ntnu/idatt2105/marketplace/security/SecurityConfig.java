@@ -25,6 +25,7 @@ public class SecurityConfig {
                 "/api/listings/random",
                 "/h2-console/**")// for databasetilgang
                 .permitAll()
+                .requestMatchers("api/users/register", "api/users/login", "api/users/", "/api/listings/all", "/api/listings/id/**",  "api/users").permitAll()
                 .requestMatchers("/api/listings/recommended").authenticated()
                 .anyRequest().authenticated()
             )

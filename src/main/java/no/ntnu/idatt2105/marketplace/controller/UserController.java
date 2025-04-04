@@ -6,11 +6,16 @@ import no.ntnu.idatt2105.marketplace.exception.IncorrectPasswordException;
 import no.ntnu.idatt2105.marketplace.exception.PhonenumberNotAvailibleException;
 import no.ntnu.idatt2105.marketplace.exception.TokenExpiredException;
 import no.ntnu.idatt2105.marketplace.exception.UserNotFoundException;
+import java.util.concurrent.ExecutionException;
+
+import jdk.jshell.spi.ExecutionControlProvider;
+import no.ntnu.idatt2105.marketplace.dto.user.*;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
+import no.ntnu.idatt2105.marketplace.service.security.BCryptHasher;
+import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
+import no.ntnu.idatt2105.marketplace.service.user.UserService;
 import no.ntnu.idatt2105.marketplace.responseobjects.TokenResponseObject;
 import no.ntnu.idatt2105.marketplace.responseobjects.UserResponseObject;
-import no.ntnu.idatt2105.marketplace.service.BCryptHasher;
-import no.ntnu.idatt2105.marketplace.service.JWT_token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import no.ntnu.idatt2105.marketplace.model.user.User;
 
@@ -30,6 +37,9 @@ public class UserController {
 
   @Autowired
   private UserRepo userRepo;
+
+  @Autowired
+  private UserService userService;
 
   private final BCryptHasher hasher = new BCryptHasher();
 
@@ -145,6 +155,72 @@ public class UserController {
       System.out.println("Invalid token");
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+  }
+
+  @PostMapping("/update")
+  public ResponseEntity<?> update(@RequestHeader("Authorization") String authorizationHeader, @RequestBody UserUpdate userUpdate) {
+    try {
+      if (!authorizationHeader.startsWith("Bearer ")) {
+        System.out.println("Invalid Authorization header");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      }
+
+      String token = authorizationHeader.substring(7);
+
+      int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
+
+      userService.updateUser(user_id, userUpdate);
+      return ResponseEntity.status(HttpStatus.OK).build();
+
+    } catch (Exception e) {
+      System.out.println("Error: " + e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  /**
+   * getUserInfo function that is mapped to the /my_account endpoint.
+   * goal: return userinfo to display on profile
+   * @param authorizationHeader header field containing the token used for verifying the user
+   * @return user info as an UserResponseObject
+   */
+  @PostMapping("/my_account")
+  public ResponseEntity<UserResponseObject> getUserInfo(@RequestHeader("Authorization") String authorizationHeader) {
+    if (!authorizationHeader.startsWith("Bearer ")) {
+      System.out.println("Invalid Authorization header");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    String token = authorizationHeader.substring(7);
+
+    int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
+
+    Optional<User> user = userRepo.findById(user_id);
+
+    if (user.isEmpty()) {
+      System.out.println("No user found with given email");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    UserResponseObject response = new UserResponseObject(user.get(), true);
+
+    return ResponseEntity.ok(response);
+  }
+
+  // TODO: REMOVE, ONLY FOR DEBUG
+  @GetMapping("")
+  public ResponseEntity<UserResponseObject> getUserInfoByEmail(@RequestParam String email) {
+    Optional<User> user = userRepo.findByEmail(email);
+
+    if (user.isEmpty()) {
+      System.out.println("No user found with given email");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    user.get().setPassword("");
+
+    UserResponseObject response = new UserResponseObject(user.get(), true);
+
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/") //TODO: remove this endpoint, for testing purposes only
