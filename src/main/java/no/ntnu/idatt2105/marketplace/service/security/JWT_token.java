@@ -1,4 +1,4 @@
-package no.ntnu.idatt2105.marketplace.service;
+package no.ntnu.idatt2105.marketplace.service.security;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.Claims;

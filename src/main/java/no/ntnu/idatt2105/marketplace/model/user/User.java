@@ -3,6 +3,8 @@ package no.ntnu.idatt2105.marketplace.model.user;
 import jakarta.persistence.*;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 import no.ntnu.idatt2105.marketplace.model.other.Images;
+
+import java.util.ArrayList;
 import java.util.List;
 import no.ntnu.idatt2105.marketplace.model.other.Offer;
 
@@ -41,7 +43,8 @@ public class User {
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "role_id")
   )
-  private List<Role> roles;
+  // private List<Role> roles;
+  private List<Role> roles = new ArrayList<>(); //nødvendig for å unngå nullpointer i forbindelse med testdata
 
   @ManyToMany
   @JoinTable(
@@ -49,7 +52,8 @@ public class User {
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "listing_id")
   )
-  private List<Listing> favorites;
+  //private List<Listing> favorites;
+  private List<Listing> favorites = new ArrayList<>(); //for å unngå nullpointer
 
   @ManyToMany
   @JoinTable(
@@ -57,10 +61,12 @@ public class User {
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "listing_id")
   )
-  private List<Listing> history;
+  //private List<Listing> history;
+  private List<Listing> history = new ArrayList<>(); //for å unngå nullpointer
 
   @OneToMany(mappedBy = "buyer")
-  private List<Offer> offers;
+  //private List<Offer> offers;
+  private List<Offer> offers = new ArrayList<>(); //for å unngå nullpointer
 
   // Constructor
 
@@ -77,9 +83,15 @@ public class User {
 
   // Getters and Setters
 
+
   public int getId() {
     return id;
   }
+
+  public void setId(int id) {
+    this.id = id;
+  }
+
   public String getIdAsString() {
     return Integer.toString(id);
   }
