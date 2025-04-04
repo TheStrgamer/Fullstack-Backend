@@ -23,7 +23,8 @@ public class SecurityConfig {
                 "/api/listings/all",
                 "/api/listings/id/**",
                 "/api/listings/random",
-                "/h2-console/**")// for databasetilgang
+                "/h2-console/**", // for databasetilgang
+                "/images/**")
                 .permitAll()
                 .requestMatchers("api/users/register", "api/users/login", "api/users/", "/api/listings/all", "/api/listings/id/**",  "api/users").permitAll()
                 .requestMatchers("/api/listings/recommended").authenticated()

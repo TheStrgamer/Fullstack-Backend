@@ -1,5 +1,6 @@
 package no.ntnu.idatt2105.marketplace.controller;
 
+import no.ntnu.idatt2105.marketplace.dto.listing.ListingDTO;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 import no.ntnu.idatt2105.marketplace.service.ListingService;
@@ -22,8 +23,8 @@ public class ListingController {
     }
 
     @GetMapping("/all")
-    public List<Listing> getAllListings() {
-        return listingService.getRandomListings(100); // eller listingService.getAll()
+    public ResponseEntity<List<ListingDTO>> getAllListings() {
+        return ResponseEntity.ok(listingService.getAllListings());
     }
 
     @GetMapping("/id/{id}")
@@ -40,12 +41,12 @@ public class ListingController {
     }
 
     @GetMapping("/random")
-    public ResponseEntity<List<Listing>> getRandomListings(@RequestParam(defaultValue = "10") int count) {
+    public ResponseEntity<List<ListingDTO>> getRandomListings(@RequestParam(defaultValue = "10") int count) {
         return ResponseEntity.ok(listingService.getRandomListings(count));
     }
 
     @GetMapping("/recommended")
-    public ResponseEntity<List<Listing>> getRecommendedListings(
+    public ResponseEntity<List<ListingDTO>> getRecommendedListings(
             @RequestParam(defaultValue = "10") int count,
             Principal principal) {
         return ResponseEntity.ok(listingService.getRecommendedListingsForUser(principal.getName(), count));

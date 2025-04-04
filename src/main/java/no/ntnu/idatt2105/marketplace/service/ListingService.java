@@ -1,5 +1,6 @@
 package no.ntnu.idatt2105.marketplace.service;
 
+import no.ntnu.idatt2105.marketplace.dto.listing.ListingDTO;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
@@ -22,29 +23,63 @@ public class ListingService {
         this.userRepo = userRepo;
     }
 
-    public List<Listing> getRandomListings(int count) {
+    public List<ListingDTO> getRandomListings(int count) {
         List<Listing> all = listingRepo.findAll();
         Collections.shuffle(all);
-        return all.stream().limit(count).collect(Collectors.toList());
+        return all.stream()
+                .limit(count)
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public List<Listing> getRecommendedListingsForUser(String email, int count) {
+    public List<ListingDTO> getRecommendedListingsForUser(String email, int count) {
         Optional<User> userOpt = userRepo.findByEmail(email);
-        if (userOpt.isEmpty()) return List.of();
+        if (userOpt.isEmpty()) return List.of(); // fallback
 
-        // TODO: Mer avansert anbefalingslogikk
+        // For nå: anbefal tilfeldig (senere: basert på historikk, kategorier, osv.)
         List<Listing> all = listingRepo.findAll();
         Collections.shuffle(all);
-        return all.stream().limit(count).collect(Collectors.toList());
+        return all.stream()
+                .limit(count)
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public List<Listing> getAllListings() {
-        return listingRepo.findAll();
+    public List<ListingDTO> getAllListings() {
+        return listingRepo.findAll().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     public Listing getListingById(int id) {
         return listingRepo.findById(id).orElse(null);
     }
+
+    public ListingDTO toDTO(Listing listing) {
+        String imagePath = listing.getImages().isEmpty()
+                ? null
+                : listing.getImages().get(0).getFilepath_to_image();
+
+        return new ListingDTO(
+                listing.getId(),
+                listing.getTitle(),
+                listing.getBrief_description(),
+                listing.getFull_description(),
+                listing.getPrice(),
+                listing.getSale_status(),
+                listing.getSize(),
+                listing.getLatitude(),
+                listing.getLongitude(),
+                listing.getCategory().getName(),
+                listing.getCondition().getName(),
+                listing.getCreator().getFirstname(),
+                listing.getCreator().getSurname(),
+                listing.getCreated_at(),
+                listing.getUpdated_at(),
+                imagePath
+        );
+    }
+
 
 }
 
