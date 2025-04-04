@@ -24,6 +24,7 @@ public class SecurityConfig {
                 "/api/listings/id/**",
                 "/h2-console/**" )// for databasetilgang
                 .permitAll()
+                .requestMatchers("api/users/register", "api/users/login", "api/users/", "/api/listings/all", "/api/listings/id/**",  "api/users").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
