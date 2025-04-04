@@ -22,8 +22,10 @@ public class SecurityConfig {
                 "api/users/",
                 "/api/listings/all",
                 "/api/listings/id/**",
-                "/h2-console/**" )// for databasetilgang
+                "/api/listings/random",
+                "/h2-console/**")// for databasetilgang
                 .permitAll()
+                .requestMatchers("/api/listings/recommended").authenticated()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
