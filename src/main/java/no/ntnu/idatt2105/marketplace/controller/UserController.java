@@ -158,10 +158,20 @@ public class UserController {
     }
   }
 
-  @PutMapping("/update/{id}")
-  public ResponseEntity<?> update(@PathVariable int id, @RequestBody UserUpdate userUpdate) {
+  @PostMapping("/update")
+  public ResponseEntity<?> update(@RequestHeader("Authorization") String authorizationHeader, @RequestBody UserUpdate userUpdate) {
     try {
-      User updatedUser = userService.updateUser(id, userUpdate);
+      if (!authorizationHeader.startsWith("Bearer ")) {
+        System.out.println("Invalid Authorization header");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      }
+
+      String token = authorizationHeader.substring(7);
+      String email = jwt.extractEmailFromJwt(token);
+
+      int user_id = userRepo.findByEmail(email).get().getId();
+
+      userService.updateUser(user_id, userUpdate);
       return ResponseEntity.status(HttpStatus.OK).build();
 
     } catch (Exception e) {

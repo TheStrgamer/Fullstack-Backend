@@ -12,7 +12,7 @@ public class UserService {
   @Autowired
   private UserRepo userRepo;
 
-  public User updateUser(int id, UserUpdate dto) throws Exception{
+  public void updateUser(int id, UserUpdate dto) throws Exception{
     User user = userRepo.findById(id).orElseThrow(() -> new Exception("User not found"));
 
 
@@ -25,6 +25,6 @@ public class UserService {
     user.setProfile_picture(dto.getProfile_picture() != null  ? dto.getProfile_picture()  : user.getProfile_picture());
 
     System.out.println("Updated user");
-    return userRepo.save(user);
+    userRepo.save(user);
   }
 }
