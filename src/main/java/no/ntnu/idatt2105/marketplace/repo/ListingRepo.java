@@ -8,9 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ListingRepo extends JpaRepository<Listing, Integer> {
-    // No need to redefine findById, it's already in JpaRepository
-    // Optional<Listing> findById(int id);  <-- Remove this line
-
     // get all listings by category
     List<Listing> findAllByCategory(Categories category);
 

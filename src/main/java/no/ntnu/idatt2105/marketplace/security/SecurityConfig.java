@@ -22,6 +22,8 @@ public class SecurityConfig {
                 "api/users/",
                 "/api/listings/all",
                 "/api/listings/id/**",
+                "/api/listings/categories",
+                "/api/listings/conditions",
                 "/h2-console/**" )// for databasetilgang
                 .permitAll()
                 .requestMatchers("api/users/register", "api/users/login", "api/users/", "/api/listings/all", "/api/listings/id/**",  "api/users").permitAll()
