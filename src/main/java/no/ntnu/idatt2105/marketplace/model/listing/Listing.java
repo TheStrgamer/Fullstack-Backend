@@ -109,6 +109,10 @@ public class Listing {
     return creator;
   }
 
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
   public Categories getCategory() {
     return category;
   }
