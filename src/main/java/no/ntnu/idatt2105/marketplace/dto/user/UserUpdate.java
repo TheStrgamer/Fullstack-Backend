@@ -6,6 +6,7 @@ public class UserUpdate {
 
   private String firstname;
   private String surname;
+  private String email;
   private String phonenumber;
   private Images profile_picture;
 
@@ -17,6 +18,10 @@ public class UserUpdate {
 
   public String getSurname() {
     return surname;
+  }
+
+  public String getEmail() {
+    return email;
   }
 
   public String getPhonenumber() {
