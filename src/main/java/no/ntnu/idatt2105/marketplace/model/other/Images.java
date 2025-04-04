@@ -14,7 +14,7 @@ public class Images {
   private int id;
 
   @Column(unique = true, nullable = false)
-  private String filepath_to_image;
+  private String filepathToImage;
 
   @ManyToOne
   @JoinColumn(name = "listing_id")
@@ -23,9 +23,9 @@ public class Images {
 
   // constructor
   public Images() {}
-  public Images(int id, String filepath_to_image) {
+  public Images(int id, String filepathToImage) {
     this.id = id;
-    this.filepath_to_image = filepath_to_image;
+    this.filepathToImage = filepathToImage;
   }
 
   // getters and setters
@@ -39,10 +39,14 @@ public class Images {
   }
 
   public String getFilepath_to_image() {
-    return filepath_to_image;
+    return filepathToImage;
   }
 
   public void setFilepath_to_image(String filepath_to_image) {
-    this.filepath_to_image = filepath_to_image;
+    this.filepathToImage = filepath_to_image;
+  }
+
+  public void setListing(Listing listing) {
+    this.listing = listing;
   }
 }
