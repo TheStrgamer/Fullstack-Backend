@@ -189,7 +189,9 @@ public class UserController {
 
 
   @GetMapping("/validate")
-  @Operation(summary = "JWT validation", description = "Returns true upon receiving a valid JWT")
+  @Operation(
+          summary = "JWT validation",
+          description = "Returns true upon receiving a valid JWT")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "401", description = "Token is invalid, has expired or authorization header is invalid"),
           @ApiResponse(responseCode = "200", description = "Token is valid")
@@ -217,7 +219,9 @@ public class UserController {
 
 
   @PostMapping("/update")
-  @Operation(summary = "Updated user credentials", description = "Returns ")
+  @Operation(
+          summary = "Updated user credentials",
+          description = "Returns ")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "401", description = "Invalid Authorization header"),
           @ApiResponse(responseCode = "200", description = "")
@@ -246,7 +250,9 @@ public class UserController {
 
 
   @PostMapping("/my_account")
-  @Operation(summary = "Get account credentials", description = "Returns the logged in users credentials")
+  @Operation(
+          summary = "Get account credentials",
+          description = "Returns the logged in users credentials")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "401", description = "Invalid Authorization header"),
           @ApiResponse(responseCode = "404", description = "No User found with given email"),
