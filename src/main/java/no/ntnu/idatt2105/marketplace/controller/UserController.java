@@ -1,6 +1,15 @@
 package no.ntnu.idatt2105.marketplace.controller;
 
 import java.util.Optional;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ntnu.idatt2105.marketplace.exception.EmailNotAvailibleException;
 import no.ntnu.idatt2105.marketplace.exception.IncorrectPasswordException;
 import no.ntnu.idatt2105.marketplace.exception.PhonenumberNotAvailibleException;
@@ -33,6 +42,7 @@ import no.ntnu.idatt2105.marketplace.model.user.User;
 
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "User API", description = "Operations related to user accounts")
 public class UserController {
 
   @Autowired
@@ -102,8 +112,39 @@ public class UserController {
     return 0;
   }
 
+
+
+
   @PostMapping("/register")
-  public ResponseEntity<String> registerUser(@RequestBody User user) {
+  @Operation(
+          summary = "User register",
+          description = "Registers a new user with given credentials"
+  )
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = "200",
+                  description = "User registered successfully",
+                  content = @Content(
+                          schema = @Schema(implementation = String.class)
+                  )
+          ),
+          @ApiResponse(
+                  responseCode = "400",
+                  description = "Invalid user data"
+          ),
+          @ApiResponse(
+                  responseCode = "409",
+                  description = "Email and/or phonenumber already in use"
+          )
+  })
+  public ResponseEntity<String> registerUser(
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                  description = "User register data",
+                  required = true,
+                  content = @Content(
+                          schema = @Schema(implementation = User.class)
+                  )
+          ) @RequestBody User user) {
     try {
       register(user);
       return ResponseEntity.ok("User registered successfully");
@@ -115,11 +156,56 @@ public class UserController {
     } catch (PhonenumberNotAvailibleException e) {
       return ResponseEntity.status(HttpStatus.CONFLICT).body("Phone number is already in use");
     }
-
   }
 
+
+
+
   @PostMapping("/login")
-  public ResponseEntity<?> login(@RequestBody User user) {
+  @Operation(
+          summary = "User login",
+          description = "Validates user credentials and returns a JWT token on success"
+  )
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = "200",
+                  description = "JWT token returned",
+                  content = @Content(
+                          schema = @Schema(implementation = TokenResponseObject.class)
+                  )
+          ),
+          @ApiResponse(
+                  responseCode = "401",
+                  description = "Incorrect password for given email",
+                  content = @Content(
+                          schema = @Schema(implementation = String.class)
+                  )
+          ),
+          @ApiResponse(
+                  responseCode = "404",
+                  description = "No user found with given email and password",
+                  content = @Content(
+                          schema = @Schema(implementation = String.class)
+                  )
+          ),
+          @ApiResponse(
+                  responseCode = "400",
+                  description = "Invalid user data",
+                  content = @Content(
+                          schema = @Schema(implementation = String.class)
+                  )
+          )
+  })
+  public ResponseEntity<?> login(
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "User login data",
+            required = true,
+            content = @Content(
+                    schema = @Schema(implementation = User.class)
+            )
+          )
+          @RequestBody User user)
+  {
     System.out.println("Logging in user with: " + user.getEmail() + " " + user.getPassword());
     TokenResponseObject token;
     try {
@@ -137,8 +223,32 @@ public class UserController {
     return ResponseEntity.ok(token);
   }
 
+
+
+
   @GetMapping("/validate")
-  public ResponseEntity<Boolean> validate(@RequestHeader("Authorization") String authorizationHeader) {
+  @Operation(
+          summary = "JWT validation",
+          description = "Returns true upon receiving a valid JWT"
+  )
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = "401",
+                  description = "Token is invalid, has expired or authorization header is invalid"
+          ),
+          @ApiResponse(
+                  responseCode = "200",
+                  description = "Token is valid"
+          )
+  })
+  public ResponseEntity<Boolean> validate(
+          @Parameter(
+                  name = "Authorization",
+                  description = "Bearer token in the format `Bearer <JWT>`",
+                  required = true,
+                  example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+          )
+          @RequestHeader("Authorization") String authorizationHeader) {
     try {
       if (!authorizationHeader.startsWith("Bearer ")) {
         System.out.println("Invalid Authorization header");
@@ -157,8 +267,38 @@ public class UserController {
     }
   }
 
+
+
+
   @PostMapping("/update")
-  public ResponseEntity<?> update(@RequestHeader("Authorization") String authorizationHeader, @RequestBody UserUpdate userUpdate) {
+  @Operation(
+          summary = "Updated user credentials",
+          description = "Returns "
+  )
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = "401",
+                  description = "Invalid Authorization header"
+          ),
+          @ApiResponse(
+                  responseCode = "200",
+                  description = "Successfully updated user credentials"
+          )
+  })
+  public ResponseEntity<?> update(
+          @Parameter(
+                  name = "Authorization",
+                  description = "Bearer token in the format `Bearer <JWT>`",
+                  required = true,
+                  example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+          ) @RequestHeader("Authorization") String authorizationHeader,
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                  description = "Updated user data",
+                  required = true,
+                  content = @Content(
+                          schema = @Schema(implementation = UserController.class)
+                  )
+          ) @RequestBody UserUpdate userUpdate) {
     try {
       if (!authorizationHeader.startsWith("Bearer ")) {
         System.out.println("Invalid Authorization header");
@@ -178,14 +318,35 @@ public class UserController {
     }
   }
 
-  /**
-   * getUserInfo function that is mapped to the /my_account endpoint.
-   * goal: return userinfo to display on profile
-   * @param authorizationHeader header field containing the token used for verifying the user
-   * @return user info as an UserResponseObject
-   */
+
+
+
   @PostMapping("/my_account")
-  public ResponseEntity<UserResponseObject> getUserInfo(@RequestHeader("Authorization") String authorizationHeader) {
+  @Operation(
+          summary = "Get account credentials",
+          description = "Returns the logged in users credentials"
+  )
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = "401",
+                  description = "Invalid Authorization header"
+          ),
+          @ApiResponse(
+                  responseCode = "404",
+                  description = "No User found with given email"
+          ),
+          @ApiResponse(
+                  responseCode = "200",
+                  description = "User Credentials Returned"
+          )
+  })
+  public ResponseEntity<UserResponseObject> getUserInfo(
+          @Parameter(
+                  name = "Authorization",
+                  description = "Bearer token in the format `Bearer <JWT>`",
+                  required = true,
+                  example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+          ) @RequestHeader("Authorization") String authorizationHeader) {
     if (!authorizationHeader.startsWith("Bearer ")) {
       System.out.println("Invalid Authorization header");
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -206,31 +367,62 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
-  // TODO: REMOVE, ONLY FOR DEBUG
-  @GetMapping("")
-  public ResponseEntity<UserResponseObject> getUserInfoByEmail(@RequestParam String email) {
-    Optional<User> user = userRepo.findByEmail(email);
 
-    if (user.isEmpty()) {
-      System.out.println("No user found with given email");
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
 
-    user.get().setPassword("");
-
-    UserResponseObject response = new UserResponseObject(user.get(), true);
-
-    return ResponseEntity.ok(response);
-  }
 
   @GetMapping("/") //TODO: remove this endpoint, for testing purposes only
+  @Operation(
+          summary = "Get all users",
+          description = "Returns all users stored in the database"
+  )
+  @ApiResponse(
+          responseCode = "200",
+          description = "List of all users",
+          content = @Content(
+                  mediaType = "application/json",
+                  array = @ArraySchema(
+                          schema = @Schema(implementation = User.class)
+                  )
+          )
+  )
   public Iterable<User> getAllUsers() {
     return userRepo.findAll();
   }
+
+
+
+
   @GetMapping("/{id}/info")
+  @Operation(
+          summary = "Get user information",
+          description = "Returns information about a user with the provided id")
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = "401",
+                  description = "Invalid Authorization header and/or token"
+          ),
+          @ApiResponse(
+                  responseCode = "404",
+                  description = "User not found"
+          ),
+          @ApiResponse(
+                  responseCode = "200",
+                  description = "Returned user information"
+          ),
+  })
   public ResponseEntity<UserResponseObject> getUserInfo(
-      @RequestHeader("Authorization") String authorizationHeader,
-      @PathVariable String id) {
+          @Parameter(
+                  name = "Authorization",
+                  description = "Bearer token in the format `Bearer <JWT>`",
+                  required = true,
+                  example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+          ) @RequestHeader("Authorization") String authorizationHeader,
+          @Parameter(
+                  name = "id",
+                  description = "Integer value representing the id of the user",
+                  required = true,
+                  example = "4"
+          ) @PathVariable String id) {
     try {
       if (!authorizationHeader.startsWith("Bearer ")) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -258,8 +450,4 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
   }
-
-
-
-
 }

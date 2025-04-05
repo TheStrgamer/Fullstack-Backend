@@ -17,16 +17,19 @@ public class SecurityConfig {
             .headers(headers -> headers.frameOptions(frame -> frame.disable())) // tillat H2 console i iframe
             .cors(cors -> {})
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("api/users/register",
-                "api/users/login",
-                "api/users/",
-                "/api/listings/all",
-                "/api/listings/id/**",
-                "/api/listings/random",
-                "/h2-console/**", // for databasetilgang
-                "/images/**")
+                .requestMatchers(
+                        "api/users/register",
+                        "api/users/login",
+                        "api/users/",
+                        "/api/listings/all",
+                        "/api/listings/id/**",
+                        "/api/listings/random",
+                        "/h2-console/**",             // for databasetilgang
+                        "/images/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html")
                 .permitAll()
-                .requestMatchers("api/users/register", "api/users/login", "api/users/", "/api/listings/all", "/api/listings/id/**",  "api/users").permitAll()
                 .requestMatchers("/api/listings/recommended").authenticated()
                 .anyRequest().authenticated()
             )
