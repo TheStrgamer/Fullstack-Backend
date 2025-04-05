@@ -206,23 +206,6 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
-  // TODO: REMOVE, ONLY FOR DEBUG
-  @GetMapping("")
-  public ResponseEntity<UserResponseObject> getUserInfoByEmail(@RequestParam String email) {
-    Optional<User> user = userRepo.findByEmail(email);
-
-    if (user.isEmpty()) {
-      System.out.println("No user found with given email");
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-
-    user.get().setPassword("");
-
-    UserResponseObject response = new UserResponseObject(user.get(), true);
-
-    return ResponseEntity.ok(response);
-  }
-
   @GetMapping("/") //TODO: remove this endpoint, for testing purposes only
   public Iterable<User> getAllUsers() {
     return userRepo.findAll();
