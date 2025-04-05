@@ -26,7 +26,9 @@ public class SecurityConfig {
                         "/api/listings/random",
                         "/h2-console/**",             // for databasetilgang
                         "/images/**",
-                        "**/swagger-ui.html")
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html")
                 .permitAll()
                 .requestMatchers("/api/listings/recommended").authenticated()
                 .anyRequest().authenticated()
