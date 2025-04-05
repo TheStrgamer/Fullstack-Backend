@@ -1,13 +1,13 @@
 package no.ntnu.idatt2105.marketplace.model.listing;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import no.ntnu.idatt2105.marketplace.model.negotiation.Conversation;
 import no.ntnu.idatt2105.marketplace.model.other.Images;
-import no.ntnu.idatt2105.marketplace.model.other.Offer;
+import no.ntnu.idatt2105.marketplace.model.negotiation.Offer;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 
 @Entity
@@ -75,6 +75,9 @@ public class Listing {
   @OneToMany(mappedBy = "listing")
   //private List<Images> images;
   private List<Images> images = new ArrayList<>(); //unngå nullpointer
+
+  @OneToMany(mappedBy = "listing")
+  private List<Conversation> conversations = new ArrayList<>();
 
   // constructor
   public Listing() {}
@@ -220,6 +223,21 @@ public class Listing {
 
   public void removeImage(Images image) {
     images.remove(image);
+  }
+
+  public List<Conversation> getConversations() {
+    return conversations;
+  }
+  public void addConversation(Conversation conversation) {
+    conversations.add(conversation);
+  }
+  public void closeConversation(Conversation conversation) {
+    conversation.setStatus(1);
+  }
+  public void closeAllConversations() {
+    for (Conversation conversation : conversations) {
+      conversation.setStatus(1);
+    }
   }
 
 }

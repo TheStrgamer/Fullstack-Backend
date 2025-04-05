@@ -2,11 +2,12 @@ package no.ntnu.idatt2105.marketplace.model.user;
 
 import jakarta.persistence.*;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
+import no.ntnu.idatt2105.marketplace.model.negotiation.Conversation;
 import no.ntnu.idatt2105.marketplace.model.other.Images;
 
 import java.util.ArrayList;
 import java.util.List;
-import no.ntnu.idatt2105.marketplace.model.other.Offer;
+import no.ntnu.idatt2105.marketplace.model.negotiation.Offer;
 
 @Entity
 @Table(name = "users")
@@ -64,9 +65,15 @@ public class User {
   //private List<Listing> history;
   private List<Listing> history = new ArrayList<>(); //for å unngå nullpointer
 
+  @OneToMany(mappedBy = "creator")
+  private List<Listing> my_listings = new ArrayList<>();
+
   @OneToMany(mappedBy = "buyer")
   //private List<Offer> offers;
   private List<Offer> offers = new ArrayList<>(); //for å unngå nullpointer
+
+  @OneToMany(mappedBy = "buyer")
+  private List<Conversation> senderConversations = new ArrayList<>();
 
   // Constructor
 
@@ -196,6 +203,32 @@ public class User {
 
   public void removeOffer(Offer offer) {
     offers.remove(offer);
+  }
+
+  private List<Conversation> getSellerConversations() {
+    List<Conversation> conversations = new ArrayList<>();
+    for (Listing listing : my_listings) {
+      for (Conversation conversation : listing.getConversations()) {
+        if (conversation.getSeller() == this) {
+          conversations.add(conversation);
+        }
+      }
+    }
+    return conversations;
+  }
+
+  public List<Conversation> getActiveNegotiations() {
+    List<Conversation> conversations = new ArrayList<>();
+    conversations.addAll(getSellerConversations());
+    conversations.addAll(senderConversations);
+    return conversations;
+  }
+
+  public void addSenderConversation(Conversation conversation) {
+    senderConversations.add(conversation);
+  }
+  public void removeSenderConversation(Conversation conversation) {
+    conversation.setStatus(1);
   }
 
 }
