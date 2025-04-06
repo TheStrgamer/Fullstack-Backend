@@ -10,16 +10,14 @@ public class ConversationDTO {
   private String other_user_name;
   private String last_message;
   private String last_update;
-  private List<Message> messages;
+  private List<MessageDTO> messages;
   private int status;
 
   public ConversationDTO(int id, String other_user_picture, String other_user_name,
-      String last_message,
-      String last_update, List<Message> messages, int status) {
+      String last_update, List<MessageDTO> messages, int status) {
     this.id = id;
     this.other_user_picture = other_user_picture;
     this.other_user_name = other_user_name;
-    this.last_message = last_message;
     this.last_update = last_update;
     this.messages = messages;
     this.status = status;
@@ -45,7 +43,7 @@ public class ConversationDTO {
     return last_update;
   }
 
-  public List<Message> getMessages() {
+  public List<MessageDTO> getMessages() {
     return messages;
   }
 
@@ -73,11 +71,24 @@ public class ConversationDTO {
     this.last_update = last_update;
   }
 
-  public void setMessages(List<Message> messages) {
+  public void setMessages(List<MessageDTO> messages) {
     this.messages = messages;
   }
 
   public void setStatus(int status) {
     this.status = status;
+  }
+
+  @Override
+  public String toString() {
+    return "ConversationDTO{" +
+        "id=" + id +
+        ", other_user_picture='" + other_user_picture + '\'' +
+        ", other_user_name='" + other_user_name + '\'' +
+        ", last_message='" + last_message + '\'' +
+        ", last_update='" + last_update + '\'' +
+        ", messages=" + messages +
+        ", status=" + status +
+        '}';
   }
 }

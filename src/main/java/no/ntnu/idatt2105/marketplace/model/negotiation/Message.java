@@ -70,4 +70,14 @@ public class Message {
     return sendt_at;
   }
 
+  @Override
+  public String toString() {
+    return "Message{" +
+        ", sender=" + sender +
+        ", conversation=" + conversation +
+        ", text='" + text + '\'' +
+        ", sendt_at=" + sendt_at +
+        '}';
+  }
+
 }

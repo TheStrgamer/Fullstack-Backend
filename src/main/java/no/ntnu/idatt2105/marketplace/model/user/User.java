@@ -231,5 +231,9 @@ public class User {
     conversation.setStatus(1);
   }
 
+  @Override
+  public String toString() {
+    return firstname + " " + surname;
+  }
 }
 

@@ -142,18 +142,18 @@ public class UserController {
     try {
       if (!authorizationHeader.startsWith("Bearer ")) {
         System.out.println("Invalid Authorization header");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
       }
       String sessionToken = authorizationHeader.substring(7);
       jwt.validateJwtToken(sessionToken);
       return ResponseEntity.ok(true);
     } catch (TokenExpiredException e) {
       System.out.println("Token has expired");
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
     }
     catch (IllegalArgumentException e) {
       System.out.println("Invalid token");
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
     }
   }
 
