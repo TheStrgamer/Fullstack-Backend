@@ -19,4 +19,7 @@ public interface ListingRepo extends JpaRepository<Listing, Integer> {
 
     // get all listings by title
     List<Listing> findAllByTitle(String title);
+
+    // gat all listings
+    List<Listing> findAll();
 }

@@ -17,7 +17,6 @@ import no.ntnu.idatt2105.marketplace.repo.CategoriesRepo;
 import no.ntnu.idatt2105.marketplace.repo.ConditionRepo;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 import no.ntnu.idatt2105.marketplace.responseobjects.ListingResponseObject;
-import no.ntnu.idatt2105.marketplace.security.JWTAuthorizationFilter;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,7 +26,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.security.Principal;
 import java.util.List;
 
