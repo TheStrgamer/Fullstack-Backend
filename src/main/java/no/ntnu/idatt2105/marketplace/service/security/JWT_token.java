@@ -61,10 +61,10 @@ public class JWT_token {
     }
   }
   public User getUserByToken(String token) {
-    String email = extractIdFromJwt(token);
-    if (email == null) {
+    String id = extractIdFromJwt(token);
+    if (id == null) {
       return null;
     }
-    return userRepo.findByEmail(email).orElse(null);
+    return userRepo.findById(Integer.parseInt(id)).orElse(null);
   }
 }
