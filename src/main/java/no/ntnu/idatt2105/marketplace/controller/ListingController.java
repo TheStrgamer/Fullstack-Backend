@@ -1,5 +1,7 @@
 package no.ntnu.idatt2105.marketplace.controller;
 
+import no.ntnu.idatt2105.marketplace.model.listing.Categories;
+import no.ntnu.idatt2105.marketplace.model.listing.Condition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -10,7 +12,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ntnu.idatt2105.marketplace.dto.listing.ListingDTO;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
+import no.ntnu.idatt2105.marketplace.model.user.User;
+import no.ntnu.idatt2105.marketplace.repo.CategoriesRepo;
+import no.ntnu.idatt2105.marketplace.repo.ConditionRepo;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
+import no.ntnu.idatt2105.marketplace.responseobjects.ListingResponseObject;
+import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import no.ntnu.idatt2105.marketplace.service.ListingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,14 +34,22 @@ import java.util.List;
 @Tag(name = "Listing API", description = "Operation related to Listings")
 public class ListingController {
 
-    private final ListingService listingService;
+    @Autowired
+    private ListingService listingService;
 
-    public ListingController(ListingService listingService) {
-        this.listingService = listingService;
-    }
+    @Autowired
+    private ListingRepo listingRepo;
 
+    @Autowired
+    private CategoriesRepo CategoriesRepo;
 
+    @Autowired
+    private ConditionRepo ConditionRepo;
 
+    @Autowired
+    private JWT_token jwtTokenService;
+
+    private static final Logger LOGGER = LogManager.getLogger(ListingController.class);
 
     @GetMapping("/all")
     @Operation(
@@ -48,8 +65,9 @@ public class ListingController {
                             schema = @Schema(implementation = ListingDTO.class))
             )
     )
-    public ResponseEntity<List<ListingDTO>> getAllListings() {
-        return ResponseEntity.ok(listingService.getAllListings());
+    public List<ListingResponseObject> getAllListings() {
+        List<Listing> listings = listingRepo.findAll();
+        return ListingResponseObject.fromEntityList(listings);
     }
 
 
@@ -82,13 +100,69 @@ public class ListingController {
                     example = "123"
             ) @PathVariable String id) {
         try {
-            Listing listing = listingService.getListingById(Integer.parseInt(id));
-            if (listing == null) {
-                return new ResponseEntity<>("Listing not found", HttpStatus.NOT_FOUND);
-            }
-            return new ResponseEntity<>(listing, HttpStatus.OK);
+            return listingRepo.findById(Integer.valueOf(id))
+                    .map(listing -> ResponseEntity.ok(new ListingResponseObject(listing)))
+                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new ListingResponseObject()));
+//            Listing listing = listingService.getListingById(Integer.parseInt(id));
+//            if (listing == null) {
+//                return new ResponseEntity<>("Listing not found", HttpStatus.NOT_FOUND);
+//            }
+//            return new ResponseEntity<>(listing, HttpStatus.OK);
         } catch (NumberFormatException e) {
-            return new ResponseEntity<>("Invalid ID format", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest()
+                    .body(new ListingResponseObject());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ListingResponseObject());
+        }
+    }
+
+    @GetMapping("/categories")
+    public List<Categories> getListingCategories() {
+        return CategoriesRepo.findAll();
+    }
+
+    @GetMapping("/conditions")
+    public List<Condition> getListingConditions() {
+        return ConditionRepo.findAll();
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createListing(@RequestBody Listing listing, @RequestHeader("Authorization") String authHeader) {
+        try {
+            LOGGER.info("Received listing data: {}", listing);
+
+            if (listing.getTitle() == null || listing.getBrief_description() == null ||
+                    listing.getFull_description() == null) {
+                LOGGER.error("Missing required fields in listing data");
+                return new ResponseEntity<>("Missing required fields", HttpStatus.BAD_REQUEST);
+            }
+
+            String token = authHeader.replace("Bearer ", "");
+            LOGGER.info("Received token: {}", token);
+            User user = jwtTokenService.getUserByToken(token);
+
+            if (user == null) {
+                return new ResponseEntity<>("Invalid token or user not found", HttpStatus.UNAUTHORIZED);
+            }
+
+            listing.setCreator(user);
+
+            Categories category = CategoriesRepo.findById(listing.getCategory().getId()).orElse(null);
+            Condition condition = ConditionRepo.findById(listing.getCondition().getId()).orElse(null);
+
+            if (category == null || condition == null) {
+                LOGGER.error("Category or condition not found");
+                return new ResponseEntity<>("Category or condition not found", HttpStatus.BAD_REQUEST);
+            }
+            listing.setCategory(category);
+            listing.setCondition(condition);
+            listingRepo.save(listing);
+            return new ResponseEntity<>(listing, HttpStatus.CREATED);
+        } catch (Exception e) {
+            LOGGER.error("Error creating listing: ", e);
+            return new ResponseEntity<>("Error creating listing", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -139,4 +213,3 @@ public class ListingController {
         return ResponseEntity.ok(listingService.getRecommendedListingsForUser(principal.getName(), count));
     }
 }
-
