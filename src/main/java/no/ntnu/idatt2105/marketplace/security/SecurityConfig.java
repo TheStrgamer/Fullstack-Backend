@@ -24,16 +24,22 @@ public class SecurityConfig {
                         "/api/listings/all",
                         "/api/listings/id/**",
                         "/api/listings/random",
+                        "/api/listings/categories",
+                        "/api/listings/conditions",
                         "/h2-console/**",             // for databasetilgang
                         "/images/**",
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
-                        "/swagger-ui.html",
-                        "/api/listings/categories",
-                        "/api/listings/conditions"
-                )
+                        "/swagger-ui.html")
                 .permitAll()
-                .requestMatchers("api/users/register", "api/users/login", "api/users/", "/api/listings/all", "/api/listings/id/**",  "api/users", "/api/listings/recommended").permitAll()
+                .requestMatchers(
+                        "api/users/register",
+                        "api/users/login",
+                        "api/users/",
+                        "/api/listings/all",
+                        "/api/listings/id/**",
+                        "api/users",
+                        "/api/listings/recommended").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
