@@ -39,7 +39,7 @@ public class ImagesService {
       saveImageInFiles(path, file);
 
       // set the filepath in the model
-      img.setFilepath_to_image(path.toString());
+      img.setFilepath_to_image("images/" + filename);
 
       return img;
     } catch (IOException e) {

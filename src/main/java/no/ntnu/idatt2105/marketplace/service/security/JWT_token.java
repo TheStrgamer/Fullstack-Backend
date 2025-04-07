@@ -28,7 +28,7 @@ public class JWT_token {
   public TokenResponseObject generateJwtToken(User user) {
     Date expirationDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
     String token = Jwts.builder()
-            .setSubject(user.getEmail())
+            .setSubject(user.getIdAsString())
             .setIssuedAt(new Date())
             .setExpiration(expirationDate)
             .signWith(key)
