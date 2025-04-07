@@ -158,6 +158,7 @@ public class ListingController {
             }
             listing.setCategory(category);
             listing.setCondition(condition);
+            LOGGER.info("Saved listing");
             listingRepo.save(listing);
             return new ResponseEntity<>(listing, HttpStatus.CREATED);
         } catch (Exception e) {
