@@ -77,7 +77,6 @@ public class WebSocketAuthorization implements HandshakeInterceptor {
           return true;
         }
       }
-
       System.out.println("Authorization failed");
       response.setStatusCode(HttpStatus.UNAUTHORIZED);
       return false;

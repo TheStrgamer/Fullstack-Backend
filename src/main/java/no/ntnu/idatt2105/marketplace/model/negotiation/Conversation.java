@@ -46,11 +46,10 @@ public class Conversation {
   // constructor
   public Conversation() {}
 
-  public Conversation(int id, User buyer, Listing listing) {
+  public Conversation(User buyer, Listing listing) {
     if (buyer == listing.getCreator()) {
       throw new IllegalArgumentException("Buyer cannot be the same as the seller");
     }
-    this.id = id;
     this.buyer = buyer;
     this.listing = listing;
     this.status = 0; // 0 = open, 1 = closed
