@@ -6,11 +6,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.Date;
-import java.util.List;
-import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 
 @Entity
@@ -37,8 +34,7 @@ public class Message {
   // constructor
   public Message() {}
 
-  public Message(int id, User sender_id, Conversation conversation_id, String text) {
-    this.id = id;
+  public Message(User sender_id, Conversation conversation_id, String text) {
     this.sender = sender_id;
     this.conversation = conversation_id;
     this.text = text;

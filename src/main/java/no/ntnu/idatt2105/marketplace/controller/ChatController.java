@@ -8,10 +8,10 @@ import no.ntnu.idatt2105.marketplace.dto.negotiation.MessageDTO;
 import no.ntnu.idatt2105.marketplace.dto.negotiation.NegotiationChatsDTO;
 import no.ntnu.idatt2105.marketplace.model.negotiation.Conversation;
 import no.ntnu.idatt2105.marketplace.model.negotiation.Message;
+import no.ntnu.idatt2105.marketplace.model.other.Images;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.ConversationRepo;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
-import no.ntnu.idatt2105.marketplace.service.security.BCryptHasher;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import no.ntnu.idatt2105.marketplace.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/negotiation/chat/")
+@RequestMapping("/api/negotiation/chat")
 public class ChatController {
   @Autowired
   private UserRepo userRepo;
@@ -65,13 +65,11 @@ public class ChatController {
 
   @GetMapping("/{id}")
   public ResponseEntity<ConversationDTO> getConversation(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("id") int id) {
-    System.out.println("Getting conversation with id: " + id);
     if (!authorizationHeader.startsWith("Bearer ")) {
       System.out.println("Invalid Authorization header");
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
     String token = authorizationHeader.substring(7);
-    System.out.println("Token: " + token);
     int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
     Optional<User> user = userRepo.findById(user_id);
     if (user.isEmpty()) {
@@ -90,7 +88,11 @@ public class ChatController {
     }
     Conversation conv = conversation.get();
     boolean isSeller = conv.getSeller() == user.get();
-    String otherUserPicture = isSeller ? conv.getBuyer().getProfile_picture().getFilepath_to_image() : conv.getSeller().getProfile_picture().getFilepath_to_image();
+    Images otherUserPicture = isSeller ? conv.getBuyer().getProfile_picture() : conv.getSeller().getProfile_picture();
+    String otherUserPicturePath = "";
+    if (otherUserPicture != null) {
+      otherUserPicturePath = otherUserPicture.getFilepath_to_image();
+    }
     String otherUserName = isSeller ? conv.getBuyer().toString() : conv.getSeller().toString();
     String lastUpdate = conv.getUpdatedAt().toString();
 
@@ -108,7 +110,7 @@ public class ChatController {
     int status = conv.getStatus();
     ConversationDTO conversationDTO = new ConversationDTO(
         conv.getId(),
-        otherUserPicture,
+        otherUserPicturePath,
         otherUserName,
         lastUpdate,
         messages,

@@ -24,6 +24,17 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
   private final JWT_token jwtTokenService = new JWT_token();
 
+  /**
+   * Makes it so that the filter does not run for WebSocket requests.
+   */
+  @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    String path = request.getRequestURI();
+    boolean isWebSocket = path.startsWith("/ws/chat/");
+    System.out.println(path + " isWebSocket: " + isWebSocket);
+    return isWebSocket;
+  }
+
   @Override
   protected void doFilterInternal(
       HttpServletRequest request,

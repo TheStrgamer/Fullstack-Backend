@@ -52,6 +52,6 @@ public class ImagesService {
   }
 
   public Images getDefaultUserImage() {
-    return new Images(0, "images/default_user.png");
+    return new Images(0, "");
   }
 }
