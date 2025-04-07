@@ -36,6 +36,14 @@ public class JWT_token {
     return new TokenResponseObject(token, expirationDate.getTime());
   }
 
+
+  /**
+   * Validates the JWT token and checks if it has expired.
+   *
+   * @param token the JWT token to validate
+   * @throws TokenExpiredException if the token has expired
+   * @throws IllegalArgumentException if the token is invalid or empty
+   */
   public void validateJwtToken(String token) {
     try {
       Jwts.parser().setSigningKey(key).parseClaimsJws(token);

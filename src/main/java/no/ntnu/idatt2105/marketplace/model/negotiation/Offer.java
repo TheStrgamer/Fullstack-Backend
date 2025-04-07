@@ -1,4 +1,4 @@
-package no.ntnu.idatt2105.marketplace.model.other;
+package no.ntnu.idatt2105.marketplace.model.negotiation;
 
 import jakarta.persistence.*;
 

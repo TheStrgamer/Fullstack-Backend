@@ -50,4 +50,8 @@ public class ImagesService {
   public void saveImageInFiles(Path path, MultipartFile file) throws IOException {
     Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
   }
+
+  public Images getDefaultUserImage() {
+    return new Images(0, "");
+  }
 }
