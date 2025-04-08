@@ -60,7 +60,11 @@ public class ListingService {
                 ? null
                 : listing.getImages().get(0).getFilepath_to_image();
 
-        return new ListingDTO(
+        List<String> imageUrls = listing.getImages().stream()
+                .map(img -> "http://localhost:8080/" + img.getFilepath_to_image())
+                .toList();
+
+        ListingDTO dto = new ListingDTO(
                 listing.getId(),
                 listing.getTitle(),
                 listing.getBrief_description(),
@@ -77,6 +81,8 @@ public class ListingService {
                 listing.getUpdated_at(),
                 imagePath
         );
+        dto.setImageUrls(imageUrls);
+        return dto;
     }
 
 
