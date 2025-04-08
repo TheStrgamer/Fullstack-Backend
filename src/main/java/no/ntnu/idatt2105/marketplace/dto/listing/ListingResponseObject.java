@@ -1,11 +1,10 @@
-package no.ntnu.idatt2105.marketplace.responseobjects;
+package no.ntnu.idatt2105.marketplace.dto.listing;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
-import no.ntnu.idatt2105.marketplace.model.other.Images;
 
 public class ListingResponseObject {
     private int id;

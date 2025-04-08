@@ -16,7 +16,7 @@ import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.CategoriesRepo;
 import no.ntnu.idatt2105.marketplace.repo.ConditionRepo;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
-import no.ntnu.idatt2105.marketplace.responseobjects.ListingResponseObject;
+import no.ntnu.idatt2105.marketplace.dto.listing.ListingResponseObject;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -39,11 +39,7 @@ public class User {
   private Images profile_picture;
 
   @ManyToOne
-  @JoinTable(
-        name = "user_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-  )
+  @JoinColumn(name = "role_id") // This will be the foreign key column in the user table
   private Role role;
 
 

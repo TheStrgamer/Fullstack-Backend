@@ -1,18 +1,42 @@
 package no.ntnu.idatt2105.marketplace.service.user;
 
 import java.util.List;
+import java.util.Optional;
+
 import no.ntnu.idatt2105.marketplace.dto.negotiation.NegotiationChatsDTO;
 import no.ntnu.idatt2105.marketplace.dto.user.UserUpdate;
+import no.ntnu.idatt2105.marketplace.exception.EmailNotAvailibleException;
+import no.ntnu.idatt2105.marketplace.exception.IncorrectPasswordException;
+import no.ntnu.idatt2105.marketplace.exception.PhonenumberNotAvailibleException;
+import no.ntnu.idatt2105.marketplace.exception.UserNotFoundException;
+import no.ntnu.idatt2105.marketplace.model.user.Role;
 import no.ntnu.idatt2105.marketplace.model.user.User;
+import no.ntnu.idatt2105.marketplace.repo.RoleRepo;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
+import no.ntnu.idatt2105.marketplace.dto.other.TokenResponseObject;
+import no.ntnu.idatt2105.marketplace.service.security.BCryptHasher;
+import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Service
 public class UserService {
 
   @Autowired
   private UserRepo userRepo;
+
+  @Autowired
+  private RoleRepo roleRepo;
+
+  @Autowired
+  private JWT_token jwt;
+
+  private final BCryptHasher hasher = new BCryptHasher();
+
+  public void setJwt(JWT_token jwt) {
+    this.jwt = jwt;
+  }
 
   public void updateUser(int id, UserUpdate dto) throws Exception{
     User user = userRepo.findById(id).orElseThrow(() -> new Exception("User not found"));
@@ -39,5 +63,60 @@ public class UserService {
             negotiation.getLatestMessage(),
             negotiation.getUpdatedAt()
         )).toList();
+  }
+
+
+  public boolean validateEmail(String email) {
+    return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+  }
+  public boolean verifyEmailNotInUse(String email) {
+    return userRepo.findByEmail(email).isEmpty();
+  }
+  public boolean validatePassword(String password) {
+    return !password.isEmpty();
+  }
+  public boolean validatePhoneNumber(String phoneNumber) {
+    return phoneNumber.matches("^\\d{8}$");
+  }
+  public boolean verifyPhoneNumberNotInUse(String phoneNumber) {
+    return userRepo.findByPhonenumber(phoneNumber).isEmpty();
+  }
+  public boolean validateName(String name) {
+    return name.matches("^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$");
+  }
+  public boolean validateUser(User user) {
+    return validateEmail(user.getEmail()) && validatePassword(user.getPassword()) && validatePhoneNumber(user.getPhonenumber()) && validateName(user.getFirstname()) && validateName(user.getSurname());
+  }
+
+  public TokenResponseObject authenticate(String email, String password) {
+    Optional<User> user = userRepo.findByEmail(email);
+    if (user.isEmpty()) {
+      throw new UserNotFoundException("No user found with given email and password");
+    }
+    if (!hasher.checkPassword(password, user.get().getPassword())) {
+      throw new IncorrectPasswordException("Incorrect password for given email");
+    }
+    System.out.println("User with id " + user.get().getIdAsString() + " found with given email and password");
+    return jwt.generateJwtToken(user.get());
+  }
+
+  public int register(User user) {
+    if (!verifyEmailNotInUse(user.getEmail())) {
+      System.out.println("Email is already in use");
+      throw new EmailNotAvailibleException("Email is already in use");
+    }
+    if (!verifyPhoneNumberNotInUse(user.getPhonenumber())) {
+      System.out.println("Phone number is already in use");
+      throw new PhonenumberNotAvailibleException("Phone number is already in use");
+    }
+    if (!validateUser(user)) {
+      System.out.println("Invalid user data");
+      throw new IllegalArgumentException("Invalid user data");
+    }
+    user.setPassword(hasher.hashPassword(user.getPassword()));
+    Role role = roleRepo.findByName("USER").orElseThrow();
+    user.setRole(role);
+    userRepo.save(user);
+    return 0;
   }
 }

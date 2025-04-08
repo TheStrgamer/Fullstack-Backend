@@ -72,8 +72,7 @@ public class ListingService {
                 listing.getLongitude(),
                 listing.getCategory().getName(),
                 listing.getCondition().getName(),
-                listing.getCreator().getFirstname(),
-                listing.getCreator().getSurname(),
+                listing.getCreator().getId(),
                 listing.getCreated_at(),
                 listing.getUpdated_at(),
                 imagePath
