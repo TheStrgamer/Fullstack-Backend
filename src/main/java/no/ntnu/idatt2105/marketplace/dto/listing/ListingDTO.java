@@ -2,6 +2,7 @@ package no.ntnu.idatt2105.marketplace.dto.listing;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
+import java.util.List;
 
 @Schema(description = "Data transfer object representing a marketplace listing")
 public class ListingDTO {
@@ -50,6 +51,10 @@ public class ListingDTO {
 
     @Schema(description = "Relative or absolute path to the listing's main image", example = "/images/listings/101.jpg")
     private String imagePath;
+
+    @Schema(description = "List of image URLs for the listing")
+    private List<String> imageUrls;
+
 
     // Constructor
     public ListingDTO(int id, String title, String briefDescription, String fullDescription, int price, int saleStatus,
@@ -117,5 +122,13 @@ public class ListingDTO {
     }
     public String getImagePath() {
         return imagePath;
+    }
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    // Setters
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 }

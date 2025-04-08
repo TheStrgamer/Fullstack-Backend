@@ -16,7 +16,6 @@ import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.CategoriesRepo;
 import no.ntnu.idatt2105.marketplace.repo.ConditionRepo;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
-import no.ntnu.idatt2105.marketplace.dto.listing.ListingResponseObject;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,9 +64,8 @@ public class ListingController {
                             schema = @Schema(implementation = ListingDTO.class))
             )
     )
-    public List<ListingResponseObject> getAllListings() {
-        List<Listing> listings = listingRepo.findAll();
-        return ListingResponseObject.fromEntityList(listings);
+    public List<ListingDTO> getAllListings() {
+        return listingService.getAllListings();
     }
 
 
@@ -101,20 +99,17 @@ public class ListingController {
             ) @PathVariable String id) {
         try {
             return listingRepo.findById(Integer.valueOf(id))
-                    .map(listing -> ResponseEntity.ok(new ListingResponseObject(listing)))
-                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body(new ListingResponseObject()));
+                    .map(listing -> ResponseEntity.ok(listingService.toDTO(listing)))
+                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 //            Listing listing = listingService.getListingById(Integer.parseInt(id));
 //            if (listing == null) {
 //                return new ResponseEntity<>("Listing not found", HttpStatus.NOT_FOUND);
 //            }
 //            return new ResponseEntity<>(listing, HttpStatus.OK);
         } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ListingResponseObject());
+            return ResponseEntity.badRequest().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ListingResponseObject());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

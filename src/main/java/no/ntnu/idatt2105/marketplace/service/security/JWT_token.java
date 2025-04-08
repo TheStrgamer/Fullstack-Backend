@@ -23,7 +23,7 @@ public class JWT_token {
   @Autowired
   private UserRepo userRepo;
   private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-  private static final long EXPIRATION_TIME = 15 * 60 * 1000;
+  private static final long EXPIRATION_TIME = 120 * 60 * 1000;
 
   public TokenResponseObject generateJwtToken(User user) {
     Date expirationDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
