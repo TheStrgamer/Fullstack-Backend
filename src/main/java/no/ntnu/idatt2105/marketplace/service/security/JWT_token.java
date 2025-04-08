@@ -12,7 +12,7 @@ import java.util.Date;
 import io.jsonwebtoken.security.Keys;
 import no.ntnu.idatt2105.marketplace.exception.TokenExpiredException;
 import no.ntnu.idatt2105.marketplace.model.user.User;
-import no.ntnu.idatt2105.marketplace.responseobjects.TokenResponseObject;
+import no.ntnu.idatt2105.marketplace.dto.other.TokenResponseObject;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

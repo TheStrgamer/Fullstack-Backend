@@ -40,11 +40,8 @@ public class ListingDTO {
     @Schema(description = "Condition label of the item", example = "Used - Good")
     private String conditionName;
 
-    @Schema(description = "First name of the listing creator", example = "Alice")
-    private String creatorFirstName;
-
-    @Schema(description = "Surname of the listing creator", example = "Johansen")
-    private String creatorSurname;
+    @Schema(description = "Id of the listing creator", example = "221")
+    private int creatorId;
 
     @Schema(description = "Timestamp when the listing was created", example = "2024-03-15T10:23:00Z")
     private Date createdAt;
@@ -62,7 +59,7 @@ public class ListingDTO {
     // Constructor
     public ListingDTO(int id, String title, String briefDescription, String fullDescription, int price, int saleStatus,
                       String size, double latitude, double longitude, String categoryName, String conditionName,
-                      String creatorFirstName, String creatorSurname, Date createdAt, Date updatedAt, String imagePath) {
+                      int creatorId, Date createdAt, Date updatedAt, String imagePath) {
         this.id = id;
         this.title = title;
         this.briefDescription = briefDescription;
@@ -74,8 +71,7 @@ public class ListingDTO {
         this.longitude = longitude;
         this.categoryName = categoryName;
         this.conditionName = conditionName;
-        this.creatorFirstName = creatorFirstName;
-        this.creatorSurname = creatorSurname;
+        this.creatorId = creatorId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.imagePath = imagePath;
@@ -115,11 +111,8 @@ public class ListingDTO {
     public String getConditionName() {
         return conditionName;
     }
-    public String getCreatorFirstName() {
-        return creatorFirstName;
-    }
-    public String getCreatorSurname() {
-        return creatorSurname;
+    public int getCreatorId() {
+        return creatorId;
     }
     public Date getCreatedAt() {
         return createdAt;
