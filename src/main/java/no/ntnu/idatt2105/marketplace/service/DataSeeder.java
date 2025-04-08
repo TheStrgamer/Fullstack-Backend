@@ -105,7 +105,7 @@ public class DataSeeder implements CommandLineRunner {
                 "12345678",
                 profileImg
         );
-        user.addRole(role);
+        user.setRole(role);
         userRepo.save(user);
 
         // Opprett listing
@@ -152,7 +152,7 @@ public class DataSeeder implements CommandLineRunner {
                 "98765432",
                 profileImg
         );
-        user.addRole(role);
+        user.setRole(role);
         userRepo.save(user);
 
         // Opprett listing 1 – Jakke

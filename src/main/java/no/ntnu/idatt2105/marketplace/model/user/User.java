@@ -37,14 +37,14 @@ public class User {
   @JoinColumn(name = "images_id", unique = true)
   private Images profile_picture;
 
-  @ManyToMany
+  @ManyToOne
   @JoinTable(
-      name = "user_roles",
-      joinColumns = @JoinColumn(name = "user_id"),
-      inverseJoinColumns = @JoinColumn(name = "role_id")
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
   )
-  // private List<Role> roles;
-  private List<Role> roles = new ArrayList<>(); //nødvendig for å unngå nullpointer i forbindelse med testdata
+  private Role role;
+
 
   @ManyToMany
   @JoinTable(
@@ -143,16 +143,12 @@ public class User {
     this.profile_picture = profile_picture;
   }
 
-  public List<Role> getRoles() {
-    return roles;
+  public Role getRole() {
+    return role;
   }
 
-  public void addRole(Role role) {
-    roles.add(role);
-  }
-
-  public void removeRole(Role role) {
-    roles.remove(role);
+  public void setRole(Role role) {
+    this.role = role;
   }
 
   public List<Listing> getFavorites() {

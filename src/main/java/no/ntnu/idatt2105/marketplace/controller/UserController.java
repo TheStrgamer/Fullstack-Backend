@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 import jdk.jshell.spi.ExecutionControlProvider;
 import no.ntnu.idatt2105.marketplace.dto.user.*;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
+import no.ntnu.idatt2105.marketplace.service.images.ImagesService;
 import no.ntnu.idatt2105.marketplace.service.security.BCryptHasher;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import no.ntnu.idatt2105.marketplace.service.user.UserService;
@@ -50,6 +51,9 @@ public class UserController {
 
   @Autowired
   private UserService userService;
+
+  @Autowired
+  private ImagesService imagesService;
 
   private final BCryptHasher hasher = new BCryptHasher();
 
@@ -321,7 +325,7 @@ public class UserController {
 
 
 
-  @PostMapping("/my_account")
+  @GetMapping("/my_account")
   @Operation(
           summary = "Get account credentials",
           description = "Returns the logged in users credentials"
@@ -359,10 +363,12 @@ public class UserController {
     Optional<User> user = userRepo.findById(user_id);
 
     if (user.isEmpty()) {
-      System.out.println("No user found with given email");
+      System.out.println("No user found with given id:" + user_id);
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     UserResponseObject response = new UserResponseObject(user.get(), true);
+
+    System.out.println(response);
 
     return ResponseEntity.ok(response);
   }

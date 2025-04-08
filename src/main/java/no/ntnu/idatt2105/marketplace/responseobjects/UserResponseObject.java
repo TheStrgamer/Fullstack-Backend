@@ -1,7 +1,7 @@
 package no.ntnu.idatt2105.marketplace.responseobjects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import no.ntnu.idatt2105.marketplace.model.other.Images;
 import no.ntnu.idatt2105.marketplace.model.user.Role;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 
@@ -22,28 +22,29 @@ public class UserResponseObject {
   @Schema(description = "User's phone number", example = "12345678")
   private String phonenumber;
 
-  @Schema(description = "User's profile picture object")
-  private Images profile_picture;
+  @Schema(description = "User's profile picture url")
+  @JsonProperty("profilePicture")
+  private String profilePicture;
 
-  @Schema(description = "List of roles the user has (only included for self-requests)", example = "[{\"name\": \"ROLE_USER\"}]")
-  private List<Role> roles;
+  @Schema(description = "The role the user has (only included for self-requests)", example = "1")
+  private int role;
 
-  public UserResponseObject(String email, String firstname, String surname, String phonenumber, Images profile_picture, List<Role> roles) {
+  public UserResponseObject(String email, String firstname, String surname, String phonenumber, String profilePicture, int role) {
     this.email = email;
     this.firstname = firstname;
     this.surname = surname;
     this.phonenumber = phonenumber;
-    this.profile_picture = profile_picture;
-    this.roles = roles;
+    this.profilePicture = profilePicture;
+    this.role = role;
   }
 
-  public UserResponseObject(String email, String firstname, String surname, String phonenumber, Images profile_picture) {
+  public UserResponseObject(String email, String firstname, String surname, String phonenumber, String profilePicture) {
     this.email = email;
     this.firstname = firstname;
     this.surname = surname;
     this.phonenumber = phonenumber;
-    this.profile_picture = profile_picture;
-    this.roles = null;
+    this.profilePicture = profilePicture;
+    this.role = -1;
   }
 
   public UserResponseObject(User user, boolean includeRoles) {
@@ -51,8 +52,8 @@ public class UserResponseObject {
     this.firstname = user.getFirstname();
     this.surname = user.getSurname();
     this.phonenumber = user.getPhonenumber();
-    this.profile_picture = user.getProfile_picture();
-    this.roles = includeRoles ? user.getRoles() : null;
+    this.profilePicture = user.getProfile_picture() != null ? user.getProfile_picture().getFilepath_to_image() : null;
+    this.role = includeRoles ? user.getRole().getId() : -1;
   }
 
   // Getters and setters
@@ -89,19 +90,29 @@ public class UserResponseObject {
     this.phonenumber = phonenumber;
   }
 
-  public Images getProfile_picture() {
-    return profile_picture;
+  public String getProfilePicture() {
+    return profilePicture;
   }
 
-  public void setProfile_picture(Images profile_picture) {
-    this.profile_picture = profile_picture;
+  public void setProfilePicture(String profile_picture_url) {
+    this.profilePicture = profile_picture_url;
   }
 
-  public List<Role> getRoles() {
-    return roles;
+  public int getRole() {
+    return role;
   }
 
-  public void setRoles(List<Role> roles) {
-    this.roles = roles;
+  public void setRole(int role) {
+    this.role = role;
+  }
+
+  @Override
+  public String toString() {
+    return "Email: " + this.email
+            + "\nFirstName: " + this.firstname
+            + "\nLastname: " + this.surname
+            + "\nPhonenumber: " + this.phonenumber
+            + "\nProfile Picture URL : " + this.profilePicture
+            + "\nRole: " + this.role;
   }
 }
