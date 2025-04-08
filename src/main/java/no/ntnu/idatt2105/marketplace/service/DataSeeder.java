@@ -178,8 +178,11 @@ public class DataSeeder implements CommandLineRunner {
         listingRepo.save(iphone);
 
         Images iphoneImg = new Images(0, "/images/iphone.png");
+        Images iphone2Img = new Images(0, "/images/iphone12-back.png");
         iphoneImg.setListing(iphone);
         imagesRepo.save(iphoneImg);
+        iphone2Img.setListing(iphone);
+        imagesRepo.save(iphone2Img);
 
         // Add listing to favorites
         Optional<User> testUserOpt = userRepo.findByEmail("Albert@example.com");

@@ -1,4 +1,4 @@
-package no.ntnu.idatt2105.marketplace.responseobjects;
+package no.ntnu.idatt2105.marketplace.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
