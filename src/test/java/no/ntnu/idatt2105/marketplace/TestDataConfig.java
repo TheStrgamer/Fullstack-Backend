@@ -32,20 +32,17 @@ class TestDataConfig {
     return args -> {
       // Create test Images:
       Images images = new Images();
-      images.setId(1);
       images.setFilepath_to_image("test.jpg");
       images.setListing(null);
       imagesRepo.save(images);
 
       // Create test roles:
       Role role = new Role();
-      role.setId(1);
       role.setName("USER");
       roleRepo.save(role);
 
       // Create test users:
       User testUser = new User();
-      testUser.setId(1);
       testUser.setFirstname("Test");
       testUser.setSurname("User");
       testUser.setEmail("test@test.com");
@@ -57,13 +54,11 @@ class TestDataConfig {
 
       // Create test categories:
       Categories category = new Categories();
-      category.setId(1);
       category.setName("Test Category");
       categoriesRepo.save(category);
 
       // Create test conditions:
       Condition condition = new Condition();
-      condition.setId(1);
       condition.setName("Test Condition");
       conditionRepo.save(condition);
 
@@ -75,12 +70,10 @@ class TestDataConfig {
         created_date = simpleDateFormat.parse("2023-10-01");
         updated_date = simpleDateFormat.parse("2023-10-02");
       } catch (ParseException e) {
-        e.printStackTrace();
         throw new RuntimeException("Error parsing date", e);
       }
 
       Listing listing = new Listing();
-      listing.setId(1);
       listing.setTitle("Test Listing");
       listing.setBrief_description("This is a test listing");
       listing.setFull_description("This is a full test listing");
