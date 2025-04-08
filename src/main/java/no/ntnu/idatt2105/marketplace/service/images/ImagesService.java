@@ -5,13 +5,17 @@ import no.ntnu.idatt2105.marketplace.repo.ImagesRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,6 +27,24 @@ public class ImagesService {
   @Autowired
   private ImagesRepo imagesRepo;
 
+
+  public List<Images> saveListingImages(List<MultipartFile> images) throws Exception {
+    List<Images> createdImages = new ArrayList<>();
+
+    for (MultipartFile file : images) {
+      Images image = createDBImageFromRequest(file, "listingImages");
+      Images saved = imagesRepo.save(image);
+      createdImages.add(saved);
+    }
+
+    return createdImages;
+  }
+
+
+  public Images saveUserProfilePicture(MultipartFile file) throws Exception {
+    Images image = createDBImageFromRequest(file, "profilePictures");
+    return imagesRepo.save(image);
+  }
 
   public Images createDBImageFromRequest(MultipartFile file, String subDirectory) throws Exception {
     
@@ -43,7 +65,8 @@ public class ImagesService {
       saveImageInFiles(path, file);
 
       // set the filepath in the model
-      img.setFilepath_to_image("images/" + filename);
+      img.setFilepath_to_image("/images/" + subDirectory + "/" + filename);
+
 
       return img;
     } catch (IOException e) {
@@ -53,10 +76,6 @@ public class ImagesService {
 
   public void saveImageInFiles(Path path, MultipartFile file) throws IOException {
     Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-  }
-
-  public void saveImageInDB() {
-
   }
 
   public String getImageURLFromId(int id) {
