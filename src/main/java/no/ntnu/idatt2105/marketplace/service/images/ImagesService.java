@@ -1,23 +1,27 @@
 package no.ntnu.idatt2105.marketplace.service.images;
 
 import no.ntnu.idatt2105.marketplace.model.other.Images;
+import no.ntnu.idatt2105.marketplace.repo.ImagesRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Optional;
 
 @Service
 public class ImagesService {
 
   @Value("${app.upload.dir}")
   private String uploadDir;
+
+  @Autowired
+  private ImagesRepo imagesRepo;
 
 
   public Images createDBImageFromRequest(MultipartFile file, String subDirectory) throws Exception {
@@ -49,5 +53,16 @@ public class ImagesService {
 
   public void saveImageInFiles(Path path, MultipartFile file) throws IOException {
     Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+  }
+
+  public void saveImageInDB() {
+
+  }
+
+  public String getImageURLFromId(int id) {
+    Optional<Images> img = imagesRepo.findById(id);
+    if (img.isEmpty()) return "";
+
+    return img.get().getFilepath_to_image();
   }
 }

@@ -7,5 +7,7 @@ import java.util.Optional;
 
 public interface ImagesRepo extends JpaRepository<Images, Integer> {
     Optional<Images> findByFilepathToImage(String filepathToImage);
+
+    Optional<Images> findById(int id);
 }
 
