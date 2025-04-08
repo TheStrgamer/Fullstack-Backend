@@ -14,9 +14,6 @@ public class Role {
   @Column(unique = true, nullable = false)
   private String name;
 
-  @ManyToMany(mappedBy = "roles")
-  private List<User> users;
-
   // constructor
   public Role() {}
   public Role(int id, String name) {
@@ -39,9 +36,5 @@ public class Role {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public List<User> getUsers() {
-    return users;
   }
 }
