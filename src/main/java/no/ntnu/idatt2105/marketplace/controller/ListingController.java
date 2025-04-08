@@ -1,5 +1,6 @@
 package no.ntnu.idatt2105.marketplace.controller;
 
+import no.ntnu.idatt2105.marketplace.dto.listing.ListingUpdate;
 import no.ntnu.idatt2105.marketplace.model.listing.Categories;
 import no.ntnu.idatt2105.marketplace.model.listing.Condition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,6 +48,7 @@ public class ListingController {
 
     @Autowired
     private JWT_token jwtTokenService;
+
 
     private static final Logger LOGGER = LogManager.getLogger(ListingController.class);
 
@@ -207,5 +209,130 @@ public class ListingController {
             ) @RequestParam(defaultValue = "10") int count,
             Principal principal) {
         return ResponseEntity.ok(listingService.getRecommendedListingsForUser(principal.getName(), count));
+    }
+
+
+
+
+    @PutMapping("/update{id}")
+    @Operation(
+            summary = "Update listing",
+            description = "Updates a listing with the given id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully updated listing"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid Authorization header"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error updating listings"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "User does not have permission tpo update the requested listing"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Could not find requested listing"
+            ),
+    })
+    public ResponseEntity<?> updateListing(
+            @Parameter(
+                    name = "Authorization",
+                    description = "Bearer token in the format `Bearer <JWT>`",
+                    required = true,
+                    example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+            ) @RequestHeader("Authorization") String authorizationHeader,
+            @Parameter(
+                    name = "id",
+                    description = "The id of the listing that is being updated",
+                    example = "111"
+            ) @PathVariable int id,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Updated listing data",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = ListingUpdate.class)
+                    )
+            ) @RequestBody ListingUpdate updatedListingData) {
+        try {
+            // validate token
+            if (!authorizationHeader.startsWith("Bearer ")) {
+                LOGGER.info("Invalid Authorization header");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            // validate listing
+            if (listingService.isListingValid(id)) {
+                LOGGER.info("There exists not listing with the id: " + id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            // validate user permission
+            String token = authorizationHeader.substring(7);
+            int user_id = Integer.parseInt(jwtTokenService.extractIdFromJwt(token));
+
+            if (listingService.userHasPermission(id, user_id)) {
+                LOGGER.info("User with id" + user_id
+                                + " has no permission to update listing with id: " + id);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+
+            listingService.updateListing(id, updatedListingData);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception e) {
+            LOGGER.error("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+
+    @GetMapping("/getMyListings")
+    @Operation(
+            summary = "Get all listings by user id",
+            description = "Returns a list of listingDTOs containing information about listings created by a user with the given user_id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully returned a list of listings where the creator id equals the given user id"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid Authorization header"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error returning list of listings"
+            ),
+    })
+    public ResponseEntity<List<ListingDTO>> getListingsForUser(
+            @Parameter(
+                    name = "Authorization",
+                    description = "Bearer token in the format `Bearer <JWT>`",
+                    required = true,
+                    example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+            ) @RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            // validate token
+            if (!authorizationHeader.startsWith("Bearer ")) {
+                LOGGER.info("Invalid Authorization header");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            String token = authorizationHeader.substring(7);
+            int user_id = Integer.parseInt(jwtTokenService.extractIdFromJwt(token));
+
+            List<ListingDTO> response = listingService.getAllListingsForUser(user_id);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

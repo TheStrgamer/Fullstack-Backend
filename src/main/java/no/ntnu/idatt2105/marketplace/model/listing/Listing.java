@@ -229,6 +229,10 @@ public class Listing {
     images.remove(image);
   }
 
+  public void setImages(List<Images> images) {
+    this.images = images;
+  }
+
   public List<Conversation> getConversations() {
     return conversations;
   }
