@@ -1,5 +1,8 @@
 package no.ntnu.idatt2105.marketplace;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,6 +65,35 @@ class TestDataConfig {
       condition.setId(1);
       condition.setName("Test Condition");
       conditionRepo.save(condition);
+
+      // Create test listings:
+      Date created_date;
+      Date updated_date = new Date();
+      try {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        created_date = simpleDateFormat.parse("2023-10-01");
+        updated_date = simpleDateFormat.parse("2023-10-02");
+      } catch (ParseException e) {
+        e.printStackTrace();
+        throw new RuntimeException("Error parsing date", e);
+      }
+
+      Listing listing = new Listing();
+      listing.setId(1);
+      listing.setTitle("Test Listing");
+      listing.setBrief_description("This is a test listing");
+      listing.setFull_description("This is a full test listing");
+      listing.setPrice(100);
+      listing.setCondition(condition);
+      listing.setCategory(category);
+      listing.setCreator(testUser);
+      listing.setSale_status(0);
+      listing.setCreated_at(created_date);
+      listing.setUpdated_at(updated_date);
+      listing.setLatitude(100);
+      listing.setLongitude(100);
+      listing.setSize("test size");
+      listingRepo.save(listing);
     };
   }
 }
