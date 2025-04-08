@@ -3,6 +3,7 @@ package no.ntnu.idatt2105.marketplace;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import no.ntnu.idatt2105.marketplace.model.negotiation.Message;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -68,7 +69,7 @@ class TestDataConfig {
 
       // Create test listings:
       Date created_date;
-      Date updated_date = new Date();
+      Date updated_date;
       try {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         created_date = simpleDateFormat.parse("2023-10-01");
@@ -94,6 +95,21 @@ class TestDataConfig {
       listing.setLongitude(100);
       listing.setSize("test size");
       listingRepo.save(listing);
+
+      // Create test conversations:
+      Conversation conversation = new Conversation(testUser, listing);
+      conversation.setStatus(0);
+      conversation.updateDate();
+
+      // Create test messages:
+      Message message = new Message(testUser, conversation, "test message");
+      messageRepo.save(message);
+
+      // Add message to conversation and save:
+      conversation.addMessage(message);
+      conversationRepo.save(conversation);
+
+
     };
   }
 }
