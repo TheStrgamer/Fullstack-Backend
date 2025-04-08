@@ -1,5 +1,7 @@
 package no.ntnu.idatt2105.marketplace.service.user;
 
+import java.util.List;
+import no.ntnu.idatt2105.marketplace.dto.negotiation.NegotiationChatsDTO;
 import no.ntnu.idatt2105.marketplace.dto.user.UserUpdate;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
@@ -27,5 +29,15 @@ public class UserService {
 
     System.out.println("Updated user");
     userRepo.save(user);
+  }
+
+  public List<NegotiationChatsDTO> getActiveChats(User user) {
+    return user.getActiveNegotiations().stream()
+        .map(negotiation -> new NegotiationChatsDTO(
+            negotiation.getId(),
+            negotiation.getBuyer() == user ? negotiation.getSeller() : negotiation.getBuyer(),
+            negotiation.getLatestMessage(),
+            negotiation.getUpdatedAt()
+        )).toList();
   }
 }

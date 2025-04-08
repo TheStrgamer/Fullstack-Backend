@@ -30,7 +30,8 @@ public class SecurityConfig {
                         "/images/**",
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
-                        "/swagger-ui.html")
+                        "/swagger-ui.html",
+                    "/ws/**")
                 .permitAll()
                 .requestMatchers(
                         "api/users/register",
@@ -39,7 +40,8 @@ public class SecurityConfig {
                         "/api/listings/all",
                         "/api/listings/id/**",
                         "api/users",
-                        "/api/listings/recommended").permitAll()
+                        "/api/listings/recommended",
+                    "/ws/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

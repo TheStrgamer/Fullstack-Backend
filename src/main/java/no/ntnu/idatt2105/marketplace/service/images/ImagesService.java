@@ -65,4 +65,8 @@ public class ImagesService {
 
     return img.get().getFilepath_to_image();
   }
+  
+  public Images getDefaultUserImage() {
+    return new Images(0, "");
+  }
 }
