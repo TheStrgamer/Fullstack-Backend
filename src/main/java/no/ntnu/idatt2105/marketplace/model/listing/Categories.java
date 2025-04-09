@@ -70,4 +70,9 @@ public class Categories {
   public List<Listing> getListings() {
     return listings;
   }
+
+  @Override
+  public String toString() {
+    return name;
+  }
 }

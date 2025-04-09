@@ -154,6 +154,10 @@ public class User {
     this.role = role;
   }
 
+  public boolean isAdmin() {
+    return role.getName().equals("ADMIN");
+  }
+
   public List<Listing> getFavorites() {
     return favorites;
   }
