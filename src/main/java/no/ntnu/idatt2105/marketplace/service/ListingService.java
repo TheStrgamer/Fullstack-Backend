@@ -1,8 +1,13 @@
 package no.ntnu.idatt2105.marketplace.service;
 
+import no.ntnu.idatt2105.marketplace.dto.listing.CategoriesDTO;
+import no.ntnu.idatt2105.marketplace.dto.listing.ConditionsDTO;
 import no.ntnu.idatt2105.marketplace.dto.listing.ListingDTO;
 import no.ntnu.idatt2105.marketplace.dto.listing.ListingUpdate;
+import no.ntnu.idatt2105.marketplace.model.listing.Categories;
+import no.ntnu.idatt2105.marketplace.model.listing.Condition;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
+import no.ntnu.idatt2105.marketplace.model.other.Images;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.CategoriesRepo;
 import no.ntnu.idatt2105.marketplace.repo.ConditionRepo;
@@ -11,6 +16,7 @@ import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import no.ntnu.idatt2105.marketplace.service.images.ImagesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -118,17 +124,54 @@ public class ListingService {
     }
 
     public boolean userHasPermission(int listing_id, int user_id) {
-        // if user role = ADMIN or user is creator return true
-        return userRepo.findById(user_id).get().getRole().getName().equals("ADMIN") || listingRepo.findById(listing_id).get().getCreator().getId() == user_id;
+        Optional<User> userOpt = userRepo.findById(user_id);
+        Optional<Listing> listingOpt = listingRepo.findById(listing_id);
+
+        if (userOpt.isEmpty() || listingOpt.isEmpty()) {
+            System.out.println("User or listing not found");
+            return false;
+        }
+
+        User user = userOpt.get();
+        Listing listing = listingOpt.get();
+
+        boolean isAdmin = user.getRole() != null && "ADMIN".equalsIgnoreCase(user.getRole().getName());
+        boolean isCreator = listing.getCreator() != null && listing.getCreator().getId() == user_id;
+
+        System.out.println("Is Admin: " + isAdmin);
+        System.out.println("Is Creator: " + isCreator);
+
+        return isAdmin || isCreator;
     }
 
 
+
+
+
     public void updateListing(int listing_id, ListingUpdate updatedListingData) throws Exception {
-        Listing listing = listingRepo.findById(listing_id).get();
+        System.out.println("Updating listing with id: " + listing_id + "Data: " + "\n" + updatedListingData.toString());
+        Optional<Listing> isPresentCheck = listingRepo.findById(listing_id);
+        if (isPresentCheck.isEmpty()) {
+            throw new Exception("No listing with id " + listing_id);
+        }
+        Listing listing = isPresentCheck.get();
+
+        Optional<Categories> categoriesOptional = categoriesRepo.findById(updatedListingData.getCategory_id());
+        Optional<Condition> conditionOptional = conditionRepo.findById(updatedListingData.getCondition_id());
+
+
 
         listing.setTitle(updatedListingData.getTitle());
-        listing.setCategory(categoriesRepo.findById(updatedListingData.getCategory_id()).get());
-        listing.setCondition(conditionRepo.findById(updatedListingData.getCondition_id()).get());
+        // check category
+        if (categoriesOptional.isPresent()) {
+            listing.setCategory(categoriesOptional.get());
+        } else throw new Exception("No category found");
+
+        // check condition
+        if (conditionOptional.isPresent()) {
+            listing.setCondition(conditionOptional.get());
+        } else throw new Exception("No condition found");
+
         listing.setSale_status(updatedListingData.getSale_status());
         listing.setPrice(updatedListingData.getPrice());
         listing.setBrief_description(updatedListingData.getBrief_description());
@@ -136,10 +179,67 @@ public class ListingService {
         listing.setSize(updatedListingData.getSize());
         listing.setLatitude(updatedListingData.getLatitude());
         listing.setLongitude(updatedListingData.getLongitude());
-        listing.setImages(imagesService.saveListingImages(updatedListingData.getImages()));
+//        List<Images> images = imagesService.saveListingImages((updatedListingData.getImages()));
+//        listing.setImages(images);
 
         listingRepo.save(listing);
     }
 
+
+    public List<CategoriesDTO> getAllCategories() {
+        return categoriesRepo.findAll().stream()
+                .map(this::toCategoriesDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ConditionsDTO> getAllConditions() {
+        return conditionRepo.findAll().stream()
+                .map(this::toConditionsDTO)
+                .collect(Collectors.toList());
+    }
+
+    private CategoriesDTO toCategoriesDTO(Categories category) {
+        CategoriesDTO dto = new CategoriesDTO();
+        dto.setId(category.getId());
+        dto.setName(category.getName());
+        dto.setDescription(category.getDescription());
+
+        if (category.getParent_category() != null) {
+            dto.setParent_category(category.getParent_category().getId());
+        }
+
+        return dto;
+    }
+
+    private ConditionsDTO toConditionsDTO(Condition condition) {
+        ConditionsDTO dto = new ConditionsDTO();
+        dto.setId(condition.getId());
+        dto.setName(condition.getName());
+
+        return dto;
+    }
+
+    public void deleteListingImages(int listing_id) {
+        Optional<Listing> listing = listingRepo.findById(listing_id);
+        listing.ifPresent(value -> value.setImages(null));
+    }
+
+    @Transactional
+    public void delete(int listing_id) {
+        System.out.println("Deleting");
+        // Delete all images related to the listing from the files
+        Optional<Listing> listing = listingRepo.findById(listing_id);
+        if (listing.isEmpty()) return;
+
+        // get the images
+        List<Images> listingImages = listing.get().getImages();
+        System.out.println("Deleting images from files");
+        for (Images image : listingImages) {
+            imagesService.deleteImageFromFile(image.getId());
+        }
+        // Delete the listings
+        System.out.println("Deleting the listing from the database");
+        listingRepo.deleteById(listing_id);
+    }
 }
 

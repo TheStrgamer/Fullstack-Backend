@@ -1,14 +1,12 @@
 package no.ntnu.idatt2105.marketplace.dto.listing;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Date;
 import java.util.List;
 
 @Schema(description = "Data transfer object representing a marketplace listing")
-public class ListingDTO {
-
-    @Schema(description = "Unique ID of the listing", example = "101")
-    private int id;
+public class ListingCreate {
 
     @Schema(description = "Title of the listing", example = "Vintage bicycle for sale")
     private String title;
@@ -34,11 +32,11 @@ public class ListingDTO {
     @Schema(description = "Longitude of the item location", example = "10.3951")
     private double longitude;
 
-    @Schema(description = "Name of the item's category", example = "Bicycles")
-    private String categoryName;
+    @Schema(description = "Id of the item's category", example = "123")
+    private int category;
 
-    @Schema(description = "Condition label of the item", example = "Used - Good")
-    private String conditionName;
+    @Schema(description = "Id of the item' category", example = "123")
+    private int condition;
 
     @Schema(description = "Id of the listing creator", example = "221")
     private int creatorId;
@@ -57,10 +55,9 @@ public class ListingDTO {
 
 
     // Constructor
-    public ListingDTO(int id, String title, String briefDescription, String fullDescription, int price, int saleStatus,
-                      String size, double latitude, double longitude, String categoryName, String conditionName,
-                      int creatorId, Date createdAt, Date updatedAt, String imagePath) {
-        this.id = id;
+    public ListingCreate(String title, String briefDescription, String fullDescription, int price, int saleStatus,
+                         String size, double latitude, double longitude, int category, int condition,
+                         int creatorId, Date createdAt, Date updatedAt, String imagePath) {
         this.title = title;
         this.briefDescription = briefDescription;
         this.fullDescription = fullDescription;
@@ -69,8 +66,8 @@ public class ListingDTO {
         this.size = size;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.categoryName = categoryName;
-        this.conditionName = conditionName;
+        this.category = category;
+        this.condition = condition;
         this.creatorId = creatorId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -78,9 +75,6 @@ public class ListingDTO {
     }
 
     // Getters
-    public int getId() {
-        return id;
-    }
     public String getTitle() {
         return title;
     }
@@ -105,11 +99,11 @@ public class ListingDTO {
     public double getLongitude() {
         return longitude;
     }
-    public String getCategoryName() {
-        return categoryName;
+    public int getCategory() {
+        return category;
     }
-    public String getConditionName() {
-        return conditionName;
+    public int getCondition() {
+        return condition;
     }
     public int getCreatorId() {
         return creatorId;
@@ -128,8 +122,87 @@ public class ListingDTO {
     }
 
     // Setters
+
+    public void setCreatorId(int creatorId) {
+        this.creatorId = creatorId;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setBriefDescription(String briefDescription) {
+        this.briefDescription = briefDescription;
+    }
+
+    public void setFullDescription(String fullDescription) {
+        this.fullDescription = fullDescription;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public void setCategory(int category) {
+        this.category = category;
+    }
+
+    public void setCondition(int condition) {
+        this.condition = condition;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public void setSaleStatus(int saleStatus) {
+        this.saleStatus = saleStatus;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+
+
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
     }
 
+    @Override
+    public String toString() {
+        return "ListingCreate{" +
+                ",\n  title='" + title + '\'' +
+                ",\n  briefDescription='" + briefDescription + '\'' +
+                ",\n  fullDescription='" + fullDescription + '\'' +
+                ",\n  price=" + price +
+                ",\n  saleStatus=" + saleStatus +
+                ",\n  size='" + size + '\'' +
+                ",\n  latitude=" + latitude +
+                ",\n  longitude=" + longitude +
+                ",\n  categoryId=" + category +
+                ",\n  conditionId=" + condition +
+                ",\n  creatorId=" + creatorId +
+                ",\n  createdAt=" + createdAt +
+                ",\n  updatedAt=" + updatedAt +
+                ",\n  imagePath='" + imagePath + '\'' +
+                ",\n  imageUrls=" + (imageUrls != null ? imageUrls.toString() : "null") +
+                "\n}";
+    }
 }

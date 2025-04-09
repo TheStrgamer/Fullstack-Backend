@@ -38,6 +38,9 @@ public class ListingUpdate {
   @Schema(description = "The longitude of the listing")
   private double longitude;
 
+  @Schema(description = "The last updated time of the listing")
+  private String updatedAt;
+
   @Schema(description = "The images of the listing")
   private List<MultipartFile> images;
 
@@ -83,7 +86,29 @@ public class ListingUpdate {
     return size;
   }
 
+  public String getUpdatedAt() {
+    return updatedAt;
+  }
+
   public List<MultipartFile> getImages() {
     return images;
+  }
+
+  @Override
+  public String toString() {
+    return "ListingUpdate {" +
+            "\n  title='" + title + '\'' +
+            ",\n  category_id=" + category_id +
+            ",\n  condition_id=" + condition_id +
+            ",\n  sale_status=" + sale_status +
+            ",\n  price=" + price +
+            ",\n  brief_description='" + brief_description + '\'' +
+            ",\n  full_description='" + full_description + '\'' +
+            ",\n  size='" + size + '\'' +
+            ",\n  latitude=" + latitude +
+            ",\n  longitude=" + longitude +
+            ",\n  updatedAt='" + updatedAt + '\'' +
+            ",\n  images=" + (images != null ? images.size() + " file(s)" : "null") +
+            "\n}";
   }
 }

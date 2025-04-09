@@ -72,7 +72,7 @@ public class Listing {
   //private List<Offer> offers;
   private List<Offer> offers = new ArrayList<>(); //unngå nullpointer
 
-  @OneToMany(mappedBy = "listing")
+  @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
   //private List<Images> images;
   private List<Images> images = new ArrayList<>(); //unngå nullpointer
 
