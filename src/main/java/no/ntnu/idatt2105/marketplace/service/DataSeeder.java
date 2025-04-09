@@ -69,20 +69,23 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedCategories() {
+        if (categoriesRepo.findByName("Other").isEmpty()) {
+            categoriesRepo.save(new Categories("Other", "Default category", null));
+        }
         if (categoriesRepo.findByName("Electronics").isEmpty()) {
-            categoriesRepo.save(new Categories(0, "Electronics", "Devices and gadgets", null));
+            categoriesRepo.save(new Categories("Electronics", "Devices and gadgets", null));
         }
         if (categoriesRepo.findByName("Clothing").isEmpty()) {
-            categoriesRepo.save(new Categories(0, "Clothing", "Apparel and accessories", null));
+            categoriesRepo.save(new Categories("Clothing", "Apparel and accessories", null));
         }
         if (categoriesRepo.findByName("Furniture").isEmpty()) {
-            categoriesRepo.save(new Categories(0, "Furniture", "Home and office furniture", null));
+            categoriesRepo.save(new Categories("Furniture", "Home and office furniture", null));
         }
         if (categoriesRepo.findByName("Books").isEmpty()) {
-            categoriesRepo.save(new Categories(0, "Books", "Literature and textbooks", null));
+            categoriesRepo.save(new Categories("Books", "Literature and textbooks", null));
         }
         if (categoriesRepo.findByName("Trading cards").isEmpty()) {
-            categoriesRepo.save(new Categories(0, "Trading cards", "Trading cards", null));
+            categoriesRepo.save(new Categories("Trading cards", "Trading cards", null));
         }
     }
 

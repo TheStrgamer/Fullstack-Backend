@@ -12,9 +12,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ntnu.idatt2105.marketplace.dto.admin.CategoriesAdminDTO;
+import no.ntnu.idatt2105.marketplace.dto.admin.CategoriesUploadDTO;
 import no.ntnu.idatt2105.marketplace.dto.admin.ListingAdminDTO;
 import no.ntnu.idatt2105.marketplace.dto.admin.UserAdminDTO;
 
+import no.ntnu.idatt2105.marketplace.exception.UserNotAdminException;
+import no.ntnu.idatt2105.marketplace.exception.UserNotFoundException;
 import no.ntnu.idatt2105.marketplace.model.listing.Categories;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 import no.ntnu.idatt2105.marketplace.repo.CategoriesRepo;
@@ -26,12 +29,17 @@ import no.ntnu.idatt2105.marketplace.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import no.ntnu.idatt2105.marketplace.model.user.User;
+import no.ntnu.idatt2105.marketplace.service.user.AdminService;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -55,6 +63,9 @@ public class AdminController {
 
   @Autowired
   private JWT_token jwt;
+
+  @Autowired
+  private AdminService adminService;
 
 
   @GetMapping("/amIAdmin")
@@ -86,22 +97,12 @@ public class AdminController {
           required = true,
           example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
       ) @RequestHeader("Authorization") String authorizationHeader) {
-    if (!authorizationHeader.startsWith("Bearer ")) {
-      System.out.println("Invalid Authorization header");
+    try {
+      adminService.validateAdminPrivileges(authorizationHeader);
+    } catch (UserNotAdminException e) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-    String token = authorizationHeader.substring(7);
-    int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
-    Optional<User> user = userRepo.findById(user_id);
-    if (user.isEmpty()) {
-      System.out.println("No user found with given id:" + user_id);
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-    boolean isAdmin = user.get().isAdmin();
-    if(!isAdmin)
-    {
-      System.out.println("User is not an admin");
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
     System.out.println("User is an admin");
     return ResponseEntity.ok(true);
@@ -137,24 +138,12 @@ public class AdminController {
           example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
       ) @RequestHeader("Authorization") String authorizationHeader) {
 
-    if (!authorizationHeader.startsWith("Bearer ")) {
-      System.out.println("Invalid Authorization header");
+    try {
+      adminService.validateAdminPrivileges(authorizationHeader);
+    } catch (UserNotAdminException e) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-
-    String token = authorizationHeader.substring(7);
-    int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
-    Optional<User> user = userRepo.findById(user_id);
-
-    if (user.isEmpty()) {
-      System.out.println("No user found with given id:" + user_id);
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-    User adminUser = user.get();
-    if(!adminUser.isAdmin())
-    {
-      System.out.println("User is not an admin");
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
     List<User> users = userRepo.findAll();
     if (users.isEmpty()) {
@@ -199,29 +188,16 @@ public class AdminController {
           required = true,
           example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
       ) @RequestHeader("Authorization") String authorizationHeader) {
-
-    if (!authorizationHeader.startsWith("Bearer ")) {
-      System.out.println("Invalid Authorization header");
+    try {
+      adminService.validateAdminPrivileges(authorizationHeader);
+    } catch (UserNotAdminException e) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-
-    String token = authorizationHeader.substring(7);
-    int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
-    Optional<User> user = userRepo.findById(user_id);
-
-    if (user.isEmpty()) {
-      System.out.println("No user found with given id:" + user_id);
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-    User adminUser = user.get();
-    if(!adminUser.isAdmin())
-    {
-      System.out.println("User is not an admin");
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
     List<Listing> listings = listingRepo.findAll();
     if (listings.isEmpty()) {
-      System.out.println("No users found");
+      System.out.println("No listings found");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     ArrayList<ListingAdminDTO> listingDTOList = new ArrayList<>();
@@ -262,24 +238,12 @@ public class AdminController {
           example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
       ) @RequestHeader("Authorization") String authorizationHeader) {
 
-    if (!authorizationHeader.startsWith("Bearer ")) {
-      System.out.println("Invalid Authorization header");
+    try {
+      adminService.validateAdminPrivileges(authorizationHeader);
+    } catch (UserNotAdminException e) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-
-    String token = authorizationHeader.substring(7);
-    int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
-    Optional<User> user = userRepo.findById(user_id);
-
-    if (user.isEmpty()) {
-      System.out.println("No user found with given id:" + user_id);
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-    User adminUser = user.get();
-    if(!adminUser.isAdmin())
-    {
-      System.out.println("User is not an admin");
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
     List<Categories> categories = categoriesRepo.findAll();
     if (categories.isEmpty()) {
@@ -292,6 +256,118 @@ public class AdminController {
       categoryDTOList.add(categoryDTO);
     }
     return ResponseEntity.ok(categoryDTOList);
+  }
+
+  @PostMapping("/categories/add")
+  @Operation(
+      summary = "Add categories",
+      description = "Post request to add a category"
+  )
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Category created successfully",
+          content = @Content(
+              schema = @Schema(implementation = String.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "Invalid request"
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "Unauthorized"
+      )
+  })
+  public ResponseEntity<Boolean> addCategory(
+      @Parameter(
+          name = "Authorization",
+          description = "Bearer token in the format `Bearer <JWT>`",
+          required = true,
+          example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+      )
+      @RequestBody CategoriesUploadDTO category,
+      @RequestHeader("Authorization") String authorizationHeader) {
+
+    try {
+      adminService.validateAdminPrivileges(authorizationHeader);
+    } catch (UserNotAdminException e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+    String name = category.getName();
+    boolean nameExists = categoriesRepo.findByName(name).isPresent();
+    if (nameExists) {
+      System.out.println("Category with name " + name + " already exists");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+    String description = category.getDescription();
+    Categories newCategory = new Categories(name, description, null);
+    categoriesRepo.save(newCategory);
+    System.out.println("Category " + name + " created successfully");
+    return ResponseEntity.ok(true);
+  }
+
+  @DeleteMapping("/categories/delete/{id}")
+  @Operation(
+      summary = "Delete categories",
+      description = "Post request to delete a category"
+  )
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Category deleted successfully",
+          content = @Content(
+              schema = @Schema(implementation = String.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "Invalid request"
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "Unauthorized"
+      )
+  })
+  public ResponseEntity<String> deleteCategory(
+      @Parameter(
+          name = "Authorization",
+          description = "Bearer token in the format `Bearer <JWT>`",
+          required = true,
+          example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+      )
+      @PathVariable String id,
+      @RequestHeader("Authorization") String authorizationHeader) {
+    try {
+      adminService.validateAdminPrivileges(authorizationHeader);
+    } catch (UserNotAdminException e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+    }
+    Optional<Categories> category = categoriesRepo.findById(Integer.parseInt(id));
+    if (category.isEmpty()) {
+      System.out.println("Category with id " + id + " not found");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category with id " + id + " not found");
+    }
+    Categories cat = category.get();
+    if (cat.getName().equals("Other")) {
+      System.out.println("Cannot delete category 'Other'");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+          .body("Cannot delete category 'Other'");
+    }
+    List<Listing> listings = listingRepo.findAllByCategory(cat);
+    Categories defaultCategory = categoriesRepo.findByName("Other").orElse(null);
+    for (Listing l : listings) {
+      l.setCategory(defaultCategory);
+      listingRepo.save(l);
+    }
+    categoriesRepo.delete(cat);
+    System.out.println("Category " + cat.getName() + " deleted successfully");
+    return ResponseEntity.ok("Category " + cat.getName() + " deleted successfully");
   }
 
 }
