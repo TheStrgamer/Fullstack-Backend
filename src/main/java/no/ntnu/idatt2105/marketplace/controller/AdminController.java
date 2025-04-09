@@ -15,14 +15,17 @@ import no.ntnu.idatt2105.marketplace.dto.admin.CategoriesAdminDTO;
 import no.ntnu.idatt2105.marketplace.dto.admin.CategoriesUploadDTO;
 import no.ntnu.idatt2105.marketplace.dto.admin.ListingAdminDTO;
 import no.ntnu.idatt2105.marketplace.dto.admin.UserAdminDTO;
+import no.ntnu.idatt2105.marketplace.dto.admin.UserUploadAdminDTO;
 
 import no.ntnu.idatt2105.marketplace.exception.UserNotAdminException;
-import no.ntnu.idatt2105.marketplace.exception.UserNotFoundException;
 import no.ntnu.idatt2105.marketplace.model.listing.Categories;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
+import no.ntnu.idatt2105.marketplace.model.user.Role;
 import no.ntnu.idatt2105.marketplace.repo.CategoriesRepo;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
+import no.ntnu.idatt2105.marketplace.repo.RoleRepo;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
+import no.ntnu.idatt2105.marketplace.service.ListingService;
 import no.ntnu.idatt2105.marketplace.service.images.ImagesService;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import no.ntnu.idatt2105.marketplace.service.user.UserService;
@@ -57,7 +60,13 @@ public class AdminController {
   private CategoriesRepo categoriesRepo;
 
   @Autowired
+  private RoleRepo roleRepo;
+
+  @Autowired
   private UserService userService;
+
+  @Autowired
+  private ListingService listingService;
 
   @Autowired
   private ImagesService imagesService;
@@ -158,6 +167,64 @@ public class AdminController {
     }
     return ResponseEntity.ok(userDTOList);
   }
+
+  @GetMapping("/users/{id}")
+  @Operation(
+      summary = "Get specific user",
+      description = "Returns the user with the given ID including their listings count"
+  )
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "User data received successfully",
+          content = @Content(
+              schema = @Schema(implementation = UserAdminDTO.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "Invalid request"
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "Unauthorized"
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "User not found"
+      )
+  })
+  public ResponseEntity<UserAdminDTO> getUserById(
+      @Parameter(
+          name = "Authorization",
+          description = "Bearer token in the format `Bearer <JWT>`",
+          required = true,
+          example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+      ) @RequestHeader("Authorization") String authorizationHeader,
+      @Parameter(description = "ID of the user to retrieve", required = true)
+      @PathVariable String id) {
+
+    try {
+      adminService.validateAdminPrivileges(authorizationHeader);
+    } catch (UserNotAdminException e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+
+    Optional<User> user = userRepo.findById(Integer.parseInt(id));
+    if (user.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    UserAdminDTO userDTO = new UserAdminDTO(
+        user.get(),
+        userService.getListingCount(user.get())
+    );
+
+    return ResponseEntity.ok(userDTO);
+  }
+
   @DeleteMapping("/users/delete/{id}")
   @Operation(
       summary = "Delete user",
@@ -224,6 +291,49 @@ public class AdminController {
     return ResponseEntity.ok("User " + userToDelete.get().getEmail() + " deleted successfully");
   }
 
+  @PutMapping("/users/update/{id}")
+  @Operation(
+      summary = "Update user details",
+      description = "Allows an admin to update user information"
+  )
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "User updated successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid request"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "404", description = "User not found")
+  })
+  public ResponseEntity<String> updateUser(
+      @PathVariable String id,
+      @RequestBody UserUploadAdminDTO userUpdateDTO,
+      @RequestHeader("Authorization") String authorizationHeader) {
+
+    try {
+      adminService.validateAdminPrivileges(authorizationHeader);
+    } catch (UserNotAdminException e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+    }
+
+    Optional<User> optionalUser = userRepo.findById(Integer.parseInt(id));
+    if (optionalUser.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+    }
+
+    User user = optionalUser.get();
+    user.setFirstname(userUpdateDTO.getFirstname());
+    user.setSurname(userUpdateDTO.getSurname());
+    user.setEmail(userUpdateDTO.getEmail());
+    user.setPhonenumber(userUpdateDTO.getPhonenumber());
+    Optional<Role> role = roleRepo.findByName(userUpdateDTO.getRole());
+    if (role.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Role not found");
+    }
+    user.setRole(role.get());
+
+    userRepo.save(user);
+    return ResponseEntity.ok("User updated successfully");
+  }
 
 
   @GetMapping("/listings")
@@ -274,6 +384,38 @@ public class AdminController {
     }
     return ResponseEntity.ok(listingDTOList);
   }
+
+  @DeleteMapping("/listings/delete/{id}")
+  @Operation(
+      summary = "Delete a listing",
+      description = "Allows an admin to delete a listing by its ID"
+  )
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Listing deleted successfully"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized"),
+      @ApiResponse(responseCode = "404", description = "Listing not found")
+  })
+  public ResponseEntity<String> deleteListing(
+      @PathVariable String id,
+      @RequestHeader("Authorization") String authorizationHeader) {
+
+    try {
+      adminService.validateAdminPrivileges(authorizationHeader);
+    } catch (UserNotAdminException e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+    }
+
+    Optional<Listing> listingOpt = listingRepo.findById(Integer.parseInt(id));
+    if (listingOpt.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Listing not found");
+    }
+    Listing listing = listingOpt.get();
+    listingService.deleteListing(listing.getId());
+    return ResponseEntity.ok("Listing deleted successfully");
+  }
+
 
   @GetMapping("/categories")
   @Operation(

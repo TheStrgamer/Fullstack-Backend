@@ -61,7 +61,10 @@ public class User {
   //private List<Listing> history;
   private List<Listing> history = new ArrayList<>(); //for å unngå nullpointer
 
-  @OneToMany(mappedBy = "creator")
+  @OneToMany(mappedBy = "creator",
+    cascade = CascadeType.ALL,
+      orphanRemoval = true
+  )
   private List<Listing> my_listings = new ArrayList<>();
 
   @OneToMany(mappedBy = "buyer")
