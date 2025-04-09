@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -157,6 +158,72 @@ public class AdminController {
     }
     return ResponseEntity.ok(userDTOList);
   }
+  @DeleteMapping("/users/delete/{id}")
+  @Operation(
+      summary = "Delete user",
+      description = "Deletes a user by ID if the request is authorized and user is not deleting themselves"
+  )
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "User deleted successfully",
+          content = @Content(schema = @Schema(implementation = String.class))
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "Invalid request"
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "Unauthorized"
+      ),
+      @ApiResponse(
+          responseCode = "403",
+          description = "Forbidden"
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "User not found"
+      )
+  })
+  public ResponseEntity<String> deleteUser(
+      @Parameter(
+          name = "Authorization",
+          description = "Bearer token in the format `Bearer <JWT>`",
+          required = true,
+          example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      )
+      @RequestHeader("Authorization") String authorizationHeader,
+
+      @Parameter(description = "ID of the user to delete", required = true)
+      @PathVariable String id
+  ) {
+    try {
+      adminService.validateAdminPrivileges(authorizationHeader);
+    } catch (UserNotAdminException e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+    }
+
+    Optional<User> userToDelete = userRepo.findById(Integer.parseInt(id));
+    if (userToDelete.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + id + " not found");
+    }
+    int requestingId = Integer.parseInt(jwt.extractIdFromJwt(authorizationHeader.substring(7)));
+    Optional<User> requestingUser = userRepo.findById(requestingId);
+    if (requestingUser.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Requesting user not found");
+    }
+    if (userToDelete.get() == requestingUser.get()) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Admins cannot delete their own account");
+    }
+    List<Listing> listingsToDelete = listingRepo.findAllByCreator(userToDelete.get());
+    listingRepo.deleteAll(listingsToDelete);
+    userRepo.delete(userToDelete.get());
+    return ResponseEntity.ok("User " + userToDelete.get().getEmail() + " deleted successfully");
+  }
+
 
 
   @GetMapping("/listings")
@@ -247,7 +314,7 @@ public class AdminController {
     }
     List<Categories> categories = categoriesRepo.findAll();
     if (categories.isEmpty()) {
-      System.out.println("No users found");
+      System.out.println("No category found");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     ArrayList<CategoriesAdminDTO> categoryDTOList = new ArrayList<>();
@@ -256,6 +323,55 @@ public class AdminController {
       categoryDTOList.add(categoryDTO);
     }
     return ResponseEntity.ok(categoryDTOList);
+  }
+
+
+  @GetMapping("/categories/{id}")
+  @Operation(
+      summary = "Get specific category",
+      description = "Returns the category with the given id"
+  )
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Data received successfully",
+          content = @Content(
+              schema = @Schema(implementation = String.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "Invalid request"
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "Unauthorized"
+      )
+  })
+  public ResponseEntity<CategoriesAdminDTO> getCategory(
+      @Parameter(
+          name = "Authorization",
+          description = "Bearer token in the format `Bearer <JWT>`",
+          required = true,
+          example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+      ) @PathVariable String id,
+      @RequestHeader("Authorization") String authorizationHeader) {
+
+    try {
+      adminService.validateAdminPrivileges(authorizationHeader);
+    } catch (UserNotAdminException e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+    Optional<Categories> category = categoriesRepo.findById(Integer.parseInt(id));
+    if (category.isEmpty()) {
+      System.out.println("No category found");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    CategoriesAdminDTO categoryDTO = new CategoriesAdminDTO(category.get(), listingRepo.findAllByCategory(category.get()).size());
+
+    return ResponseEntity.ok(categoryDTO);
   }
 
   @PostMapping("/categories/add")
@@ -307,6 +423,68 @@ public class AdminController {
     Categories newCategory = new Categories(name, description, null);
     categoriesRepo.save(newCategory);
     System.out.println("Category " + name + " created successfully");
+    return ResponseEntity.ok(true);
+  }
+
+
+  @PutMapping("/categories/update/{id}")
+  @Operation(
+      summary = "Update a category",
+      description = "Post request to update a category"
+  )
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Category updated successfully",
+          content = @Content(
+              schema = @Schema(implementation = String.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "Invalid request"
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "Unauthorized"
+      )
+  })
+  public ResponseEntity<Boolean> updateCategory(
+      @Parameter(
+          name = "Authorization",
+          description = "Bearer token in the format `Bearer <JWT>`",
+          required = true,
+          example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+      )
+      @PathVariable String id,
+      @RequestBody CategoriesUploadDTO category,
+      @RequestHeader("Authorization") String authorizationHeader) {
+    try {
+      adminService.validateAdminPrivileges(authorizationHeader);
+    } catch (UserNotAdminException e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+    Optional<Categories> foundCategory = categoriesRepo.findById(Integer.parseInt(id));
+    if (foundCategory.isEmpty()) {
+      System.out.println("No category with id " + id + " found");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+    String newName = category.getName();
+    if (categoriesRepo.findByName(newName).isPresent() && !foundCategory.get().getName().equals(newName)) {
+      System.out.println("Category with name " + newName + " already exists");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+    String newDescription = category.getDescription();
+    Categories updatedCategory = foundCategory.get();
+    if (newDescription != null) {
+      updatedCategory.setDescription(newDescription);
+    }
+    if (newName != null) {
+      updatedCategory.setName(newName);
+    }
+    categoriesRepo.save(updatedCategory);
     return ResponseEntity.ok(true);
   }
 
