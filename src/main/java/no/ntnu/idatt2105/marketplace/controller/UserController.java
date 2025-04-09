@@ -17,6 +17,8 @@ import no.ntnu.idatt2105.marketplace.exception.TokenExpiredException;
 import no.ntnu.idatt2105.marketplace.exception.UserNotFoundException;
 
 import no.ntnu.idatt2105.marketplace.dto.user.*;
+import no.ntnu.idatt2105.marketplace.model.listing.Listing;
+import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import no.ntnu.idatt2105.marketplace.service.images.ImagesService;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
@@ -52,6 +54,9 @@ public class UserController {
 
   @Autowired
   private ImagesService imagesService;
+
+  @Autowired
+  private ListingRepo listingRepo;
 
 
 
@@ -400,4 +405,140 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
   }
+
+  @PostMapping("/favorites/toggle/{listingId}")
+  @Operation(
+          summary = "Toggle favorite for listing",
+          description = "Adds a listing to user's favorites if it's not already favorited, removes it if it is"
+  )
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Favorite status toggled"),
+          @ApiResponse(responseCode = "401", description = "Unauthorized"),
+          @ApiResponse(responseCode = "404", description = "User or listing not found")
+  })
+  public ResponseEntity<String> toggleFavorite(
+          @Parameter(
+                  name = "Authorization",
+                  description = "Bearer token in the format `Bearer <JWT>`",
+                  required = true,
+                  example = "Bearer eyJhbGciOiJIUzI1N..."
+          ) @RequestHeader("Authorization") String authorizationHeader,
+          @Parameter(
+                  name = "listingId",
+                  description = "ID of the listing to toggle favorite status for",
+                  required = true,
+                  example = "3"
+          ) @PathVariable int listingId) {
+
+    if (!authorizationHeader.startsWith("Bearer ")) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid authorization header");
+    }
+
+    String token = authorizationHeader.substring(7);
+    int userId = Integer.parseInt(jwt.extractIdFromJwt(token));
+
+    try {
+      userService.toggleFavorite(userId, listingId);
+      return ResponseEntity.ok("Favorite toggled");
+    } catch (UserNotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Listing not found");
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error toggling favorite");
+    }
+  }
+
+
+  @GetMapping("/favorites/check/{listingId}")
+  @Operation(
+          summary = "Check if listing is favorited",
+          description = "Returns true/false if current user has this listing as favorite"
+  )
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Favorite status returned"),
+          @ApiResponse(responseCode = "401", description = "Unauthorized"),
+          @ApiResponse(responseCode = "404", description = "User or listing not found")
+  })
+  public ResponseEntity<Boolean> isFavorite(
+          @RequestHeader("Authorization") String authorizationHeader,
+          @PathVariable int listingId) {
+
+    if (!authorizationHeader.startsWith("Bearer ")) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    String token = authorizationHeader.substring(7);
+    int userId = Integer.parseInt(jwt.extractIdFromJwt(token));
+
+    Optional<User> userOpt = userRepo.findById(userId);
+    Optional<Listing> listingOpt = listingRepo.findById(listingId);
+
+    if (userOpt.isEmpty() || listingOpt.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    boolean isFav = userOpt.get().getFavorites().contains(listingOpt.get());
+    return ResponseEntity.ok(isFav);
+  }
+
+  @GetMapping("/owns/{listingId}")
+  @Operation(
+          summary = "Sjekk om innlogget bruker eier en gitt listing",
+          description = "Returnerer true hvis den innloggede brukeren (utledet fra JWT) eier annonsen med oppgitt ID"
+  )
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = "200",
+                  description = "Returnerer true hvis bruker eier annonsen, ellers false",
+                  content = @Content(schema = @Schema(implementation = Boolean.class))
+          ),
+          @ApiResponse(
+                  responseCode = "401",
+                  description = "Ugyldig eller manglende JWT-token"
+          ),
+          @ApiResponse(
+                  responseCode = "404",
+                  description = "Bruker ikke funnet"
+          )
+  })
+  public ResponseEntity<Boolean> checkIfUserOwnsListing(
+          @Parameter(
+                  name = "Authorization",
+                  description = "JWT i formatet `Bearer <token>`",
+                  required = true,
+                  example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          )
+          @RequestHeader("Authorization") String authorizationHeader,
+
+          @Parameter(
+                  name = "listingId",
+                  description = "ID til annonsen som sjekkes",
+                  required = true,
+                  example = "3"
+          )
+          @PathVariable int listingId
+  ) {
+    if (!authorizationHeader.startsWith("Bearer ")) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+    }
+
+    String token = authorizationHeader.substring(7);
+    int userId = Integer.parseInt(jwt.extractIdFromJwt(token));
+    Optional<User> userOpt = userRepo.findById(userId);
+
+    if (userOpt.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
+    }
+
+    User user = userOpt.get();
+    boolean owns = user.getMy_listings().stream()
+            .anyMatch(listing -> listing.getId() == listingId);
+
+    return ResponseEntity.ok(owns);
+  }
+
+
+
+
 }

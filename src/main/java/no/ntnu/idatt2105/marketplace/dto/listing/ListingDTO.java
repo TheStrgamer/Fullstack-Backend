@@ -55,6 +55,9 @@ public class ListingDTO {
     @Schema(description = "List of image URLs for the listing")
     private List<String> imageUrls;
 
+    @Schema(description = "Boolean value to determine if a listing is favorited by the user or not", example = "true")
+    private boolean isFavorited;
+
 
     // Constructor
     public ListingDTO(int id, String title, String briefDescription, String fullDescription, int price, int saleStatus,
@@ -126,9 +129,11 @@ public class ListingDTO {
     public List<String> getImageUrls() {
         return imageUrls;
     }
+    public boolean isFavorited() {return isFavorited;}
 
     // Setters
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
     }
+    public void setFavorited(boolean isFavorited) {this.isFavorited = isFavorited;}
 }
