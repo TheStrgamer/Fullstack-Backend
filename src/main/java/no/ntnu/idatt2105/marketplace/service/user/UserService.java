@@ -11,6 +11,7 @@ import no.ntnu.idatt2105.marketplace.exception.PhonenumberNotAvailibleException;
 import no.ntnu.idatt2105.marketplace.exception.UserNotFoundException;
 import no.ntnu.idatt2105.marketplace.model.user.Role;
 import no.ntnu.idatt2105.marketplace.model.user.User;
+import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 import no.ntnu.idatt2105.marketplace.repo.RoleRepo;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import no.ntnu.idatt2105.marketplace.dto.other.TokenResponseObject;
@@ -31,6 +32,9 @@ public class UserService {
 
   @Autowired
   private JWT_token jwt;
+
+  @Autowired
+  private ListingRepo listingRepo;
 
   private final BCryptHasher hasher = new BCryptHasher();
 
@@ -118,5 +122,8 @@ public class UserService {
     user.setRole(role);
     userRepo.save(user);
     return 0;
+  }
+  public int getListingCount(User user) {
+    return listingRepo.findAllByCreator(user).size();
   }
 }

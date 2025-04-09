@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ListingService {
@@ -84,6 +85,21 @@ public class ListingService {
         dto.setImageUrls(imageUrls);
         return dto;
     }
+    @Transactional
+    public void deleteListing(int listingId) {
+        Listing listing = listingRepo.findById(listingId)
+            .orElseThrow(() -> new RuntimeException("Listing not found"));
+
+        listing.removeUser_favorites();
+        listing.removeUser_history();
+
+        listing.removeOffers();
+        listing.getConversations().clear();
+        listing.getImages().clear();
+
+        listingRepo.delete(listing);
+    }
+
 
 
 }

@@ -68,15 +68,15 @@ public class Listing {
   //private List<User> user_history;
   private List<User> user_history = new ArrayList<>(); //unngå nullpointer
 
-  @OneToMany(mappedBy = "listing")
+  @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
   //private List<Offer> offers;
   private List<Offer> offers = new ArrayList<>(); //unngå nullpointer
 
-  @OneToMany(mappedBy = "listing")
+  @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
   //private List<Images> images;
   private List<Images> images = new ArrayList<>(); //unngå nullpointer
 
-  @OneToMany(mappedBy = "listing")
+  @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Conversation> conversations = new ArrayList<>();
 
   // constructor
@@ -242,6 +242,21 @@ public class Listing {
     for (Conversation conversation : conversations) {
       conversation.setStatus(1);
     }
+  }
+
+  public void removeUser_favorites() {
+    for (User user : user_favorites) {
+      user.getFavorites().remove(this);
+    }
+  }
+  public void removeUser_history() {
+    for (User user : user_history) {
+      user.getHistory().remove(this);
+    }
+  }
+
+  public void removeOffers() {
+    offers.clear();
   }
 
 }

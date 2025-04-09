@@ -26,8 +26,7 @@ public class Categories {
   // constructor
   public Categories() {}
 
-  public Categories(int id, String name, String description, Categories parent_category){
-    this.id = id;
+  public Categories(String name, String description, Categories parent_category){
     this.name = name;
     this.description = description;
     this.parent_category = parent_category;
@@ -69,5 +68,10 @@ public class Categories {
 
   public List<Listing> getListings() {
     return listings;
+  }
+
+  @Override
+  public String toString() {
+    return name;
   }
 }
