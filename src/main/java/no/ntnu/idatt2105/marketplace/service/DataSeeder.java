@@ -96,10 +96,7 @@ public class DataSeeder implements CommandLineRunner {
         if (imagesRepo.findByFilepathToImage("/images/Albert.jpeg").isEmpty()) {
             imagesRepo.save(new Images(0, "/images/Albert.jpeg"));
         }
-
     }
-    //imagesRepo.save(new Images(0, "/images/listing-mac.png"));
-
 
     private void seedUserWithListing() {
         if (userRepo.findByEmail("test@example.com").isPresent()) return;
@@ -149,6 +146,7 @@ public class DataSeeder implements CommandLineRunner {
         listingImg.setListing(listing);      // Knyt til listing
         imagesRepo.save(listingImg);         // Hibernate setter listing_id korrekt
     }
+
     public void seedAdminUser() {
         if (userRepo.findByEmail("admin@admin.com").isPresent()) return;
         // Hent roller og kategori/tilstand
@@ -163,6 +161,7 @@ public class DataSeeder implements CommandLineRunner {
         adminUser.setRole(adminrole);
         userRepo.save(adminUser);
     }
+
     private void seedAdditionalUserAndListings() {
         if (userRepo.findByEmail("Albert@example.com").isPresent()) return;
 
