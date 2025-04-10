@@ -257,7 +257,7 @@ public class Listing {
   @Override
   public int hashCode() {
     return Objects.hash(id);
-    
+  }
   public void removeUser_favorites() {
     for (User user : user_favorites) {
       user.getFavorites().remove(this);
