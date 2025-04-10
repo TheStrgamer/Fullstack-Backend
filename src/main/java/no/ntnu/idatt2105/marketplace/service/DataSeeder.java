@@ -44,6 +44,7 @@ public class DataSeeder implements CommandLineRunner {
         seedCategories();
         seedImages();
         seedUserWithListing();
+        seedAdminUser();
         seedAdditionalUserAndListings();
         seedMoreCategoriesAndUsersWithListings();
         assignAlbertFavoritesAndHistory();
@@ -52,6 +53,9 @@ public class DataSeeder implements CommandLineRunner {
     private void seedRoles() {
         if (roleRepo.findByName("USER").isEmpty()) {
             roleRepo.save(new Role(0, "USER"));
+        }
+        if (roleRepo.findByName("ADMIN").isEmpty()) {
+            roleRepo.save(new Role(0, "ADMIN"));
         }
     }
 
@@ -102,6 +106,21 @@ public class DataSeeder implements CommandLineRunner {
         Images listingImg = new Images(0, "/images/listing-mac.png");
         listingImg.setListing(listing);
         imagesRepo.save(listingImg);
+    }
+
+    public void seedAdminUser() {
+        if (userRepo.findByEmail("admin@admin.com").isPresent()) return;
+        // Hent roller og kategori/tilstand
+        Role adminrole = roleRepo.findByName("ADMIN").orElseThrow();
+        User adminUser = new User("admin@admin.com",
+                hasher.hashPassword("admin"),
+                "Admin",
+                "Superuser",
+                "42069420",
+                null
+        );
+        adminUser.setRole(adminrole);
+        userRepo.save(adminUser);
     }
 
     private void seedAdditionalUserAndListings() {

@@ -37,6 +37,9 @@ public class UserService {
   @Autowired
   private JWT_token jwt;
 
+  @Autowired
+  private ListingRepo listingRepo;
+
   private final BCryptHasher hasher = new BCryptHasher();
 
   public void setJwt(JWT_token jwt) {
@@ -153,4 +156,8 @@ public class UserService {
     return isNowFavorite;
   }
 
+
+  public int getListingCount(User user) {
+    return listingRepo.findAllByCreator(user).size();
+  }
 }
