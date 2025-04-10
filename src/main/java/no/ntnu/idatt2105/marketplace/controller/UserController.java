@@ -473,8 +473,18 @@ public class UserController {
           @ApiResponse(responseCode = "404", description = "User or listing not found")
   })
   public ResponseEntity<Boolean> isFavorite(
-          @RequestHeader("Authorization") String authorizationHeader,
-          @PathVariable int listingId) {
+          @Parameter(
+                  name = "Authorization",
+                  description = "Bearer token in the format `Bearer <JWT>`",
+                  required = true,
+                  example = "Bearer eyJhbGciOiJIUzI1N..."
+          )@RequestHeader("Authorization") String authorizationHeader,
+          @Parameter(
+                  name = "listingId",
+                  description = "ID of the listing to toggle favorite status for",
+                  required = true,
+                  example = "3"
+          )@PathVariable int listingId) {
 
     if (!authorizationHeader.startsWith("Bearer ")) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
