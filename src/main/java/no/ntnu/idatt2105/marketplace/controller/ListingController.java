@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/listings")
@@ -96,16 +97,20 @@ public class ListingController {
                     description = "Integer value representing the listing id",
                     required = true,
                     example = "123"
-            ) @PathVariable String id) {
+            ) @PathVariable String id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
-            return listingRepo.findById(Integer.valueOf(id))
-                    .map(listing -> ResponseEntity.ok(listingService.toDTO(listing)))
-                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-//            Listing listing = listingService.getListingById(Integer.parseInt(id));
-//            if (listing == null) {
-//                return new ResponseEntity<>("Listing not found", HttpStatus.NOT_FOUND);
-//            }
-//            return new ResponseEntity<>(listing, HttpStatus.OK);
+            int listingId = Integer.parseInt(id);
+            Optional<Listing> listingOpt = listingRepo.findById(listingId);
+            if (listingOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            Listing listing = listingOpt.get();
+            User user = null;
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                user = jwtTokenService.getUserByToken(token);  // Henter bruker fra token
+            }
+            return ResponseEntity.ok(listingService.toDTO(listing, user)); // Sender med bruker
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
@@ -200,12 +205,13 @@ public class ListingController {
          description = "List of recommended listings"
     )
     public ResponseEntity<List<ListingDTO>> getRecommendedListings(
-            @Parameter(
-                    name = "count",
-                    description = "Integer value representing the amount of listings that are to be returned",
-                    example = "5"
-            ) @RequestParam(defaultValue = "10") int count,
-            Principal principal) {
-        return ResponseEntity.ok(listingService.getRecommendedListingsForUser(principal.getName(), count));
+            @RequestParam(defaultValue = "50") int count,
+            @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        User user = jwtTokenService.getUserByToken(token);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(listingService.getRecommendedListingsForUser(user, count));
     }
 }

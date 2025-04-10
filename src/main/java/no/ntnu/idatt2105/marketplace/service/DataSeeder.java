@@ -10,9 +10,7 @@ import no.ntnu.idatt2105.marketplace.service.security.BCryptHasher;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class DataSeeder implements CommandLineRunner {
@@ -48,6 +46,8 @@ public class DataSeeder implements CommandLineRunner {
         seedUserWithListing();
         seedAdminUser();
         seedAdditionalUserAndListings();
+        seedMoreCategoriesAndUsersWithListings();
+        assignAlbertFavoritesAndHistory();
     }
 
     private void seedRoles() {
@@ -96,10 +96,7 @@ public class DataSeeder implements CommandLineRunner {
         if (imagesRepo.findByFilepathToImage("/images/Albert.jpeg").isEmpty()) {
             imagesRepo.save(new Images(0, "/images/Albert.jpeg"));
         }
-
     }
-    //imagesRepo.save(new Images(0, "/images/listing-mac.png"));
-
 
     private void seedUserWithListing() {
         if (userRepo.findByEmail("test@example.com").isPresent()) return;
@@ -149,6 +146,7 @@ public class DataSeeder implements CommandLineRunner {
         listingImg.setListing(listing);      // Knyt til listing
         imagesRepo.save(listingImg);         // Hibernate setter listing_id korrekt
     }
+
     public void seedAdminUser() {
         if (userRepo.findByEmail("admin@admin.com").isPresent()) return;
         // Hent roller og kategori/tilstand
@@ -163,6 +161,7 @@ public class DataSeeder implements CommandLineRunner {
         adminUser.setRole(adminrole);
         userRepo.save(adminUser);
     }
+
     private void seedAdditionalUserAndListings() {
         if (userRepo.findByEmail("Albert@example.com").isPresent()) return;
 
@@ -213,16 +212,48 @@ public class DataSeeder implements CommandLineRunner {
         imagesRepo.save(iphoneImg);
         iphone2Img.setListing(iphone);
         imagesRepo.save(iphone2Img);
+    }
 
-        // Add listing to favorites
-        Optional<User> testUserOpt = userRepo.findByEmail("Albert@example.com");
-        if (testUserOpt.isPresent()) {
-            Listing laptop = listingRepo.findAllByTitle("Brukt laptop").stream().findFirst().orElseThrow();
-            user.addFavorite(laptop);
+    private void seedMoreCategoriesAndUsersWithListings() {
+        Role role = roleRepo.findByName("USER").orElseThrow();
+        Condition used = conditionRepo.findByName("Used").orElseThrow();
+        List<Categories> allCategories = categoriesRepo.findAll();
+
+        for (int i = 1; i <= 5; i++) {
+            String email = "user" + i + "@example.com";
+            if (userRepo.findByEmail(email).isPresent()) continue;
+
+            User user = new User(email, hasher.hashPassword("password" + i), "User", String.valueOf(i), "9990000" + i, null);
+            user.setRole(role);
             userRepo.save(user);
+
+            for (int j = 1; j <= 6; j++) {
+                Categories cat = allCategories.get((i + j) % allCategories.size());
+                Listing listing = new Listing(0, user, cat, used, "Ting " + j + " fra bruker" + i,
+                        0, 100 * j, "Kort beskrivelse", "Lang beskrivelse", null,
+                        new Date(), new Date(), 60.0 + i, 10.0 + j);
+                listingRepo.save(listing);
+            }
         }
     }
 
+    private void assignAlbertFavoritesAndHistory() {
+        Optional<User> albertOpt = userRepo.findByEmail("Albert@example.com");
+        if (albertOpt.isEmpty()) return;
+
+        User albert = albertOpt.get();
+        List<Listing> all = listingRepo.findAll();
+        List<Listing> notOwn = all.stream().filter(l -> l.getCreator().getId() != albert.getId()).toList();
+
+        for (int i = 0; i < 10 && i < notOwn.size(); i++) {
+            albert.addFavorite(notOwn.get(i));
+        }
+        for (int i = 10; i < 20 && i < notOwn.size(); i++) {
+            albert.addHistory(notOwn.get(i));
+        }
+
+        userRepo.save(albert);
+    }
 }
 
 

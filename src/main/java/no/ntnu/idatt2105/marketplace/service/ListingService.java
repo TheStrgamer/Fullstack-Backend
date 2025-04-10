@@ -7,9 +7,7 @@ import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,18 +31,61 @@ public class ListingService {
                 .collect(Collectors.toList());
     }
 
-    public List<ListingDTO> getRecommendedListingsForUser(String email, int count) {
-        Optional<User> userOpt = userRepo.findByEmail(email);
-        if (userOpt.isEmpty()) return List.of(); // fallback
+    public List<ListingDTO> getRecommendedListingsForUser(User currentUser, int count) {
+        Map<String, Integer> categoryScores = new HashMap<>();
 
-        // For nå: anbefal tilfeldig (senere: basert på historikk, kategorier, osv.)
-        List<Listing> all = listingRepo.findAll();
-        Collections.shuffle(all);
-        return all.stream()
+        // 1. Poeng fra favoritter (vekt 2)
+        for (Listing fav : currentUser.getFavorites()) {
+            String cat = fav.getCategory().getName();
+            categoryScores.put(cat, categoryScores.getOrDefault(cat, 0) + 2);
+        }
+
+        // 2. Poeng fra historikk (vekt 1)
+        for (Listing viewed : currentUser.getHistory()) {
+            String cat = viewed.getCategory().getName();
+            categoryScores.put(cat, categoryScores.getOrDefault(cat, 0) + 1);
+        }
+
+        // 3. Fallback til tilfeldige hvis ingen data
+        if (categoryScores.isEmpty()) {
+            return getRandomListings(count);
+        }
+
+        // 4. Filtrer ut brukerens egne annonser
+        List<Listing> allListings = listingRepo.findAll().stream()
+                .filter(listing -> listing.getCreator().getId() != currentUser.getId())
+                .toList();
+
+        List<Listing> filtered = allListings.stream()
+                .filter(listing -> listing.getCreator().getId() != currentUser.getId())
+                .collect(Collectors.toList());
+
+        // 🎲 Randomiser først for å sikre ulik rekkefølge ved lik score
+        Collections.shuffle(filtered);
+
+        // 5. Sortér etter kategoripoeng
+        List<Listing> sorted = filtered.stream()
+                .sorted((l1, l2) -> {
+                    int score1 = categoryScores.getOrDefault(l1.getCategory().getName(), 0);
+                    int score2 = categoryScores.getOrDefault(l2.getCategory().getName(), 0);
+                    return Integer.compare(score2, score1); // descending
+                })
                 .limit(count)
-                .map(this::toDTO)
+                .toList();
+
+        // 6. Bygg DTO-er og sett favoritt-status
+        return sorted.stream()
+                .map(listing -> {
+                    ListingDTO dto = toDTO(listing);
+                    dto.setFavorited(currentUser.getFavorites().contains(listing));
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
+
+
+
+
 
     public List<ListingDTO> getAllListings() {
         return listingRepo.findAll().stream()
@@ -56,13 +97,13 @@ public class ListingService {
         return listingRepo.findById(id).orElse(null);
     }
 
-    public ListingDTO toDTO(Listing listing) {
+    public ListingDTO toDTO(Listing listing, User user) {
         String imagePath = listing.getImages().isEmpty()
                 ? null
                 : listing.getImages().get(0).getFilepath_to_image();
 
         List<String> imageUrls = listing.getImages().stream()
-                .map(img -> "http://localhost:8080/" + img.getFilepath_to_image())
+                .map(img -> "http://localhost:8080" + img.getFilepath_to_image())
                 .toList();
 
         ListingDTO dto = new ListingDTO(
@@ -83,6 +124,10 @@ public class ListingService {
                 imagePath
         );
         dto.setImageUrls(imageUrls);
+        if (user != null) {
+            dto.setFavorited(user.getFavorites().contains(listing));
+        }
+
         return dto;
     }
     @Transactional
@@ -100,6 +145,10 @@ public class ListingService {
         listingRepo.delete(listing);
     }
 
+
+    public ListingDTO toDTO(Listing listing) {
+        return toDTO(listing, null);
+    }
 
 
 }

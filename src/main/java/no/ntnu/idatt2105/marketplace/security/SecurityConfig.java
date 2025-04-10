@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .requestMatchers(
                         "api/users/register",
                         "api/users/login",
-                        "api/users/",
+                        "/api/users/",
                         "/api/listings/all",
                         "/api/listings/id/**",
                         "api/users",
