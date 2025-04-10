@@ -20,7 +20,7 @@ import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import no.ntnu.idatt2105.marketplace.service.ListingService;
+import no.ntnu.idatt2105.marketplace.service.listing.ListingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

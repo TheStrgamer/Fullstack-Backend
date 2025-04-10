@@ -7,6 +7,7 @@ import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,6 +56,10 @@ public class ImagesService {
   public void deleteImage(int image_id) {
     Optional<Images> img = imagesRepo.findById(image_id);
     imagesRepo.deleteById(image_id);
+  }
+
+  public void deleteImage(Images image) {
+    imagesRepo.deleteById(image.getId());
   }
 
 
@@ -109,7 +114,7 @@ public class ImagesService {
   public void deleteImageFromFile(int imageId) {
     Optional<Images> imageOpt = imagesRepo.findById(imageId);
     if (imageOpt.isPresent()) {
-      String filepath = imageOpt.get().getFilepath_to_image();
+      String filepath = uploadDir + imageOpt.get().getFilepath_to_image().substring(8);
       try {
         Files.deleteIfExists(Paths.get(filepath));
         System.out.println("Deleted file: " + filepath);
@@ -119,4 +124,24 @@ public class ImagesService {
       }
     }
   }
+
+  @Transactional
+  public void removeImagesFromListing(int listingId, List<Integer> imageIdsToRemove) throws Exception {
+    Listing listing = listingRepo.findById(listingId)
+            .orElseThrow(() -> new Exception("Listing not found"));
+
+    List<Images> updatedImages = new ArrayList<>();
+
+    for (Images image : listing.getImages()) {
+      if (imageIdsToRemove.contains(image.getId())) {
+        deleteImageFromFile(image.getId()); // delete from file
+      } else {
+        updatedImages.add(image); // keep this one
+      }
+    }
+
+    listing.setImages(updatedImages); // orphanRemoval triggers delete
+    listingRepo.saveAndFlush(listing); // must persist to trigger orphan logic
+  }
+
 }

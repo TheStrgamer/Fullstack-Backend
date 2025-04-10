@@ -38,6 +38,10 @@ public class Images {
     this.id = id;
   }
 
+  public Listing getListing() {
+    return listing;
+  }
+
   public String getFilepath_to_image() {
     return filepathToImage;
   }

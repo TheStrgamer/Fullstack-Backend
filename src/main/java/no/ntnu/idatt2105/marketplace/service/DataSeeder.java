@@ -1,5 +1,6 @@
 package no.ntnu.idatt2105.marketplace.service;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import no.ntnu.idatt2105.marketplace.model.listing.*;
 import no.ntnu.idatt2105.marketplace.model.other.Images;
@@ -7,9 +8,12 @@ import no.ntnu.idatt2105.marketplace.model.user.Role;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.*;
 import no.ntnu.idatt2105.marketplace.service.security.BCryptHasher;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +29,9 @@ public class DataSeeder implements CommandLineRunner {
     private final ImagesRepo imagesRepo;
     private final BCryptHasher hasher;
 
+    @Value("${app.upload.dir}")
+    private String uploadDir; // Should be: uploads/images/
+
     public DataSeeder(RoleRepo roleRepo, CategoriesRepo categoriesRepo,
                       ConditionRepo conditionRepo, UserRepo userRepo,
                       ListingRepo listingRepo, ImagesRepo imagesRepo,
@@ -36,6 +43,12 @@ public class DataSeeder implements CommandLineRunner {
         this.listingRepo = listingRepo;
         this.imagesRepo = imagesRepo;
         this.hasher = hasher;
+    }
+
+    @PostConstruct
+    public void initUploadDirs() throws Exception {
+        Files.createDirectories(Paths.get(uploadDir, "profileImages"));
+        Files.createDirectories(Paths.get(uploadDir, "listingImages"));
     }
 
     @Override
@@ -74,29 +87,23 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedImages() {
-        if (imagesRepo.findByFilepathToImage("/images/default-profile.png").isEmpty()) {
-            imagesRepo.save(new Images(0, "/images/default-profile.png"));
+        if (imagesRepo.findByFilepathToImage("/images/profileImages/default-profile.png").isEmpty()) {
+            imagesRepo.save(new Images(0, "/images/profileImages/default-profile.png"));
         }
-        if (imagesRepo.findByFilepathToImage("/images/Albert.jpeg").isEmpty()) {
-            imagesRepo.save(new Images(0, "/images/Albert.jpeg"));
+        if (imagesRepo.findByFilepathToImage("/images/profileImages/Albert.jpeg").isEmpty()) {
+            imagesRepo.save(new Images(0, "/images/profileImages/Albert.jpeg"));
         }
-
     }
-    //imagesRepo.save(new Images(0, "/images/listing-mac.png"));
-
 
     private void seedUserWithListing() {
         if (userRepo.findByEmail("test@example.com").isPresent()) return;
 
-        // Hent roller og kategori/tilstand
         Role role = roleRepo.findByName("USER").orElseThrow();
         Categories cat = categoriesRepo.findByName("Electronics").orElseThrow();
         Condition condition = conditionRepo.findByName("Used").orElseThrow();
 
-        // Hent bilde for profil
-        Images profileImg = imagesRepo.findByFilepathToImage("/images/default-profile.png").orElseThrow();
+        Images profileImg = imagesRepo.findByFilepathToImage("/images/profileImages/default-profile.png").orElseThrow();
 
-        // Opprett bruker
         User user = new User(
                 "test@example.com",
                 hasher.hashPassword("test123"),
@@ -108,14 +115,13 @@ public class DataSeeder implements CommandLineRunner {
         user.setRole(role);
         userRepo.save(user);
 
-        // Opprett listing
         Listing listing = new Listing(
                 0,
                 user,
                 cat,
                 condition,
                 "Brukt laptop",
-                0, // tilgjengelig
+                0,
                 1500,
                 "Fin brukt MacBook",
                 "Lite brukt MacBook Pro 13'' fra 2020. Batteri i god stand.",
@@ -127,23 +133,20 @@ public class DataSeeder implements CommandLineRunner {
         );
         listingRepo.save(listing);
 
-        // Ikke bruk et bilde som allerede er i databasen
-        // Opprett nytt bilde direkte med riktig relasjon
-        Images listingImg = new Images(0, "/images/listing-mac.png");
-        listingImg.setListing(listing);      // Knyt til listing
-        imagesRepo.save(listingImg);         // Hibernate setter listing_id korrekt
+        Images listingImg = new Images(0, "/images/listingImages/listing-mac.png");
+        listingImg.setListing(listing);
+        imagesRepo.save(listingImg);
     }
+
     private void seedAdditionalUserAndListings() {
         if (userRepo.findByEmail("Albert@example.com").isPresent()) return;
 
-        // Hent felles data
         Role role = roleRepo.findByName("USER").orElseThrow();
         Categories clothing = categoriesRepo.findByName("Clothing").orElseThrow();
         Categories electronics = categoriesRepo.findByName("Electronics").orElseThrow();
         Condition used = conditionRepo.findByName("Used").orElseThrow();
 
-        // Opprett ny bruker
-        Images profileImg = imagesRepo.findByFilepathToImage("/images/Albert.jpeg").orElseThrow();
+        Images profileImg = imagesRepo.findByFilepathToImage("/images/profileImages/Albert.jpeg").orElseThrow();
         User user = new User(
                 "Albert@example.com",
                 hasher.hashPassword("password123"),
@@ -155,36 +158,33 @@ public class DataSeeder implements CommandLineRunner {
         user.setRole(role);
         userRepo.save(user);
 
-        // Opprett listing 1 – Jakke
         Listing jacket = new Listing(
                 0, user, clothing, used,
                 "Pent brukt jakke", 0, 300,
                 "Stilig vårjakke", "Lite brukt jakke i størrelse M, perfekt til våren.",
-                "M", new Date(), new Date(), 59.9139, 10.7522 // Oslo
+                "M", new Date(), new Date(), 59.9139, 10.7522
         );
         listingRepo.save(jacket);
 
-        Images jacketImg = new Images(0, "/images/jacket.png");
+        Images jacketImg = new Images(0, "/images/listingImages/jacket.png");
         jacketImg.setListing(jacket);
         imagesRepo.save(jacketImg);
 
-        // Opprett listing 2 – iPhone
         Listing iphone = new Listing(
                 0, user, electronics, used,
                 "iPhone 12 til salgs", 0, 4500,
                 "Fin iPhone 12", "iPhone 12, 128 GB. Ingen riper. Følger med lader og deksel.",
-                null, new Date(), new Date(), 60.3913, 5.3221 // Bergen
+                null, new Date(), new Date(), 60.3913, 5.3221
         );
         listingRepo.save(iphone);
 
-        Images iphoneImg = new Images(0, "/images/iphone.png");
-        Images iphone2Img = new Images(0, "/images/iphone12-back.png");
+        Images iphoneImg = new Images(0, "/images/listingImages/iphone.png");
+        Images iphone2Img = new Images(0, "/images/listingImages/iphone12-back.png");
         iphoneImg.setListing(iphone);
-        imagesRepo.save(iphoneImg);
         iphone2Img.setListing(iphone);
+        imagesRepo.save(iphoneImg);
         imagesRepo.save(iphone2Img);
 
-        // Add listing to favorites
         Optional<User> testUserOpt = userRepo.findByEmail("Albert@example.com");
         if (testUserOpt.isPresent()) {
             Listing laptop = listingRepo.findAllByTitle("Brukt laptop").stream().findFirst().orElseThrow();
@@ -192,7 +192,4 @@ public class DataSeeder implements CommandLineRunner {
             userRepo.save(user);
         }
     }
-
 }
-
-

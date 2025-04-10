@@ -41,8 +41,8 @@ public class ListingUpdate {
   @Schema(description = "The last updated time of the listing")
   private String updatedAt;
 
-  @Schema(description = "The images of the listing")
-  private List<MultipartFile> images;
+  @Schema(description = "The remaining original image urls of the listing")
+  private List<String> images;
 
   // Getters and setters
 
@@ -90,7 +90,7 @@ public class ListingUpdate {
     return updatedAt;
   }
 
-  public List<MultipartFile> getImages() {
+  public List<String> getImages() {
     return images;
   }
 
@@ -108,7 +108,7 @@ public class ListingUpdate {
             ",\n  latitude=" + latitude +
             ",\n  longitude=" + longitude +
             ",\n  updatedAt='" + updatedAt + '\'' +
-            ",\n  images=" + (images != null ? images.size() + " file(s)" : "null") +
+            ",\n  images=" + (images != null ? images.size() : "null") +
             "\n}";
   }
 }

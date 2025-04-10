@@ -1,4 +1,4 @@
-package no.ntnu.idatt2105.marketplace.service;
+package no.ntnu.idatt2105.marketplace.service.listing;
 
 import no.ntnu.idatt2105.marketplace.dto.listing.CategoriesDTO;
 import no.ntnu.idatt2105.marketplace.dto.listing.ConditionsDTO;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -147,31 +148,44 @@ public class ListingService {
 
 
 
-
+    @Transactional
     public void updateListing(int listing_id, ListingUpdate updatedListingData) throws Exception {
-        System.out.println("Updating listing with id: " + listing_id + "Data: " + "\n" + updatedListingData.toString());
-        Optional<Listing> isPresentCheck = listingRepo.findById(listing_id);
-        if (isPresentCheck.isEmpty()) {
-            throw new Exception("No listing with id " + listing_id);
-        }
-        Listing listing = isPresentCheck.get();
+        System.out.println("Updating listing with id: " + listing_id + "\n" + updatedListingData);
 
-        Optional<Categories> categoriesOptional = categoriesRepo.findById(updatedListingData.getCategory_id());
-        Optional<Condition> conditionOptional = conditionRepo.findById(updatedListingData.getCondition_id());
-
-
+        Listing listing = listingRepo.findById(listing_id)
+                .orElseThrow(() -> new Exception("No listing with id " + listing_id));
 
         listing.setTitle(updatedListingData.getTitle());
-        // check category
-        if (categoriesOptional.isPresent()) {
-            listing.setCategory(categoriesOptional.get());
-        } else throw new Exception("No category found");
 
-        // check condition
-        if (conditionOptional.isPresent()) {
-            listing.setCondition(conditionOptional.get());
-        } else throw new Exception("No condition found");
+        Categories category = categoriesRepo.findById(updatedListingData.getCategory_id())
+                .orElseThrow(() -> new Exception("No category found"));
+        Condition condition = conditionRepo.findById(updatedListingData.getCondition_id())
+                .orElseThrow(() -> new Exception("No condition found"));
 
+        listing.setCategory(category);
+        listing.setCondition(condition);
+
+        // ✅ Handle image update & orphan removal
+        List<String> updatedImageUrls = Optional.ofNullable(updatedListingData.getImages()).orElse(List.of());
+        List<Images> imagesToKeep = new ArrayList<>();
+
+        List<Images> existingImages = new ArrayList<>(listing.getImages());
+        for (Images image : existingImages) {
+            String fullURL = "http://localhost:8080" + image.getFilepath_to_image();
+
+            if (updatedImageUrls.contains(fullURL)) {
+                imagesToKeep.add(image); // don't worry about setListing — handled in setImages()
+                System.out.println("Keeping: " + image.getFilepath_to_image());
+            } else {
+                image.setListing(null);
+                listing.removeImage(image);
+                imagesService.deleteImageFromFile(image.getId());
+            }
+        }
+
+//        listing.setImages(imagesToKeep); // 🔄 will auto-set listing ref inside
+
+        // ✅ Update other fields
         listing.setSale_status(updatedListingData.getSale_status());
         listing.setPrice(updatedListingData.getPrice());
         listing.setBrief_description(updatedListingData.getBrief_description());
@@ -179,11 +193,15 @@ public class ListingService {
         listing.setSize(updatedListingData.getSize());
         listing.setLatitude(updatedListingData.getLatitude());
         listing.setLongitude(updatedListingData.getLongitude());
-//        List<Images> images = imagesService.saveListingImages((updatedListingData.getImages()));
-//        listing.setImages(images);
 
-        listingRepo.save(listing);
+        // ✅ Save
+        listingRepo.saveAndFlush(listing);
+
+        // Optional: log final result
+        System.out.println("Updated listing: " + listingRepo.findById(listing_id).get());
     }
+
+
 
 
     public List<CategoriesDTO> getAllCategories() {
