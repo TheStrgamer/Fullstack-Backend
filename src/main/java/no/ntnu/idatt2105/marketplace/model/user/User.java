@@ -192,6 +192,8 @@ public class User {
     history.clear();
   }
 
+  public List<Listing> getMy_listings() {return my_listings;}
+
   public List<Offer> getOffers() {
     return offers;
   }
