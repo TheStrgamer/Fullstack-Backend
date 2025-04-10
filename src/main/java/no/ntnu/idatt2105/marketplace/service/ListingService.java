@@ -2,6 +2,7 @@ package no.ntnu.idatt2105.marketplace.service;
 
 import no.ntnu.idatt2105.marketplace.dto.listing.ListingDTO;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
+import no.ntnu.idatt2105.marketplace.model.other.Images;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
@@ -103,7 +104,7 @@ public class ListingService {
                 : listing.getImages().get(0).getFilepath_to_image();
 
         List<String> imageUrls = listing.getImages().stream()
-                .map(img -> "http://localhost:8080" + img.getFilepath_to_image())
+                .map(Images::getFilepath_to_image)
                 .toList();
 
         ListingDTO dto = new ListingDTO(
