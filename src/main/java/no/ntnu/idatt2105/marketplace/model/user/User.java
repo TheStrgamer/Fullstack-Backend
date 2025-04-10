@@ -61,7 +61,10 @@ public class User {
   //private List<Listing> history;
   private List<Listing> history = new ArrayList<>(); //for å unngå nullpointer
 
-  @OneToMany(mappedBy = "creator")
+  @OneToMany(mappedBy = "creator",
+    cascade = CascadeType.ALL,
+      orphanRemoval = true
+  )
   private List<Listing> my_listings = new ArrayList<>();
 
   @OneToMany(mappedBy = "buyer")
@@ -154,6 +157,10 @@ public class User {
     this.role = role;
   }
 
+  public boolean isAdmin() {
+    return role.getName().equals("ADMIN");
+  }
+
   public List<Listing> getFavorites() {
     return favorites;
   }
@@ -184,6 +191,8 @@ public class User {
   public void clearHistory() {
     history.clear();
   }
+
+  public List<Listing> getMy_listings() {return my_listings;}
 
   public List<Offer> getOffers() {
     return offers;

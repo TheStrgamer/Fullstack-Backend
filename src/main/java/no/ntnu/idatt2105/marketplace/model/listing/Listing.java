@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+
 import no.ntnu.idatt2105.marketplace.model.negotiation.Conversation;
 import no.ntnu.idatt2105.marketplace.model.other.Images;
 import no.ntnu.idatt2105.marketplace.model.negotiation.Offer;
@@ -68,7 +70,7 @@ public class Listing {
   //private List<User> user_history;
   private List<User> user_history = new ArrayList<>(); //unngå nullpointer
 
-  @OneToMany(mappedBy = "listing")
+  @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
   //private List<Offer> offers;
   private List<Offer> offers = new ArrayList<>(); //unngå nullpointer
 
@@ -76,7 +78,7 @@ public class Listing {
   //private List<Images> images;
   private List<Images> images = new ArrayList<>(); //unngå nullpointer
 
-  @OneToMany(mappedBy = "listing")
+  @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Conversation> conversations = new ArrayList<>();
 
   // constructor
@@ -246,6 +248,34 @@ public class Listing {
     for (Conversation conversation : conversations) {
       conversation.setStatus(1);
     }
+  }
+
+  public void removeUser_favorites() {
+    for (User user : user_favorites) {
+      user.getFavorites().remove(this);
+    }
+  }
+  public void removeUser_history() {
+    for (User user : user_history) {
+      user.getHistory().remove(this);
+    }
+  }
+
+  public void removeOffers() {
+    offers.clear();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Listing listing = (Listing) o;
+    return id == listing.id;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
   }
 
 }

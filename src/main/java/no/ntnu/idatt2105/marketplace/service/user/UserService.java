@@ -9,8 +9,10 @@ import no.ntnu.idatt2105.marketplace.exception.EmailNotAvailibleException;
 import no.ntnu.idatt2105.marketplace.exception.IncorrectPasswordException;
 import no.ntnu.idatt2105.marketplace.exception.PhonenumberNotAvailibleException;
 import no.ntnu.idatt2105.marketplace.exception.UserNotFoundException;
+import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 import no.ntnu.idatt2105.marketplace.model.user.Role;
 import no.ntnu.idatt2105.marketplace.model.user.User;
+import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 import no.ntnu.idatt2105.marketplace.repo.RoleRepo;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import no.ntnu.idatt2105.marketplace.dto.other.TokenResponseObject;
@@ -28,6 +30,9 @@ public class UserService {
 
   @Autowired
   private RoleRepo roleRepo;
+
+  @Autowired
+  private ListingRepo listingRepo;
 
   @Autowired
   private JWT_token jwt;
@@ -119,4 +124,36 @@ public class UserService {
     userRepo.save(user);
     return 0;
   }
+  public int getListingCount(User user) {
+    return listingRepo.findAllByCreator(user).size();
+  }
+
+  public boolean toggleFavorite(int userId, int listingId) {
+    Optional<User> userOpt = userRepo.findById(userId);
+    Optional<Listing> listingOpt = listingRepo.findById(listingId);
+
+    if (userOpt.isEmpty()) {
+      throw new UserNotFoundException("User not found");
+    }
+
+    if (listingOpt.isEmpty()) {
+      throw new IllegalArgumentException("Listing not found");
+    }
+
+    User user = userOpt.get();
+    Listing listing = listingOpt.get();
+    boolean isNowFavorite;
+
+    if (user.getFavorites().contains(listing)) {
+      user.removeFavorite(listing);
+      isNowFavorite = false;
+    } else {
+      user.addFavorite(listing);
+      isNowFavorite = true;
+    }
+
+    userRepo.save(user);
+    return isNowFavorite;
+  }
+
 }

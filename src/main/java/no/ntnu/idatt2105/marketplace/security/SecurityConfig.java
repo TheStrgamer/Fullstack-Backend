@@ -26,6 +26,8 @@ public class SecurityConfig {
                         "/api/listings/random",
                         "/api/listings/categories",
                         "/api/listings/conditions",
+                        "/api/categories",
+                        "/api/categories/**",
                         "/h2-console/**",             // for databasetilgang
                         "/images/**",
                         "/images/listingImages/",
@@ -40,7 +42,7 @@ public class SecurityConfig {
                 .requestMatchers(
                         "api/users/register",
                         "api/users/login",
-                        "api/users/",
+                        "/api/users/",
                         "/api/listings/all",
                         "/api/listings/id/**",
                         "api/users",

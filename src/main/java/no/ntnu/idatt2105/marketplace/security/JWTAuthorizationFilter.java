@@ -30,9 +30,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
     String path = request.getRequestURI();
-    boolean isWebSocket = path.startsWith("/ws/chat/");
-    System.out.println(path + " isWebSocket: " + isWebSocket);
-    return isWebSocket;
+    return path.startsWith("/ws/chat/");
   }
 
   @Override

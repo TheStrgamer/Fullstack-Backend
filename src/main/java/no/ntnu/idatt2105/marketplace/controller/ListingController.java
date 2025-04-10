@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import no.ntnu.idatt2105.marketplace.dto.listing.ListingDTO;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.CategoriesRepo;
@@ -52,7 +53,6 @@ public class ListingController {
 
     @Autowired
     private JWT_token jwtTokenService;
-
 
     private static final Logger LOGGER = LogManager.getLogger(ListingController.class);
 
@@ -102,11 +102,23 @@ public class ListingController {
                     description = "Integer value representing the listing id",
                     required = true,
                     example = "123"
-            ) @PathVariable String id) {
+            ) @PathVariable String id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
-            return listingRepo.findById(Integer.valueOf(id))
-                    .map(listing -> ResponseEntity.ok(listingService.toDTO(listing)))
-                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+//            return listingRepo.findById(Integer.valueOf(id))
+//                    .map(listing -> ResponseEntity.ok(listingService.toDTO(listing)))
+//                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+            int listingId = Integer.parseInt(id);
+            Optional<Listing> listingOpt = listingRepo.findById(listingId);
+            if (listingOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            Listing listing = listingOpt.get();
+            User user = null;
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                user = jwtTokenService.getUserByToken(token);  // Henter bruker fra token
+            }
+            return ResponseEntity.ok(listingService.toDTO(listing)); // Sender med bruker
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
@@ -233,13 +245,14 @@ public class ListingController {
          description = "List of recommended listings"
     )
     public ResponseEntity<List<ListingDTO>> getRecommendedListings(
-            @Parameter(
-                    name = "count",
-                    description = "Integer value representing the amount of listings that are to be returned",
-                    example = "5"
-            ) @RequestParam(defaultValue = "10") int count,
-            Principal principal) {
-        return ResponseEntity.ok(listingService.getRecommendedListingsForUser(principal.getName(), count));
+            @RequestParam(defaultValue = "50") int count,
+            @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        User user = jwtTokenService.getUserByToken(token);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(listingService.getRecommendedListingsForUser(user, count));
     }
 
 
