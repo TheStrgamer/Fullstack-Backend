@@ -39,6 +39,11 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
+        if (userRepo.count() > 0) {
+            System.out.println("Skipper seeding – brukere finnes allerede.");
+            return;
+        }
+
         seedRoles();
         seedConditions();
         seedCategories();
@@ -246,7 +251,9 @@ public class DataSeeder implements CommandLineRunner {
         List<Listing> notOwn = all.stream().filter(l -> l.getCreator().getId() != albert.getId()).toList();
 
         for (int i = 0; i < 10 && i < notOwn.size(); i++) {
-            albert.addFavorite(notOwn.get(i));
+            Listing fav = notOwn.get(i);
+            albert.addFavorite(fav);
+            listingRepo.save(fav);
         }
         for (int i = 10; i < 20 && i < notOwn.size(); i++) {
             albert.addHistory(notOwn.get(i));
