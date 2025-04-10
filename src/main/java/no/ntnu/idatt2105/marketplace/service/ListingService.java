@@ -2,6 +2,7 @@ package no.ntnu.idatt2105.marketplace.service;
 
 import no.ntnu.idatt2105.marketplace.dto.listing.ListingDTO;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
+import no.ntnu.idatt2105.marketplace.model.other.Images;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
@@ -103,7 +104,7 @@ public class ListingService {
                 : listing.getImages().get(0).getFilepath_to_image();
 
         List<String> imageUrls = listing.getImages().stream()
-                .map(img -> "http://localhost:8080" + img.getFilepath_to_image())
+                .map(Images::getFilepath_to_image)
                 .toList();
 
         ListingDTO dto = new ListingDTO(
@@ -148,6 +149,20 @@ public class ListingService {
 
     public ListingDTO toDTO(Listing listing) {
         return toDTO(listing, null);
+    }
+
+    public List<ListingDTO> getListingsByCategory(String category, Integer userId) {
+        List<Listing> listings = listingRepo.findByCategory_Name(category);
+
+        if (userId != null) {
+            listings = listings.stream()
+                    .filter(l -> l.getCreator().getId() != userId)
+                    .toList();
+        }
+
+        return listings.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
 

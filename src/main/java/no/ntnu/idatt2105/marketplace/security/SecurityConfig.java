@@ -26,6 +26,8 @@ public class SecurityConfig {
                         "/api/listings/random",
                         "/api/listings/categories",
                         "/api/listings/conditions",
+                        "/api/categories",
+                        "/api/categories/**",
                         "/h2-console/**",             // for databasetilgang
                         "/images/**",
                         "/v3/api-docs/**",
