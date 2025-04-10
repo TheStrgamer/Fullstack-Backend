@@ -124,6 +124,9 @@ public class UserService {
     userRepo.save(user);
     return 0;
   }
+  public int getListingCount(User user) {
+    return listingRepo.findAllByCreator(user).size();
+  }
 
   public boolean toggleFavorite(int userId, int listingId) {
     Optional<User> userOpt = userRepo.findById(userId);

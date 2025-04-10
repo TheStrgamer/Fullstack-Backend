@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ListingService {
@@ -129,6 +130,21 @@ public class ListingService {
 
         return dto;
     }
+    @Transactional
+    public void deleteListing(int listingId) {
+        Listing listing = listingRepo.findById(listingId)
+            .orElseThrow(() -> new RuntimeException("Listing not found"));
+
+        listing.removeUser_favorites();
+        listing.removeUser_history();
+
+        listing.removeOffers();
+        listing.getConversations().clear();
+        listing.getImages().clear();
+
+        listingRepo.delete(listing);
+    }
+
 
     public ListingDTO toDTO(Listing listing) {
         return toDTO(listing, null);

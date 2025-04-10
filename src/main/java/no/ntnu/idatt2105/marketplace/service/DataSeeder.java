@@ -44,6 +44,7 @@ public class DataSeeder implements CommandLineRunner {
         seedCategories();
         seedImages();
         seedUserWithListing();
+        seedAdminUser();
         seedAdditionalUserAndListings();
         seedMoreCategoriesAndUsersWithListings();
         assignAlbertFavoritesAndHistory();
@@ -52,6 +53,9 @@ public class DataSeeder implements CommandLineRunner {
     private void seedRoles() {
         if (roleRepo.findByName("USER").isEmpty()) {
             roleRepo.save(new Role(0, "USER"));
+        }
+        if (roleRepo.findByName("ADMIN").isEmpty()) {
+            roleRepo.save(new Role(0, "ADMIN"));
         }
     }
 
@@ -65,11 +69,23 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedCategories() {
-        List<String> categories = List.of("Electronics", "Clothing", "Books", "Sports", "Toys", "Furniture");
-        for (String cat : categories) {
-            if (categoriesRepo.findByName(cat).isEmpty()) {
-                categoriesRepo.save(new Categories(0, cat, cat + " description", null));
-            }
+        if (categoriesRepo.findByName("Other").isEmpty()) {
+            categoriesRepo.save(new Categories("Other", "Default category", null));
+        }
+        if (categoriesRepo.findByName("Electronics").isEmpty()) {
+            categoriesRepo.save(new Categories("Electronics", "Devices and gadgets", null));
+        }
+        if (categoriesRepo.findByName("Clothing").isEmpty()) {
+            categoriesRepo.save(new Categories("Clothing", "Apparel and accessories", null));
+        }
+        if (categoriesRepo.findByName("Furniture").isEmpty()) {
+            categoriesRepo.save(new Categories("Furniture", "Home and office furniture", null));
+        }
+        if (categoriesRepo.findByName("Books").isEmpty()) {
+            categoriesRepo.save(new Categories("Books", "Literature and textbooks", null));
+        }
+        if (categoriesRepo.findByName("Trading cards").isEmpty()) {
+            categoriesRepo.save(new Categories("Trading cards", "Trading cards", null));
         }
     }
 
@@ -80,55 +96,115 @@ public class DataSeeder implements CommandLineRunner {
         if (imagesRepo.findByFilepathToImage("/images/Albert.jpeg").isEmpty()) {
             imagesRepo.save(new Images(0, "/images/Albert.jpeg"));
         }
+
     }
+    //imagesRepo.save(new Images(0, "/images/listing-mac.png"));
+
 
     private void seedUserWithListing() {
         if (userRepo.findByEmail("test@example.com").isPresent()) return;
 
+        // Hent roller og kategori/tilstand
         Role role = roleRepo.findByName("USER").orElseThrow();
         Categories cat = categoriesRepo.findByName("Electronics").orElseThrow();
         Condition condition = conditionRepo.findByName("Used").orElseThrow();
+
+        // Hent bilde for profil
         Images profileImg = imagesRepo.findByFilepathToImage("/images/default-profile.png").orElseThrow();
 
-        User user = new User("test@example.com", hasher.hashPassword("test123"), "Test", "Bruker", "12345678", profileImg);
+        // Opprett bruker
+        User user = new User(
+                "test@example.com",
+                hasher.hashPassword("test123"),
+                "Test",
+                "Bruker",
+                "12345678",
+                profileImg
+        );
         user.setRole(role);
         userRepo.save(user);
 
-        Listing listing = new Listing(0, user, cat, condition, "Brukt laptop", 0, 1500,
-                "Fin brukt MacBook", "Lite brukt MacBook Pro 13'' fra 2020. Batteri i god stand.",
-                "13''", new Date(), new Date(), 63.4305, 10.3951);
+        // Opprett listing
+        Listing listing = new Listing(
+                0,
+                user,
+                cat,
+                condition,
+                "Brukt laptop",
+                0, // tilgjengelig
+                1500,
+                "Fin brukt MacBook",
+                "Lite brukt MacBook Pro 13'' fra 2020. Batteri i god stand.",
+                "13''",
+                new Date(),
+                new Date(),
+                63.4305,
+                10.3951
+        );
         listingRepo.save(listing);
 
+        // Ikke bruk et bilde som allerede er i databasen
+        // Opprett nytt bilde direkte med riktig relasjon
         Images listingImg = new Images(0, "/images/listing-mac.png");
-        listingImg.setListing(listing);
-        imagesRepo.save(listingImg);
+        listingImg.setListing(listing);      // Knyt til listing
+        imagesRepo.save(listingImg);         // Hibernate setter listing_id korrekt
     }
-
+    public void seedAdminUser() {
+        if (userRepo.findByEmail("admin@admin.com").isPresent()) return;
+        // Hent roller og kategori/tilstand
+        Role adminrole = roleRepo.findByName("ADMIN").orElseThrow();
+        User adminUser = new User("admin@admin.com",
+                hasher.hashPassword("admin"),
+                "Admin",
+                "Superuser",
+                "42069420",
+                null
+        );
+        adminUser.setRole(adminrole);
+        userRepo.save(adminUser);
+    }
     private void seedAdditionalUserAndListings() {
         if (userRepo.findByEmail("Albert@example.com").isPresent()) return;
 
+        // Hent felles data
         Role role = roleRepo.findByName("USER").orElseThrow();
         Categories clothing = categoriesRepo.findByName("Clothing").orElseThrow();
         Categories electronics = categoriesRepo.findByName("Electronics").orElseThrow();
         Condition used = conditionRepo.findByName("Used").orElseThrow();
-        Images profileImg = imagesRepo.findByFilepathToImage("/images/Albert.jpeg").orElseThrow();
 
-        User user = new User("Albert@example.com", hasher.hashPassword("password123"), "Albert", "Zindel", "98765432", profileImg);
+        // Opprett ny bruker
+        Images profileImg = imagesRepo.findByFilepathToImage("/images/Albert.jpeg").orElseThrow();
+        User user = new User(
+                "Albert@example.com",
+                hasher.hashPassword("password123"),
+                "Albert",
+                "Zindel",
+                "98765432",
+                profileImg
+        );
         user.setRole(role);
         userRepo.save(user);
 
-        Listing jacket = new Listing(0, user, clothing, used, "Pent brukt jakke", 0, 300,
+        // Opprett listing 1 – Jakke
+        Listing jacket = new Listing(
+                0, user, clothing, used,
+                "Pent brukt jakke", 0, 300,
                 "Stilig vårjakke", "Lite brukt jakke i størrelse M, perfekt til våren.",
-                "M", new Date(), new Date(), 59.9139, 10.7522);
+                "M", new Date(), new Date(), 59.9139, 10.7522 // Oslo
+        );
         listingRepo.save(jacket);
 
         Images jacketImg = new Images(0, "/images/jacket.png");
         jacketImg.setListing(jacket);
         imagesRepo.save(jacketImg);
 
-        Listing iphone = new Listing(0, user, electronics, used, "iPhone 12 til salgs", 0, 4500,
+        // Opprett listing 2 – iPhone
+        Listing iphone = new Listing(
+                0, user, electronics, used,
+                "iPhone 12 til salgs", 0, 4500,
                 "Fin iPhone 12", "iPhone 12, 128 GB. Ingen riper. Følger med lader og deksel.",
-                null, new Date(), new Date(), 60.3913, 5.3221);
+                null, new Date(), new Date(), 60.3913, 5.3221 // Bergen
+        );
         listingRepo.save(iphone);
 
         Images iphoneImg = new Images(0, "/images/iphone.png");
