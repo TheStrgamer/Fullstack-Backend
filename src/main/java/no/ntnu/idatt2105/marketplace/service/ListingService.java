@@ -150,6 +150,20 @@ public class ListingService {
         return toDTO(listing, null);
     }
 
+    public List<ListingDTO> getListingsByCategory(String category, Integer userId) {
+        List<Listing> listings = listingRepo.findByCategory_Name(category);
+
+        if (userId != null) {
+            listings = listings.stream()
+                    .filter(l -> l.getCreator().getId() != userId)
+                    .toList();
+        }
+
+        return listings.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
 
 }
 
