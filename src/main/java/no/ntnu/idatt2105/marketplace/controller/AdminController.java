@@ -1,5 +1,6 @@
 package no.ntnu.idatt2105.marketplace.controller;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -88,7 +89,7 @@ public class AdminController {
           responseCode = "200",
           description = "Data received successfully",
           content = @Content(
-              schema = @Schema(implementation = String.class)
+              schema = @Schema(implementation = Boolean.class)
           )
       ),
       @ApiResponse(
@@ -128,7 +129,10 @@ public class AdminController {
           responseCode = "200",
           description = "Data received successfully",
           content = @Content(
-              schema = @Schema(implementation = String.class)
+              mediaType = "application/json",
+              array = @ArraySchema(
+                  schema = @Schema(implementation = UserAdminDTO.class)
+              )
           )
       ),
       @ApiResponse(
@@ -346,7 +350,10 @@ public class AdminController {
           responseCode = "200",
           description = "Data received successfully",
           content = @Content(
-              schema = @Schema(implementation = String.class)
+              mediaType = "application/json",
+              array = @ArraySchema(
+                  schema = @Schema(implementation = ListingAdminDTO.class)
+              )
           )
       ),
       @ApiResponse(
@@ -427,7 +434,10 @@ public class AdminController {
           responseCode = "200",
           description = "Data received successfully",
           content = @Content(
-              schema = @Schema(implementation = String.class)
+              mediaType = "application/json",
+              array = @ArraySchema(
+                  schema = @Schema(implementation = CategoriesAdminDTO.class)
+              )
           )
       ),
       @ApiResponse(
@@ -478,7 +488,7 @@ public class AdminController {
           responseCode = "200",
           description = "Data received successfully",
           content = @Content(
-              schema = @Schema(implementation = String.class)
+              schema = @Schema(implementation = CategoriesAdminDTO.class)
           )
       ),
       @ApiResponse(
@@ -526,7 +536,7 @@ public class AdminController {
           responseCode = "200",
           description = "Category created successfully",
           content = @Content(
-              schema = @Schema(implementation = String.class)
+              schema = @Schema(implementation = Boolean.class)
           )
       ),
       @ApiResponse(
@@ -579,7 +589,7 @@ public class AdminController {
           responseCode = "200",
           description = "Category updated successfully",
           content = @Content(
-              schema = @Schema(implementation = String.class)
+              schema = @Schema(implementation = Boolean.class)
           )
       ),
       @ApiResponse(

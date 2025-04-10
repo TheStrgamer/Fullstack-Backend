@@ -317,31 +317,6 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
-
-
-
-  @GetMapping("/") //TODO: remove this endpoint, for testing purposes only
-  @Operation(
-          summary = "Get all users",
-          description = "Returns all users stored in the database"
-  )
-  @ApiResponse(
-          responseCode = "200",
-          description = "List of all users",
-          content = @Content(
-                  mediaType = "application/json",
-                  array = @ArraySchema(
-                          schema = @Schema(implementation = User.class)
-                  )
-          )
-  )
-  public Iterable<User> getAllUsers() {
-    return userRepo.findAll();
-  }
-
-
-
-
   @GetMapping("/{id}/info")
   @Operation(
           summary = "Get user information",
