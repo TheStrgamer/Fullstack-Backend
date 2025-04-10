@@ -125,7 +125,7 @@ public class UserService {
     return 0;
   }
 
-  public void toggleFavorite(int userId, int listingId) {
+  public boolean toggleFavorite(int userId, int listingId) {
     Optional<User> userOpt = userRepo.findById(userId);
     Optional<Listing> listingOpt = listingRepo.findById(listingId);
 
@@ -139,14 +139,18 @@ public class UserService {
 
     User user = userOpt.get();
     Listing listing = listingOpt.get();
+    boolean isNowFavorite;
 
     if (user.getFavorites().contains(listing)) {
       user.removeFavorite(listing);
+      isNowFavorite = false;
     } else {
       user.addFavorite(listing);
+      isNowFavorite = true;
     }
 
     userRepo.save(user);
+    return isNowFavorite;
   }
 
 }

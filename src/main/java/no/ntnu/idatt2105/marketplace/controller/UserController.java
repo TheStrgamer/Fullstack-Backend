@@ -1,5 +1,6 @@
 package no.ntnu.idatt2105.marketplace.controller;
 
+import java.util.Map;
 import java.util.Optional;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -416,7 +417,7 @@ public class UserController {
           @ApiResponse(responseCode = "401", description = "Unauthorized"),
           @ApiResponse(responseCode = "404", description = "User or listing not found")
   })
-  public ResponseEntity<String> toggleFavorite(
+  public ResponseEntity<Map<String, Boolean>> toggleFavorite(
           @Parameter(
                   name = "Authorization",
                   description = "Bearer token in the format `Bearer <JWT>`",
@@ -431,22 +432,33 @@ public class UserController {
           ) @PathVariable int listingId) {
 
     if (!authorizationHeader.startsWith("Bearer ")) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid authorization header");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     String token = authorizationHeader.substring(7);
     int userId = Integer.parseInt(jwt.extractIdFromJwt(token));
 
-    try {
-      userService.toggleFavorite(userId, listingId);
-      return ResponseEntity.ok("Favorite toggled");
-    } catch (UserNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Listing not found");
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error toggling favorite");
+    Optional<User> userOpt = userRepo.findById(userId);
+    Optional<Listing> listingOpt = listingRepo.findById(listingId);
+
+    if (userOpt.isEmpty() || listingOpt.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+
+    User user = userOpt.get();
+    Listing listing = listingOpt.get();
+
+    boolean wasFavorited = user.getFavorites().contains(listing);
+    if (wasFavorited) {
+      user.getFavorites().remove(listing);
+    } else {
+      user.getFavorites().add(listing);
+    }
+
+    userRepo.save(user);
+
+    // Returner ny favorittstatus som JSON
+    return ResponseEntity.ok(Map.of("isFavorited", !wasFavorited));
   }
 
 

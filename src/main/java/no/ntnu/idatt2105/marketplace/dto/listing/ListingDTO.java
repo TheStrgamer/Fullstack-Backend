@@ -1,5 +1,6 @@
 package no.ntnu.idatt2105.marketplace.dto.listing;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +57,7 @@ public class ListingDTO {
     private List<String> imageUrls;
 
     @Schema(description = "Boolean value to determine if a listing is favorited by the user or not", example = "true")
+    @JsonProperty("isFavorited")
     private boolean isFavorited;
 
 

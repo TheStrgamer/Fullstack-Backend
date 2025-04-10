@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+
 import no.ntnu.idatt2105.marketplace.model.negotiation.Conversation;
 import no.ntnu.idatt2105.marketplace.model.other.Images;
 import no.ntnu.idatt2105.marketplace.model.negotiation.Offer;
@@ -242,6 +244,19 @@ public class Listing {
     for (Conversation conversation : conversations) {
       conversation.setStatus(1);
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Listing listing = (Listing) o;
+    return id == listing.id;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
   }
 
 }
