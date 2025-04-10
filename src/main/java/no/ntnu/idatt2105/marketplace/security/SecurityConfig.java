@@ -30,6 +30,10 @@ public class SecurityConfig {
                         "/api/categories/**",
                         "/h2-console/**",             // for databasetilgang
                         "/images/**",
+                        "/images/listingImages/",
+                        "/images/listingImages/**",
+                        "/uploads/**",
+                        "/uploads/images/**",
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",

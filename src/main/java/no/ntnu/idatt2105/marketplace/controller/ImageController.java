@@ -7,15 +7,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import no.ntnu.idatt2105.marketplace.dto.listing.ListingImagesUpload;
 import no.ntnu.idatt2105.marketplace.model.other.Images;
 import no.ntnu.idatt2105.marketplace.repo.ImagesRepo;
 import no.ntnu.idatt2105.marketplace.service.images.ImagesService;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/images")
@@ -84,11 +88,55 @@ public class ImageController {
   }
 
   @GetMapping("/get{id}")
-  public ResponseEntity<?> getImageFrmId(@RequestParam int id) {
+  public ResponseEntity<?> getImageFromId(@PathVariable int id) {
     return ResponseEntity.ok(imagesService.getImageURLFromId(id));
   }
 
-// TODO: implement
-//  @PostMapping("/addListingImage")
-//  public ResponseEntity<?> addListingImage() {}
+
+  @PostMapping("/uploadListing")
+  @Operation(
+          summary = "Upload images for a listing",
+          description = "Allows an authenticated user to upload one or more images for a listing using a JWT token."
+  )
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = "200",
+                  description = "Images successfully uploaded"
+          ),
+          @ApiResponse(
+                  responseCode = "401",
+                  description = "Unauthorized — invalid or missing token"
+          ),
+          @ApiResponse(
+                  responseCode = "500",
+                  description = "Internal server error during upload"
+          )
+  })
+  public ResponseEntity<?> uploadImages(
+          @Parameter(
+                  name = "Authorization",
+                  description = "Bearer token in the format `Bearer <JWT>`",
+                  required = true,
+                  example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          )
+          @RequestHeader("Authorization") String authorizationHeader,
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                  description = "Object containing the listing ID and images to upload",
+                  required = true,
+                  content = @Content(
+                          mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                          schema = @Schema(implementation = ListingImagesUpload.class)
+                  )
+          )
+          @ModelAttribute ListingImagesUpload images
+  ) {
+    try {
+      imagesService.saveListingImages(images.getImages(), images.getId());
+      return ResponseEntity.ok("Successfully uploaded images");
+    } catch (Exception e) {
+      System.out.println("Error: " + e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
 }

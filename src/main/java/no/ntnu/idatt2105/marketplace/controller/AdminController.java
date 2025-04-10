@@ -26,7 +26,7 @@ import no.ntnu.idatt2105.marketplace.repo.CategoriesRepo;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 import no.ntnu.idatt2105.marketplace.repo.RoleRepo;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
-import no.ntnu.idatt2105.marketplace.service.ListingService;
+import no.ntnu.idatt2105.marketplace.service.listing.ListingService;
 import no.ntnu.idatt2105.marketplace.service.images.ImagesService;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import no.ntnu.idatt2105.marketplace.service.user.UserService;

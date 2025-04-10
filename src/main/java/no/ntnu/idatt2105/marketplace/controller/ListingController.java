@@ -1,5 +1,6 @@
 package no.ntnu.idatt2105.marketplace.controller;
 
+import no.ntnu.idatt2105.marketplace.dto.listing.*;
 import no.ntnu.idatt2105.marketplace.model.listing.Categories;
 import no.ntnu.idatt2105.marketplace.model.listing.Condition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,10 +17,11 @@ import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.CategoriesRepo;
 import no.ntnu.idatt2105.marketplace.repo.ConditionRepo;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
+import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import no.ntnu.idatt2105.marketplace.service.ListingService;
+import no.ntnu.idatt2105.marketplace.service.listing.ListingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +41,9 @@ public class ListingController {
 
     @Autowired
     private ListingRepo listingRepo;
+
+    @Autowired
+    private UserRepo userRepo;
 
     @Autowired
     private CategoriesRepo CategoriesRepo;
@@ -99,6 +104,9 @@ public class ListingController {
                     example = "123"
             ) @PathVariable String id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
+//            return listingRepo.findById(Integer.valueOf(id))
+//                    .map(listing -> ResponseEntity.ok(listingService.toDTO(listing)))
+//                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
             int listingId = Integer.parseInt(id);
             Optional<Listing> listingOpt = listingRepo.findById(listingId);
             if (listingOpt.isEmpty()) {
@@ -110,7 +118,7 @@ public class ListingController {
                 String token = authHeader.substring(7);
                 user = jwtTokenService.getUserByToken(token);  // Henter bruker fra token
             }
-            return ResponseEntity.ok(listingService.toDTO(listing, user)); // Sender med bruker
+            return ResponseEntity.ok(listingService.toDTO(listing)); // Sender med bruker
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
@@ -119,22 +127,38 @@ public class ListingController {
     }
 
     @GetMapping("/categories")
-    public List<Categories> getListingCategories() {
-        return CategoriesRepo.findAll();
+    @Operation(
+            summary = "Get all categories",
+            description = "Returns a list of DTOs containing information about a category"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Successfully returned a list of all categories"
+    )
+    public ResponseEntity<?> getListingCategories() {
+        return ResponseEntity.ok(listingService.getAllCategories());
     }
 
     @GetMapping("/conditions")
-    public List<Condition> getListingConditions() {
-        return ConditionRepo.findAll();
+    @Operation(
+            summary = "Get all conditions",
+            description = "Returns a list of DTOs containing information about a condition"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Successfully returned a list of all conditions"
+    )
+    public ResponseEntity<?> getListingConditions() {
+        return ResponseEntity.ok(listingService.getAllConditions());
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createListing(@RequestBody Listing listing, @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> createListing(@RequestBody ListingCreate listing, @RequestHeader("Authorization") String authHeader) {
         try {
             LOGGER.info("Received listing data: {}", listing);
 
-            if (listing.getTitle() == null || listing.getBrief_description() == null ||
-                    listing.getFull_description() == null) {
+            if (listing.getTitle() == null || listing.getBriefDescription() == null ||
+                    listing.getFullDescription() == null) {
                 LOGGER.error("Missing required fields in listing data");
                 return new ResponseEntity<>("Missing required fields", HttpStatus.BAD_REQUEST);
             }
@@ -147,20 +171,36 @@ public class ListingController {
                 return new ResponseEntity<>("Invalid token or user not found", HttpStatus.UNAUTHORIZED);
             }
 
-            listing.setCreator(user);
-
-            Categories category = CategoriesRepo.findById(listing.getCategory().getId()).orElse(null);
-            Condition condition = ConditionRepo.findById(listing.getCondition().getId()).orElse(null);
+            Categories category = CategoriesRepo.findById(listing.getCategory()).orElse(null);
+            Condition condition = ConditionRepo.findById(listing.getCondition()).orElse(null);
 
             if (category == null || condition == null) {
                 LOGGER.error("Category or condition not found");
                 return new ResponseEntity<>("Category or condition not found", HttpStatus.BAD_REQUEST);
             }
-            listing.setCategory(category);
-            listing.setCondition(condition);
+
+            Optional<User> creator = userRepo.findById(user.getId());
+            if (creator.isEmpty()) throw new Exception("No user found");
+
+            Listing newListing = new Listing(
+                    0,
+                    creator.get(),
+                    category,
+                    condition,
+                    listing.getTitle(),
+                    listing.getSaleStatus(),
+                    listing.getPrice(),
+                    listing.getBriefDescription(),
+                    listing.getFullDescription(),
+                    listing.getSize(),
+                    listing.getCreatedAt(),
+                    listing.getUpdatedAt(),
+                    listing.getLatitude(),
+                    listing.getLongitude()
+            );
             LOGGER.info("Saved listing");
-            listingRepo.save(listing);
-            return new ResponseEntity<>(listing, HttpStatus.CREATED);
+            Listing createdListing = listingRepo.save(newListing);
+            return new ResponseEntity<>(listingService.toDTO(createdListing), HttpStatus.CREATED);
         } catch (Exception e) {
             LOGGER.error("Error creating listing: ", e);
             return new ResponseEntity<>("Error creating listing", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -213,5 +253,189 @@ public class ListingController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.ok(listingService.getRecommendedListingsForUser(user, count));
+    }
+
+
+
+
+    @PutMapping("/update/{id}")
+    @Operation(
+            summary = "Update listing",
+            description = "Updates a listing with the given id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully updated listing"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid Authorization header"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error updating listings"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "User does not have permission tpo update the requested listing"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Could not find requested listing"
+            ),
+    })
+    public ResponseEntity<?> updateListing(
+            @Parameter(
+                    name = "Authorization",
+                    description = "Bearer token in the format `Bearer <JWT>`",
+                    required = true,
+                    example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+            ) @RequestHeader("Authorization") String authorizationHeader,
+            @Parameter(
+                    name = "id",
+                    description = "The id of the listing that is being updated",
+                    example = "111"
+            ) @PathVariable int id,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Updated listing data",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = ListingUpdate.class)
+                    )
+            ) @RequestBody ListingUpdate updatedListingData) {
+        try {
+//            LOGGER.info(updatedListingData.toString());
+            // validate token
+            if (!authorizationHeader.startsWith("Bearer ")) {
+                LOGGER.info("Invalid Authorization header");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            LOGGER.info("Token is valid");
+
+            // validate listing
+            if (!listingService.isListingValid(id)) {
+                LOGGER.info("There exists not listing with the id: " + id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            LOGGER.info("Listing is valid");
+
+            // validate user permission
+            String token = authorizationHeader.substring(7);
+            int user_id = Integer.parseInt(jwtTokenService.extractIdFromJwt(token));
+
+            if (!listingService.userHasPermission(id, user_id)) {
+                LOGGER.info("User with id" + user_id
+                                + " has no permission to update listing with id: " + id);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            LOGGER.info("User is valid \n Updating listing");
+
+
+            listingService.updateListing(id, updatedListingData);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception e) {
+            LOGGER.error("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+
+    @GetMapping("/getMyListings")
+    @Operation(
+            summary = "Get all listings by user id",
+            description = "Returns a list of listingDTOs containing information about listings created by a user with the given user_id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully returned a list of listings where the creator id equals the given user id"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid Authorization header"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error returning list of listings"
+            ),
+    })
+    public ResponseEntity<List<ListingDTO>> getListingsForUser(
+            @Parameter(
+                    name = "Authorization",
+                    description = "Bearer token in the format `Bearer <JWT>`",
+                    required = true,
+                    example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+            ) @RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            // validate token
+            if (!authorizationHeader.startsWith("Bearer ")) {
+                LOGGER.info("Invalid Authorization header");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            String token = authorizationHeader.substring(7);
+            int user_id = Integer.parseInt(jwtTokenService.extractIdFromJwt(token));
+
+            List<ListingDTO> response = listingService.getAllListingsForUser(user_id);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
+    @DeleteMapping("/{id}/delete")
+    @Operation(
+            summary = "Delete a listing",
+            description = "Delete a listing with the provided Id, if requester has permission"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid Token"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "The user has insufficient permission"
+            ),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully deleted the listing"
+            )
+    })
+    public ResponseEntity<?> delete(
+            @Parameter(
+                    name = "id",
+                    description = "The id of the listing that is being updated",
+                    example = "111"
+            ) @PathVariable int id,
+            @Parameter(
+            name = "Authorization",
+            description = "Bearer token in the format `Bearer <JWT>`",
+            required = true,
+            example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
+    ) @RequestHeader("Authorization") String authorizationHeader) {
+        // validate token
+        if (!authorizationHeader.startsWith("Bearer ")) {
+            LOGGER.info("Invalid Authorization header");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String token = authorizationHeader.substring(7);
+        int user_id = Integer.parseInt(jwtTokenService.extractIdFromJwt(token));
+
+        if (!listingService.userHasPermission(id, user_id)) {
+            System.out.println("Request denied to delete listing, due to insufficient permission");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        listingService.delete(id);
+        System.out.println("Successfully deleted listing with id: " + id);
+        return ResponseEntity.ok().build();
     }
 }
