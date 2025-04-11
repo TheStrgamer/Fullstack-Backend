@@ -470,5 +470,18 @@ public class ListingService {
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Searches for listings where the title contains the given query string (case-insensitive).
+     *
+     * @param query The search query to match in the title.
+     * @return A list of {@link ListingDTO} matching the search query.
+     */
+    public List<ListingDTO> searchByTitle(String query) {
+        return listingRepo.findByTitleContainingIgnoreCase(query).stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
 }
 

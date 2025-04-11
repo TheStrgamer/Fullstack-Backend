@@ -25,4 +25,7 @@ public interface ListingRepo extends JpaRepository<Listing, Integer> {
 
     List<Listing> findByCategory_Name(String categoryName);
 
+    List<Listing> findByTitleContainingIgnoreCase(String title);
+
+
 }
