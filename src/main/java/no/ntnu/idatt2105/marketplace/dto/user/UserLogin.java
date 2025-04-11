@@ -5,6 +5,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 /**
  * Data Transfer Object used for registering a new user.
  * Contains essential user information like email, password, and contact details.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
  */
 @Schema(description = "Data transfer object representing user login data")
 public class UserLogin {

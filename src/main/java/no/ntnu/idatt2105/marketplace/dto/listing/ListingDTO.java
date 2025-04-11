@@ -1,13 +1,21 @@
 package no.ntnu.idatt2105.marketplace.dto.listing;
 
+import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.Date;
 import java.util.List;
 
 /**
  * Data Transfer Object representing a marketplace listing, used for API responses.
+ *
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
  */
 @Schema(description = "Data transfer object representing a marketplace listing")
 public class ListingDTO {

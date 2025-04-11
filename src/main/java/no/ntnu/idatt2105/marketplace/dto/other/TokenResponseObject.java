@@ -4,6 +4,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Data transfer object representing a JWT token and its expiration timestamp.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
  */
 @Schema(description = "Response object containing a JWT token and its expiration timestamp")
 public class TokenResponseObject {

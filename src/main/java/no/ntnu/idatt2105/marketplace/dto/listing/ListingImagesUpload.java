@@ -8,6 +8,13 @@ import java.util.List;
 /**
  * Data Transfer Object used for uploading image files associated with a listing.
  * This class supports binding of form data using {@code @ModelAttribute}.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
  */
 @Schema(description = "")
 public class ListingImagesUpload {
@@ -62,5 +69,13 @@ public class ListingImagesUpload {
    */
   public void setImages(List<MultipartFile> images) {
     this.images = images;
+  }
+
+  @Override
+  public String toString() {
+    return "ListingImagesUpload{" +
+            "id=" + id +
+            ", images=" + images +
+            '}';
   }
 }

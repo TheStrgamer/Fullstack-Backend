@@ -5,6 +5,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 /**
  * Data Transfer Object representing a single message within a conversation.
  * Used to transfer non-sensitive message information between the backend and frontend.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
  */
 
 public class MessageDTO {

@@ -1,6 +1,7 @@
 package no.ntnu.idatt2105.marketplace.dto.listing;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 
 import java.util.Date;
 import java.util.List;
@@ -9,6 +10,14 @@ import java.util.List;
  * Represents the data required to create a new listing on the marketplace platform.
  * This DTO is typically used during listing submission through a REST API endpoint.
  * It captures metadata such as title, description, location, pricing, categorization, and timestamps.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
+ * @see Listing
  */
 @Schema(description = "Data transfer object representing a marketplace listing")
 public class ListingCreate {

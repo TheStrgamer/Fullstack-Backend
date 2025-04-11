@@ -3,12 +3,14 @@ package no.ntnu.idatt2105.marketplace.service.images;
 // model
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 import no.ntnu.idatt2105.marketplace.model.other.Images;
+import no.ntnu.idatt2105.marketplace.model.user.User;
 
 // repo
 import no.ntnu.idatt2105.marketplace.repo.ImagesRepo;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 
 // JUint
+import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,6 +35,9 @@ public class ImagesServiceTest {
   private ImagesRepo imagesRepo;
 
   @Mock
+  private UserRepo userRepo;
+
+  @Mock
   private ListingRepo listingRepo;
 
   @InjectMocks
@@ -50,16 +55,31 @@ public class ImagesServiceTest {
   @Test
   void saveUserProfilePicture_shouldSaveSuccessfully() throws Exception {
     MockMultipartFile file = new MockMultipartFile("file", "test.png", "image/png", "some-content".getBytes());
-    Images image = new Images();
-    image.setFilepath_to_image("/images/profilePictures/test.png");
+
+    Images dummyImage = new Images();
+    dummyImage.setFilepath_to_image("/images/profilePictures/test.png");
+
+    User user = new User();
+    user.setEmail("test@example.com");
 
     ImagesService spyService = spy(imagesService);
-    doReturn(image).when(spyService).createDBImageFromRequest(any(), eq("profilePictures"));
-    when(imagesRepo.save(any())).thenReturn(image);
 
-    Images savedImage = spyService.saveUserProfilePicture(file);
-    assertEquals("/images/profilePictures/test.png", savedImage.getFilepath_to_image());
+    doReturn(dummyImage).when(spyService).createDBImageFromRequest(any(), eq("profilePictures"));
+    when(userRepo.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+    when(imagesRepo.save(any(Images.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    when(userRepo.save(any(User.class))).thenReturn(user);
+
+    Images savedImage = spyService.saveUserProfilePicture(file, "test@example.com");
+
+    assertTrue(savedImage.getFilepath_to_image().startsWith("/images/profileImages/"));
+    assertTrue(savedImage.getFilepath_to_image().endsWith("_test.png"));
+
+    // Verifications
+    verify(imagesRepo).save(any(Images.class));
+    verify(userRepo).save(user);
   }
+
+
 
   /**
    * Tests saving listing images successfully.

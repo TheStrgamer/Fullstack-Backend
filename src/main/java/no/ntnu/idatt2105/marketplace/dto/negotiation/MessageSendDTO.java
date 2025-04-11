@@ -3,6 +3,13 @@ package no.ntnu.idatt2105.marketplace.dto.negotiation;
 /**
  * Data Transfer Object (DTO) used to send a message in a negotiation conversation.
  * Contains the message text, the ID of the conversation it belongs to, and the user's token for authentication.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
  */
 public class MessageSendDTO {
 

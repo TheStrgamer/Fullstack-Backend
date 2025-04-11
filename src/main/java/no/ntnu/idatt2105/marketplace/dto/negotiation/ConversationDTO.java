@@ -7,6 +7,13 @@ import java.util.List;
 /**
  * Data Transfer Object representing a conversation between users,
  * including basic metadata and the list of messages exchanged.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
  */
 public class ConversationDTO {
 
