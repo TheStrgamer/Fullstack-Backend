@@ -1,9 +1,13 @@
 package no.ntnu.idatt2105.marketplace.security;
 
 import java.util.Optional;
+
+import no.ntnu.idatt2105.marketplace.controller.ListingController;
 import no.ntnu.idatt2105.marketplace.model.negotiation.Conversation;
 import no.ntnu.idatt2105.marketplace.repo.ConversationRepo;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
@@ -38,6 +42,8 @@ public class WebSocketAuthorization implements HandshakeInterceptor {
   private ConversationRepo conversationRepo;
 
   private JWT_token jwt;
+  
+  private static final Logger LOGGER = LogManager.getLogger(ListingController.class);
 
   /**
    * Constructs a WebSocketAuthorization with the required dependencies.
@@ -71,9 +77,9 @@ public class WebSocketAuthorization implements HandshakeInterceptor {
       ServerHttpResponse response,
       WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
     try {
-      System.out.println("=== WebSocket Handshake Started ===");
-      System.out.println("Request URI: " + request.getURI());
-      System.out.println("Headers: " + request.getHeaders());
+      LOGGER.info("=== WebSocket Handshake Started ===");
+      LOGGER.info("Request URI: " + request.getURI());
+      LOGGER.info("Headers: " + request.getHeaders());
 
       String path = request.getURI().getPath();
 
@@ -96,17 +102,17 @@ public class WebSocketAuthorization implements HandshakeInterceptor {
         String userId = validateJwtToken(jwtToken);
 
         if (userId != null && isUserInChat(userId, chatId)) {
-          System.out.println("User with id " + userId + " authorized for chat");
+          LOGGER.info("User with id " + userId + " authorized for chat");
           attributes.put("chatId", chatId);
           attributes.put("userId", userId);
           return true;
         }
       }
-      System.out.println("Authorization failed");
+      LOGGER.info("Authorization failed");
       response.setStatusCode(HttpStatus.UNAUTHORIZED);
       return false;
     } catch (Exception e) {
-      System.out.println("Error during WebSocket handshake: " + e.getMessage());
+      LOGGER.info("Error during WebSocket handshake: " + e.getMessage());
       response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
       return false;
     }
@@ -137,7 +143,7 @@ public class WebSocketAuthorization implements HandshakeInterceptor {
   private String validateJwtToken(String jwtToken) {
     try {
       jwt.validateJwtToken(jwtToken);
-      System.out.println("ws Token is valid");
+      LOGGER.info("ws Token is valid");
     } catch (IllegalArgumentException e) {
       return null;
     }

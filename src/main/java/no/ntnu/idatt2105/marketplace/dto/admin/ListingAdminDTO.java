@@ -207,8 +207,8 @@ public class ListingAdminDTO {
    * @since 1.0
    */
   public ListingAdminDTO(int id, String title, String shortDescription, int price, String category,
-      String condition, int status, String creatorName, String createdDate, String updatedDate,
-      double longitude, double latitude, String longDescription) {
+                         String condition, int status, String creatorName, String createdDate,
+                         String updatedDate, double longitude, double latitude, String longDescription) {
     this.id = id;
     this.title = title;
     this.shortDescription = shortDescription;

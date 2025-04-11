@@ -10,10 +10,13 @@ import java.security.Key;
 import java.util.Date;
 
 import io.jsonwebtoken.security.Keys;
+import no.ntnu.idatt2105.marketplace.controller.ListingController;
 import no.ntnu.idatt2105.marketplace.exception.TokenExpiredException;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.dto.other.TokenResponseObject;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +27,7 @@ public class JWT_token {
   private UserRepo userRepo;
   private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
   private static final long EXPIRATION_TIME = 120 * 60 * 1000;
+
 
   public TokenResponseObject generateJwtToken(User user) {
     Date expirationDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);

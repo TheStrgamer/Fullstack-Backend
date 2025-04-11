@@ -37,9 +37,7 @@ public class CategoriesAdminDTO {
   @Schema(description = "Category description", example = "Boo")
   private String description;
 
-  /**
-   * Number of listings that currently exist in this category.
-   */
+  /** The number of listings associated with this category. */
   @Schema(description = "Listings within this category", example = "5")
   private int listings;
 

@@ -12,6 +12,8 @@ import no.ntnu.idatt2105.marketplace.model.other.Images;
 import no.ntnu.idatt2105.marketplace.repo.ImagesRepo;
 import no.ntnu.idatt2105.marketplace.service.images.ImagesService;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,6 +37,8 @@ public class ImageController {
 
   JWT_token jwt;
 
+  private static final Logger LOGGER = LogManager.getLogger(ListingController.class);
+
   @PostMapping("/upload-profile-image")
   @Operation(
           summary = "Upload a profile Picture",
@@ -43,7 +47,11 @@ public class ImageController {
   @ApiResponses(value = {
           @ApiResponse(
                   responseCode = "200",
-                  description = "Successfully uploaded image"
+                  description = "Successfully uploaded image",
+                  content = @Content(
+                          schema = @Schema(implementation = String.class)
+                  )
+
           ),
           @ApiResponse(
                   responseCode = "500",
@@ -80,7 +88,7 @@ public class ImageController {
       // Save the image entity in the database
       Images savedImage = imagesRepo.save(profilePicture);
 
-      return ResponseEntity.ok(savedImage);
+      return ResponseEntity.ok(savedImage.getFilepath_to_image());
 
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload image: " + e.getMessage());
@@ -88,8 +96,29 @@ public class ImageController {
   }
 
   @GetMapping("/get{id}")
+  @Operation(
+          summary = "Get image url",
+          description = "Returns the image url from a provided image id"
+  )
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = "404",
+                  description = "Image not found"
+          ),
+          @ApiResponse(
+                  responseCode = "200",
+                  description = "Image found",
+                  content = @Content(
+                          schema = @Schema(implementation = String.class)
+                  )
+          )
+  })
   public ResponseEntity<?> getImageFromId(@PathVariable int id) {
-    return ResponseEntity.ok(imagesService.getImageURLFromId(id));
+    String url = imagesService.getImageURLFromId(id);
+    if (url.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    return ResponseEntity.ok(url);
   }
 
 
@@ -101,7 +130,10 @@ public class ImageController {
   @ApiResponses(value = {
           @ApiResponse(
                   responseCode = "200",
-                  description = "Images successfully uploaded"
+                  description = "Images successfully uploaded",
+                  content = @Content(
+                          schema = @Schema(implementation = String.class)
+                  )
           ),
           @ApiResponse(
                   responseCode = "401",
@@ -134,7 +166,7 @@ public class ImageController {
       imagesService.saveListingImages(images.getImages(), images.getId());
       return ResponseEntity.ok("Successfully uploaded images");
     } catch (Exception e) {
-      System.out.println("Error: " + e.getMessage());
+      LOGGER.error("Error: " + e.getMessage());
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
