@@ -25,7 +25,9 @@ class ConversationDTOTest {
             "John Doe",
             "2024-01-01T11:00:00Z",
             messages,
-            0
+            0,
+        false,
+        "listing name"
     );
 
     assertEquals(101, dto.getId());
@@ -34,6 +36,8 @@ class ConversationDTOTest {
     assertEquals("2024-01-01T11:00:00Z", dto.getLast_update());
     assertEquals(messages, dto.getMessages());
     assertEquals(0, dto.getStatus());
+    assertEquals("listing name", dto.getListingTitle());
+    assertFalse(dto.isAmISeller());
   }
 
   /**
@@ -41,7 +45,7 @@ class ConversationDTOTest {
    */
   @Test
   void settersAndGetters_shouldUpdateAndReturnCorrectValues() {
-    ConversationDTO dto = new ConversationDTO(0, null, null, null, null, 0);
+    ConversationDTO dto = new ConversationDTO(0, null, null, null, null, 0, false, null);
 
     MessageDTO msg = new MessageDTO(5, "Updated", false, "2025-04-10T10:10:00Z");
     dto.setId(123);
@@ -67,7 +71,7 @@ class ConversationDTOTest {
    */
   @Test
   void toString_shouldContainRelevantFields() {
-    ConversationDTO dto = new ConversationDTO(1, "/pic.png", "Name", "2025-04-10", List.of(), 0);
+    ConversationDTO dto = new ConversationDTO(1, "/pic.png", "Name", "2025-04-10", List.of(), 0, false, "listing name");
     dto.setLast_message("Hello!");
 
     String result = dto.toString();

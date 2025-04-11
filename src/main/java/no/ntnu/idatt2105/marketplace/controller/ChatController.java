@@ -287,4 +287,55 @@ public class ChatController {
     return ResponseEntity.ok(conversation.get().getListing().getId());
   }
 
+  @GetMapping("isClosed/{id}")
+  @Operation(
+      summary = "Get if conversation is closed by id",
+      description = "Returns true if conversation is closed, false otherwise."
+  )
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Successfully retrieved conversation",
+          content = @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = boolean.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "Unauthorized",
+          content = @Content
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Conversation not found or user not part of the conversation",
+          content = @Content
+      )
+  })
+  public ResponseEntity<Boolean> getConversationClosed(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("id") int id) {
+    if (!authorizationHeader.startsWith("Bearer ")) {
+      LOGGER.info("Invalid Authorization header");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    String token = authorizationHeader.substring(7);
+    int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
+    Optional<User> user = userRepo.findById(user_id);
+    if (user.isEmpty()) {
+      LOGGER.info("No user found with given email");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    Optional<Conversation> conversation = conversationRepo.findById(id);
+    if (conversation.isEmpty()) {
+      LOGGER.info("No conversation found with given id");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    if (conversation.get().getBuyer() != user.get() && conversation.get().getSeller() != user.get()) {
+      LOGGER.info("User is not part of the conversation");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    Conversation conv = conversation.get();
+    boolean isClosed = conv.getStatus() == 1;
+    return ResponseEntity.ok(isClosed);
+
+  }
 }
