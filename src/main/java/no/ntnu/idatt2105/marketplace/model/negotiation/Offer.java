@@ -24,7 +24,7 @@ public class Offer {
 
 
   @Column(nullable = false)
-  private float current_offer;
+  private int current_offer;
 
   @Column(nullable = false)
   private int status;
@@ -35,17 +35,21 @@ public class Offer {
   @Column(nullable = false)
   private Date updated_at;
 
+  @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "created_by", nullable = false)
+  private User creator;
+
   // constructor
   public Offer() {}
 
-  public Offer(int id, User buyer_id, Listing listing_id, float current_offer, int status, Date created_at, Date updated_at) {
-    this.id = id;
+  public Offer(User buyer_id, Listing listing_id, int current_offer, int status, Date created_at, Date updated_at, User created_by) {
     this.buyer = buyer_id;
     this.listing = listing_id;
     this.current_offer = current_offer;
     this.status = status;
     this.created_at = created_at;
     this.updated_at = updated_at;
+    this.creator = created_by;
   }
 
   // getters and setters
@@ -59,10 +63,10 @@ public class Offer {
     this.id = id;
   }
 
-  public User getBuyer_id() {
+  public User getBuyer() {
     return buyer;
   }
-  public Listing getListing_id() {
+  public Listing getListing() {
     return listing;
   }
 
@@ -70,11 +74,11 @@ public class Offer {
     this.listing = listing_id;
   }
 
-  public float getCurrent_offer() {
+  public int getCurrent_offer() {
     return current_offer;
   }
 
-  public void setCurrent_offer(float current_offer) {
+  public void setCurrent_offer(int current_offer) {
     this.current_offer = current_offer;
   }
 
@@ -96,5 +100,9 @@ public class Offer {
 
   public void setStatus(int status) {
     this.status = status;
+  }
+
+  public User getCreator() {
+    return creator;
   }
 }

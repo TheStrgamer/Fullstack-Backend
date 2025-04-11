@@ -99,5 +99,8 @@ public class Conversation {
   public Date getUpdatedAt() {
     return updated_at;
   }
+  public void setUpdatedAt(Date updated_at) {
+    this.updated_at = updated_at;
+  }
 
 }

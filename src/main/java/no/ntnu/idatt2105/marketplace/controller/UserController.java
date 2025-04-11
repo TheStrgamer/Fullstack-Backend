@@ -535,6 +535,52 @@ public class UserController {
     return ResponseEntity.ok(owns);
   }
 
+  @GetMapping("/pfp")
+  @Operation(
+          summary = "Get requesting user profile picture path",
+          description = "Returns the path to the profile picture of the user with the given ID"
+  )
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = "200",
+                  description = "Profile picture returned successfully",
+                  content = @Content(
+                          mediaType = "image/jpeg"
+                  )
+          ),
+          @ApiResponse(
+                  responseCode = "404",
+                  description = "User not found"
+          )
+  })
+  public ResponseEntity<String> getUserProfilePicture(
+      @Parameter(
+          name = "Authorization",
+          description = "JWT i formatet `Bearer <token>`",
+          required = true,
+          example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      )
+      @RequestHeader("Authorization") String authorizationHeader
+
+      ) {
+    if (!authorizationHeader.startsWith("Bearer ")) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Authorization header");
+    }
+    String token = authorizationHeader.substring(7);
+    int userId = Integer.parseInt(jwt.extractIdFromJwt(token));
+    Optional<User> userOpt = userRepo.findById(userId);
+    if (userOpt.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+    }
+    User user = userOpt.get();
+    String profilePicturePath = user.getProfile_picture() != null ? user.getProfile_picture().getFilepath_to_image() : null;
+    if (profilePicturePath == null) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Profile picture not found");
+    }
+    return ResponseEntity.ok(profilePicturePath);
+  }
+
+
 
 
 

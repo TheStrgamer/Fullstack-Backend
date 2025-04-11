@@ -232,4 +232,53 @@ public class ChatController {
     return ResponseEntity.ok(newConversation.getId());
   }
 
+  @GetMapping("/getListingId/{chatId}")
+  @Operation(
+      summary = "Get listing id from chat id",
+      description = "Returns the listing id from the given chat id."
+  )
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "Successfully retrieved listing id",
+          content = @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = Integer.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "401",
+          description = "Unauthorized",
+          content = @Content
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Conversation not found",
+          content = @Content
+      )
+  })
+  public ResponseEntity<Integer> getListingIdFromChatId(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("chatId") int chatId) {
+    if (!authorizationHeader.startsWith("Bearer ")) {
+      System.out.println("Invalid Authorization header");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    String token = authorizationHeader.substring(7);
+    int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
+    Optional<User> user = userRepo.findById(user_id);
+    if (user.isEmpty()) {
+      System.out.println("No user found with given email");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    Optional<Conversation> conversation = conversationRepo.findById(chatId);
+    if (conversation.isEmpty()) {
+      System.out.println("No conversation found with given id");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    if (conversation.get().getBuyer() != user.get() && conversation.get().getSeller() != user.get()) {
+      System.out.println("User is not part of the conversation");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    return ResponseEntity.ok(conversation.get().getListing().getId());
+  }
+
 }

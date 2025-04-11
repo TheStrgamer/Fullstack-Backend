@@ -3,6 +3,7 @@ package no.ntnu.idatt2105.marketplace.service.listing;
 import no.ntnu.idatt2105.marketplace.dto.listing.CategoriesDTO;
 import no.ntnu.idatt2105.marketplace.dto.listing.ConditionsDTO;
 import no.ntnu.idatt2105.marketplace.dto.listing.ListingDTO;
+import no.ntnu.idatt2105.marketplace.dto.listing.ListingMiniDTO;
 import no.ntnu.idatt2105.marketplace.dto.listing.ListingUpdate;
 import no.ntnu.idatt2105.marketplace.model.listing.Categories;
 import no.ntnu.idatt2105.marketplace.model.listing.Condition;
@@ -346,6 +347,19 @@ public class ListingService {
         }
 
         return dto;
+    }
+
+    public ListingMiniDTO toMiniDTO(Listing listing) {
+        String imagePath = listing.getImages().isEmpty()
+                ? null
+                : listing.getImages().get(0).getFilepath_to_image();
+
+        return new ListingMiniDTO(
+                listing.getTitle(),
+                listing.getPrice(),
+                imagePath,
+                listing.getCreator().getFirstname() + " " + listing.getCreator().getSurname()
+        );
     }
 
     @Transactional
