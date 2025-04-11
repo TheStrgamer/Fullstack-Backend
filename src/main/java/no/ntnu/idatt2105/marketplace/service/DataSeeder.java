@@ -90,23 +90,23 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedCategories() {
-        if (categoriesRepo.findByName("Other").isEmpty()) {
-            categoriesRepo.save(new Categories("Other", "Default category", null));
+        if (categoriesRepo.findByName("Diverse").isEmpty()) {
+            categoriesRepo.save(new Categories("Diverse", "Diverse", null));
         }
-        if (categoriesRepo.findByName("Electronics").isEmpty()) {
-            categoriesRepo.save(new Categories("Electronics", "Devices and gadgets", null));
+        if (categoriesRepo.findByName("Elektronikk").isEmpty()) {
+            categoriesRepo.save(new Categories("Elektronikk", "Enheter og gadgets", null));
         }
-        if (categoriesRepo.findByName("Clothing").isEmpty()) {
-            categoriesRepo.save(new Categories("Clothing", "Apparel and accessories", null));
+        if (categoriesRepo.findByName("Klær").isEmpty()) {
+            categoriesRepo.save(new Categories("Klær", "Klær og tilbehør", null));
         }
-        if (categoriesRepo.findByName("Furniture").isEmpty()) {
-            categoriesRepo.save(new Categories("Furniture", "Home and office furniture", null));
+        if (categoriesRepo.findByName("Møbler").isEmpty()) {
+            categoriesRepo.save(new Categories("Møbler", "Hjemme og kontor møbler", null));
         }
-        if (categoriesRepo.findByName("Books").isEmpty()) {
-            categoriesRepo.save(new Categories("Books", "Literature and textbooks", null));
+        if (categoriesRepo.findByName("Bøker").isEmpty()) {
+            categoriesRepo.save(new Categories("Bøker", "Literatur og bøker", null));
         }
-        if (categoriesRepo.findByName("Trading cards").isEmpty()) {
-            categoriesRepo.save(new Categories("Trading cards", "Trading cards", null));
+        if (categoriesRepo.findByName("Samlekort").isEmpty()) {
+            categoriesRepo.save(new Categories("Samlekort", "Samlekort", null));
         }
     }
 

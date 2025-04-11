@@ -345,25 +345,21 @@ public class ListingService {
     public List<ListingDTO> getRecommendedListingsForUser(User currentUser, int count) {
         Map<String, Integer> categoryScores = new HashMap<>();
 
-        // 1. Poeng fra favoritter (vekt 2)
         for (Listing fav : currentUser.getFavorites()) {
             String cat = fav.getCategory().getName();
             categoryScores.put(cat, categoryScores.getOrDefault(cat, 0) + 2);
         }
 
-        // 2. Poeng fra historikk (vekt 1)
         for (Listing viewed : currentUser.getHistory()) {
             String cat = viewed.getCategory().getName();
             categoryScores.put(cat, categoryScores.getOrDefault(cat, 0) + 1);
         }
 
-        // 3. Fallback til tilfeldige hvis ingen data
         if (categoryScores.isEmpty()) {
             return getRandomListings(count).stream().filter(listing -> listing.getCreatorId() != currentUser.getId())
                     .collect(Collectors.toList());
         }
 
-        // 4. Filtrer ut brukerens egne annonser
         List<Listing> allListings = listingRepo.findAll().stream()
                 .filter(listing -> listing.getCreator().getId() != currentUser.getId())
                 .toList();
@@ -372,10 +368,8 @@ public class ListingService {
                 .filter(listing -> listing.getCreator().getId() != currentUser.getId())
                 .collect(Collectors.toList());
 
-        // 🎲 Randomiser først for å sikre ulik rekkefølge ved lik score
         Collections.shuffle(filtered);
 
-        // 5. Sortér etter kategoripoeng
         List<Listing> sorted = filtered.stream()
                 .sorted((l1, l2) -> {
                     int score1 = categoryScores.getOrDefault(l1.getCategory().getName(), 0);
@@ -385,7 +379,6 @@ public class ListingService {
                 .limit(count)
                 .toList();
 
-        // 6. Bygg DTO-er og sett favoritt-status
         return sorted.stream()
                 .map(listing -> {
                     ListingDTO dto = toDTO(listing);
@@ -439,6 +432,8 @@ public class ListingService {
 
         return dto;
     }
+
+
 
   /**
    * Creates a DTO with the minimal needed info of a listing
@@ -501,6 +496,8 @@ public class ListingService {
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
+
+
 
     /**
      * Searches for listings where the title contains the given query string (case-insensitive).
