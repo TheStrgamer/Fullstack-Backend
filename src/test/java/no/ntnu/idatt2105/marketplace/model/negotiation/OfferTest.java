@@ -25,7 +25,6 @@ public class OfferTest {
     Date created = new Date();
     Date updated = new Date();
 
-    offer.setId(1);
     offer.setListing_id(listing);
     offer.setCurrent_offer(999);
     offer.setStatus(1);
@@ -33,9 +32,8 @@ public class OfferTest {
 
     // Use reflection or field assignment to simulate created_at if needed.
     // For this example we validate updated_at only
-    assertEquals(1, offer.getId());
     assertEquals(listing, offer.getListing());
-    assertEquals(999.99f, offer.getCurrent_offer());
+    assertEquals(999, offer.getCurrent_offer());
     assertEquals(1, offer.getStatus());
     assertEquals(updated, offer.getUpdated_at());
   }
@@ -45,7 +43,6 @@ public class OfferTest {
    */
   @Test
   void testAllArgsConstructor() {
-    int id = 2;
     User buyer = new User();
     Listing listing = new Listing();
     int currentOffer = 500;
@@ -55,7 +52,6 @@ public class OfferTest {
 
     Offer offer = new Offer(buyer, listing, currentOffer, status, created, updated, buyer);
 
-    assertEquals(id, offer.getId());
     assertEquals(buyer, offer.getBuyer());
     assertEquals(listing, offer.getListing());
     assertEquals(currentOffer, offer.getCurrent_offer());

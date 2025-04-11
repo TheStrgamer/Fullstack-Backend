@@ -59,7 +59,6 @@ public class TransactionTest {
             "PENDING"
     );
 
-    assertEquals(2, transaction.getId());
     assertEquals(buyer, transaction.getBuyer());
     assertEquals(listing, transaction.getListing());
     assertEquals(899, transaction.getFinal_price());
