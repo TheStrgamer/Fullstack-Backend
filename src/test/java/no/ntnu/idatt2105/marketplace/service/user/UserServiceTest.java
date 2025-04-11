@@ -40,7 +40,6 @@ import no.ntnu.idatt2105.marketplace.exception.IncorrectPasswordException;
 import no.ntnu.idatt2105.marketplace.exception.PhonenumberNotAvailibleException;
 import no.ntnu.idatt2105.marketplace.exception.UserNotFoundException;
 
-@SpringBootTest
 @ActiveProfiles("test")
 class UserServiceTest {
 
