@@ -86,6 +86,25 @@ public class ListingService {
 
 
     /**
+     * Gets all listings that are favorited by a user
+     * @param user the user in question
+     * @return List of {@link ListingDTO} representing the favorite listings for the provided user
+     */
+    public List<ListingDTO> getFavoriteListingsForUser(User user) throws Exception {
+        LOGGER.info("Getting the user data via user id");
+        Optional<User> optionalUser = userRepo.findById(user.getId());
+        if (optionalUser.isEmpty()) {
+            throw new Exception("No user found");
+        }
+        LOGGER.info("Return:" + optionalUser.get().getFavorites().size() + " elements");
+        return optionalUser.get().getFavorites().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+
+
+    /**
      * Gets all existing listings from the database where the creator id equals {@code user_id}
      * @param user_id the id of the user
      * @return List of {@link ListingDTO} where the creator id equals the provided {@code user_id}

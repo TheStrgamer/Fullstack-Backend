@@ -75,7 +75,46 @@ public class ListingController {
     }
 
 
+    @GetMapping("/favorites")
+    @Operation(
+            summary = "Gets the favorite listings for a user",
+            description = "Returns a list of favorite listings "
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No user found"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid token"
+            ),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully returned a list of all categories",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = CategoriesDTO.class))
+                    )
+            )
+    })
+    public ResponseEntity<List<ListingDTO>> favorites (
+            @RequestHeader(
+                    value = "Authorization",
+                    required = false
+            ) String authHeader) throws Exception {
 
+        User user = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            user = jwtTokenService.getUserByToken(token);  // Henter bruker fra token
+        }
+        if (user == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        LOGGER.info("USER: " + user.getId());
+        List<ListingDTO> favoriteListings = listingService.getFavoriteListingsForUser(user);
+        return ResponseEntity.ok(favoriteListings);
+    }
 
     @GetMapping("/id/{id}")
     @Operation(
