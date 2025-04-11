@@ -1,5 +1,6 @@
 package no.ntnu.idatt2105.marketplace.dto.negotiation;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
 import no.ntnu.idatt2105.marketplace.model.other.Images;
 import no.ntnu.idatt2105.marketplace.model.user.User;
@@ -16,11 +17,17 @@ import no.ntnu.idatt2105.marketplace.model.user.User;
  * @version 1.0
  * @since 1.0
  */
+@Schema(description = "Data transfer object representing a negotiation chat")
 public class NegotiationChatsDTO {
+  @Schema(description = "Unique ID of the negotiation chat", example = "1")
   private int id;
+  @Schema(description = "URL of the other user's profile picture", example = "/profile.jpg")
   private String other_user_picture;
+  @Schema(description = "Name of the other user", example = "Urek Mazino")
   private String other_user_name;
+  @Schema(description = "Last message in the negotiation chat", example = "Hello, how are you?")
   private String last_message;
+  @Schema(description = "Date of the last update in the negotiation chat", example = "2023-10-01T12:00:00Z")
   private Date last_update;
 
   /**

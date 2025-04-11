@@ -265,6 +265,12 @@ public class Listing {
     offers.clear();
   }
 
+  public void closeOffers() {
+    for (Offer offer : offers) {
+      offer.setStatus(3);
+    }
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -278,6 +284,9 @@ public class Listing {
     return Objects.hash(id);
   }
 
+  public List<Offer> getOffers() {
+    return offers;
+  }
   public List<User> getUser_favorites() {
     return user_favorites;
   }
@@ -293,10 +302,6 @@ public class Listing {
 
   public void setUser_history(List<User> user_history) {
     this.user_history = user_history;
-  }
-
-  public List<Offer> getOffers() {
-    return offers;
   }
 
   public void setOffers(List<Offer> offers) {

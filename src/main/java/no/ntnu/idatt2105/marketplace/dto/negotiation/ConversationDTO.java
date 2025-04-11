@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
+@Schema(description = "Data transfer object representing a conversation in a negotiation")
 /**
  * Data Transfer Object representing a conversation between users,
  * including basic metadata and the list of messages exchanged.
@@ -16,11 +17,9 @@ import java.util.List;
  * @since 1.0
  */
 public class ConversationDTO {
-
   /** Unique identifier for the conversation */
-  @Schema(description = "Id of the conversation", example = "123")
+  @Schema(description = "Unique ID of the conversation", example = "1")
   private int id;
-
   /** URL or path to the profile picture of the other user */
   @Schema(description = "The profile image of the other user as the local url", example = "/image/profileImage/otherProfile.png")
   private String other_user_picture;
@@ -28,6 +27,12 @@ public class ConversationDTO {
   /** Full name of the other user in the conversation */
   @Schema(description = "Name of the other user", example = "Bob")
   private String other_user_name;
+  /** Indicates if the user is the seller */
+  @Schema(description = "Indicates if the user is the seller", example = "true")
+  private boolean amISeller;
+  /** the title of the listing */
+  @Schema(description = "Title of the listing", example = "Used bicycle for sale")
+  private String listingTitle;
 
   /** The most recent message text in the conversation */
   @Schema(description = "The last message sent", example = "Hello. My name is Bob")
@@ -56,10 +61,13 @@ public class ConversationDTO {
    * @param status Status of the conversation (0 = open, 1 = closed)
    */
   public ConversationDTO(int id, String other_user_picture, String other_user_name,
-                         String last_update, List<MessageDTO> messages, int status) {
+      String last_update, List<MessageDTO> messages, int status, boolean amISeller,
+      String listingTitle) {
     this.id = id;
     this.other_user_picture = other_user_picture;
     this.other_user_name = other_user_name;
+    this.amISeller = amISeller;
+    this.listingTitle = listingTitle;
     this.last_update = last_update;
     this.messages = messages;
     this.status = status;
@@ -134,6 +142,10 @@ public class ConversationDTO {
   public void setStatus(int status) {
     this.status = status;
   }
+  public boolean isAmISeller() { return amISeller; }
+  public void setAmISeller(boolean amISeller) { this.amISeller = amISeller; }
+  public String getListingTitle() { return listingTitle; }
+  public void setListingTitle(String listingTitle) { this.listingTitle = listingTitle; }
 
   @Override
   public String toString() {

@@ -43,7 +43,6 @@ import org.springframework.test.context.ActiveProfiles;
 /**
  * Unit tests for {@link ListingService}.
  */
-@SpringBootTest
 @ActiveProfiles("test")
 class ListingServiceTest {
 

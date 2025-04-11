@@ -48,7 +48,6 @@ import no.ntnu.idatt2105.marketplace.exception.UserNotAdminException;
  *
  * @author Jonas Reiher
  */
-@SpringBootTest
 @ActiveProfiles("test")
 class AdminServiceTest {
 

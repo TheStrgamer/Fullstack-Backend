@@ -154,12 +154,58 @@ public class ListingController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
             Listing listing = listingOpt.get();
-            User user = null;
+            User user;
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
                 user = jwtTokenService.getUserByToken(token);  // Henter bruker fra token
             }
             return ResponseEntity.ok(listingService.toDTO(listing)); // Sender med bruker
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @GetMapping("/mini/id/{id}")
+    @Operation(
+        summary = "Get listing by id",
+        description = "Returns a listing with the provided id"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "404",
+            description = "Listing not found"
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid id format"
+        ),
+        @ApiResponse(
+            responseCode = "200",
+            description = "Returned Listing with the given id"
+        )
+    })
+    public ResponseEntity<?> getMiniListingById(
+        @Parameter(
+            name = "id",
+            description = "Integer value representing the listing id",
+            required = true,
+            example = "123"
+        ) @PathVariable String id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            int listingId = Integer.parseInt(id);
+            Optional<Listing> listingOpt = listingRepo.findById(listingId);
+            if (listingOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            Listing listing = listingOpt.get();
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                jwtTokenService.getUserByToken(token);  // Henter bruker fra token
+            }
+            return ResponseEntity.ok(listingService.toMiniDTO(listing)); // Sender med bruker
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {

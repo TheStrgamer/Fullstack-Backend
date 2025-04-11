@@ -1,7 +1,9 @@
 package no.ntnu.idatt2105.marketplace.dto.negotiation;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Data transfer object representing a message in a negotiation")
 /**
  * Data Transfer Object representing a single message within a conversation.
  * Used to transfer non-sensitive message information between the backend and frontend.
@@ -15,7 +17,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 
 public class MessageDTO {
-
   /** Unique identifier for the message */
   @Schema(description = "Id of the message", example = "123")
   private int id;

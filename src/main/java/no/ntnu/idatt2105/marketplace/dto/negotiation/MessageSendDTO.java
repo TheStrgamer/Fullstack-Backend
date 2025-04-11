@@ -1,5 +1,8 @@
 package no.ntnu.idatt2105.marketplace.dto.negotiation;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Data transfer object representing a message to be sent in a negotiation")
 /**
  * Data Transfer Object (DTO) used to send a message in a negotiation conversation.
  * Contains the message text, the ID of the conversation it belongs to, and the user's token for authentication.
@@ -12,12 +15,15 @@ package no.ntnu.idatt2105.marketplace.dto.negotiation;
  * @since 1.0
  */
 public class MessageSendDTO {
+  @Schema(description = "The message content", example = "Hello, how are you?")
 
   /** The message text being sent */
   private String message;
+  @Schema(description = "Unique ID of the conversation", example = "1")
 
   /** The ID of the conversation to which the message belongs */
   private int conversationId;
+  @Schema(description = "JWT token for authentication", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
 
   /** The JWT token of the sender for authentication */
   private String token;

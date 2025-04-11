@@ -4,6 +4,7 @@ import no.ntnu.idatt2105.marketplace.controller.ListingController;
 import no.ntnu.idatt2105.marketplace.dto.listing.CategoriesDTO;
 import no.ntnu.idatt2105.marketplace.dto.listing.ConditionsDTO;
 import no.ntnu.idatt2105.marketplace.dto.listing.ListingDTO;
+import no.ntnu.idatt2105.marketplace.dto.listing.ListingMiniDTO;
 import no.ntnu.idatt2105.marketplace.dto.listing.ListingUpdate;
 import no.ntnu.idatt2105.marketplace.model.listing.Categories;
 import no.ntnu.idatt2105.marketplace.model.listing.Condition;
@@ -363,24 +364,21 @@ public class ListingService {
     public List<ListingDTO> getRecommendedListingsForUser(User currentUser, int count) {
         Map<String, Integer> categoryScores = new HashMap<>();
 
-        // 1. Poeng fra favoritter (vekt 2)
         for (Listing fav : currentUser.getFavorites()) {
             String cat = fav.getCategory().getName();
             categoryScores.put(cat, categoryScores.getOrDefault(cat, 0) + 2);
         }
 
-        // 2. Poeng fra historikk (vekt 1)
         for (Listing viewed : currentUser.getHistory()) {
             String cat = viewed.getCategory().getName();
             categoryScores.put(cat, categoryScores.getOrDefault(cat, 0) + 1);
         }
 
-        // 3. Fallback til tilfeldige hvis ingen data
         if (categoryScores.isEmpty()) {
-            return getRandomListings(count);
+            return getRandomListings(count).stream().filter(listing -> listing.getCreatorId() != currentUser.getId())
+                    .collect(Collectors.toList());
         }
 
-        // 4. Filtrer ut brukerens egne annonser
         List<Listing> allListings = listingRepo.findAll().stream()
                 .filter(listing -> listing.getCreator().getId() != currentUser.getId())
                 .toList();
@@ -389,10 +387,8 @@ public class ListingService {
                 .filter(listing -> listing.getCreator().getId() != currentUser.getId())
                 .collect(Collectors.toList());
 
-        // 🎲 Randomiser først for å sikre ulik rekkefølge ved lik score
         Collections.shuffle(filtered);
 
-        // 5. Sortér etter kategoripoeng
         List<Listing> sorted = filtered.stream()
                 .sorted((l1, l2) -> {
                     int score1 = categoryScores.getOrDefault(l1.getCategory().getName(), 0);
@@ -402,7 +398,6 @@ public class ListingService {
                 .limit(count)
                 .toList();
 
-        // 6. Bygg DTO-er og sett favoritt-status
         return sorted.stream()
                 .map(listing -> {
                     ListingDTO dto = toDTO(listing);
@@ -459,6 +454,26 @@ public class ListingService {
 
 
 
+  /**
+   * Creates a DTO with the minimal needed info of a listing
+   * @param listing the listing
+   * @return the DTO
+   */
+  public ListingMiniDTO toMiniDTO(Listing listing) {
+        String imagePath = listing.getImages().isEmpty()
+                ? null
+                : listing.getImages().get(0).getFilepath_to_image();
+
+        return new ListingMiniDTO(
+                listing.getTitle(),
+                listing.getPrice(),
+                imagePath,
+                listing.getCreator().getFirstname() + " " + listing.getCreator().getSurname()
+        );
+    }
+
+
+
     /**
      * Deletes a listing with the given ID
      * @param listingId the is og the listing
@@ -500,6 +515,8 @@ public class ListingService {
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
+
+
 
     /**
      * Searches for listings where the title contains the given query string (case-insensitive).

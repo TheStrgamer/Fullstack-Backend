@@ -2,6 +2,7 @@ package no.ntnu.idatt2105.marketplace.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ntnu.idatt2105.marketplace.dto.negotiation.MessageSendDTO;
+import no.ntnu.idatt2105.marketplace.dto.negotiation.OfferDTO;
 import no.ntnu.idatt2105.marketplace.model.negotiation.Conversation;
 import no.ntnu.idatt2105.marketplace.model.negotiation.Message;
 import no.ntnu.idatt2105.marketplace.model.user.User;
@@ -89,11 +90,11 @@ public class ChatSocketController extends TextWebSocketHandler {
     User user = userRepo.findById(Integer.parseInt(userId)).orElse(null);
     Message newMessage = new Message(user, conversation, payload.getMessage());
     conversation.addMessage(newMessage);
+    conversation.setUpdatedAt(newMessage.getCreatedAt());
 
     messageRepo.save(newMessage);
     conversationRepo.save(conversation);
 
-    //Remove the token before sending to the client, otherwise that would be bad
     String messagePayload = objectMapper.writeValueAsString(new MessageSendDTO(
         payload.getMessage(),
         payload.getConversationId(),
@@ -107,7 +108,7 @@ public class ChatSocketController extends TextWebSocketHandler {
           continue;
         }
         LOGGER.info("Sending message to session: " + webSocketSession.getId());
-        webSocketSession.sendMessage(new TextMessage(messagePayload));
+        webSocketSession.sendMessage(new TextMessage("ADD MESSAGE "+messagePayload));
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -132,6 +133,53 @@ public class ChatSocketController extends TextWebSocketHandler {
       }
     } catch (Exception e) {
       e.printStackTrace();
+    }
+  }
+
+  /**
+   * Function to send offer message to all clients in a chat
+   * Called by other controllers
+   * @param chatId the id of the chat
+   * @param offer the offer to send
+   */
+  public void sendOfferCreateMessage(String chatId, OfferDTO offer) {
+    System.out.println("Available chat id sessions: " + chatSessions.keySet());
+    if (chatSessions.containsKey(chatId)) {
+      for (WebSocketSession webSocketSession : chatSessions.get(chatId).values()) {
+        try {
+          String userID = (String) webSocketSession.getAttributes().get("userId");
+          boolean isSender = userID.equals(String.valueOf(offer.getCreatedById()));
+          User sender = userRepo.findById(offer.getCreatedById()).orElse(null);
+          String senderName = sender != null ? sender.getFirstname() + " " + sender.getSurname() : "Unknown";
+          String payload = offer.toJsonString(isSender, senderName);
+          System.out.println("Sending offer message to session: " + webSocketSession.getId());
+          webSocketSession.sendMessage(new TextMessage("CREATE OFFER " + payload));
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+
+  /**
+   * Function to send offer update message to all clients in a chat
+   * Called by other controllers
+   * @param chatId the id of the chat
+   * @param offerId the id of the offer to update
+   * @param status the new status of the offer
+   */
+  public void sendOfferUpdateMessage(String chatId, String offerId, int status) {
+    System.out.println("Available chat id sessions: " + chatSessions.keySet() + " chatId: " + chatId);
+    if (chatSessions.containsKey(chatId)) {
+      for (WebSocketSession webSocketSession : chatSessions.get(chatId).values()) {
+        try {
+          System.out.println("Sending offer update message to session: " + webSocketSession.getId());
+          webSocketSession.sendMessage(new TextMessage("UPDATE OFFER " + offerId + " TO " + status));
+        } catch (IOException e) {
+          System.out.println("Error sending offer update message to session: " + webSocketSession.getId());
+          e.printStackTrace();
+        }
+      }
     }
   }
 }
