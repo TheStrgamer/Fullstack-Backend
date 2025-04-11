@@ -287,4 +287,28 @@ public class Listing {
   public List<Offer> getOffers() {
     return offers;
   }
+  public List<User> getUser_favorites() {
+    return user_favorites;
+  }
+
+  public void setUser_favorites(List<User> user_favorites) {
+    this.user_favorites = user_favorites;
+  }
+
+
+  public List<User> getUser_history() {
+    return user_history;
+  }
+
+  public void setUser_history(List<User> user_history) {
+    this.user_history = user_history;
+  }
+
+  public void setOffers(List<Offer> offers) {
+    this.offers = offers;
+  }
+
+  public void setConversations(List<Conversation> conversations) {
+    this.conversations = conversations;
+  }
 }

@@ -1,9 +1,13 @@
 package no.ntnu.idatt2105.marketplace.security;
 
 import java.util.Optional;
+
+import no.ntnu.idatt2105.marketplace.controller.ListingController;
 import no.ntnu.idatt2105.marketplace.model.negotiation.Conversation;
 import no.ntnu.idatt2105.marketplace.repo.ConversationRepo;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
@@ -17,12 +21,37 @@ import org.springframework.http.HttpHeaders;
 
 import java.util.Map;
 
+/**
+ * Service that implements WebSocket authorization by intercepting the handshake process.
+ * This interceptor validates JWT tokens and ensures that only authorized users
+ * can establish WebSocket connections to specific chat conversations.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
+ * @see HandshakeInterceptor
+ * @see JWT_token
+ * @see Conversation
+ */
 @Service
 public class WebSocketAuthorization implements HandshakeInterceptor {
 
   private ConversationRepo conversationRepo;
 
   private JWT_token jwt;
+  
+  private static final Logger LOGGER = LogManager.getLogger(ListingController.class);
+
+  /**
+   * Constructs a WebSocketAuthorization with the required dependencies.
+   *
+   * @param jwt the JWT token service for validating tokens
+   * @param conversationRepo the repository for accessing conversation data
+   * @since 1.0
+   */
   @Autowired
   public WebSocketAuthorization(JWT_token jwt,
       ConversationRepo conversationRepo) {
@@ -33,12 +62,14 @@ public class WebSocketAuthorization implements HandshakeInterceptor {
 
   /**
    * Handles the WebSocket handshake process. Validates the JWT token and checks if the user is authorized to access the chat.
-   * @param request
-   * @param response
+   *
+   * @param request the HTTP request during the handshake
+   * @param response the HTTP response during the handshake
    * @param wsHandler the WebSocket handler
    * @param attributes the map of attributes
    * @return true if the handshake is successful, false otherwise
-   * @throws Exception
+   * @throws Exception if an error occurs during the handshake process
+   * @since 1.0
    */
   @Transactional
   @Override
@@ -46,9 +77,9 @@ public class WebSocketAuthorization implements HandshakeInterceptor {
       ServerHttpResponse response,
       WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
     try {
-      System.out.println("=== WebSocket Handshake Started ===");
-      System.out.println("Request URI: " + request.getURI());
-      System.out.println("Headers: " + request.getHeaders());
+      LOGGER.info("=== WebSocket Handshake Started ===");
+      LOGGER.info("Request URI: " + request.getURI());
+      LOGGER.info("Headers: " + request.getHeaders());
 
       String path = request.getURI().getPath();
 
@@ -71,17 +102,17 @@ public class WebSocketAuthorization implements HandshakeInterceptor {
         String userId = validateJwtToken(jwtToken);
 
         if (userId != null && isUserInChat(userId, chatId)) {
-          System.out.println("User with id " + userId + " authorized for chat");
+          LOGGER.info("User with id " + userId + " authorized for chat");
           attributes.put("chatId", chatId);
           attributes.put("userId", userId);
           return true;
         }
       }
-      System.out.println("Authorization failed");
+      LOGGER.info("Authorization failed");
       response.setStatusCode(HttpStatus.UNAUTHORIZED);
       return false;
     } catch (Exception e) {
-      System.out.println("Error during WebSocket handshake: " + e.getMessage());
+      LOGGER.info("Error during WebSocket handshake: " + e.getMessage());
       response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
       return false;
     }
@@ -89,10 +120,12 @@ public class WebSocketAuthorization implements HandshakeInterceptor {
 
   /**
    * Handles the WebSocket handshake completion process. This method is called after the handshake is completed.
-   * @param request
-   * @param response
-   * @param wsHandler
+   *
+   * @param request the HTTP request after the handshake
+   * @param response the HTTP response after the handshake
+   * @param wsHandler the WebSocket handler
    * @param ex the exception that occurred during the handshake, if any
+   * @since 1.0
    */
   @Override
   public void afterHandshake(
@@ -105,11 +138,12 @@ public class WebSocketAuthorization implements HandshakeInterceptor {
    * Validates the JWT token and extracts the user ID from it.
    * @param jwtToken the token to validate
    * @return the user ID if the token is valid, null otherwise
+   * @since 1.0
    */
   private String validateJwtToken(String jwtToken) {
     try {
       jwt.validateJwtToken(jwtToken);
-      System.out.println("ws Token is valid");
+      LOGGER.info("ws Token is valid");
     } catch (IllegalArgumentException e) {
       return null;
     }
@@ -125,6 +159,7 @@ public class WebSocketAuthorization implements HandshakeInterceptor {
    * @param userId the user ID to check
    * @param chatId the chat the user should be in
    * @return true if the user is in the chat, false otherwise
+   * @since 1.0
    */
   @Transactional
   public boolean isUserInChat(String userId, String chatId) {

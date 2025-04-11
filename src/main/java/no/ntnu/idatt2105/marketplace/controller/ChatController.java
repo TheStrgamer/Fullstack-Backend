@@ -22,6 +22,8 @@ import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import no.ntnu.idatt2105.marketplace.service.user.UserService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +51,8 @@ public class ChatController {
   private ListingRepo listingRepo;
 
   private final JWT_token jwt;
+
+  private static final Logger LOGGER = LogManager.getLogger(ListingController.class);
 
   @Autowired
   public ChatController(JWT_token jwt) {
@@ -82,19 +86,19 @@ public class ChatController {
   @GetMapping("/my_chats")
   public ResponseEntity<List<NegotiationChatsDTO>> getActiveChatsList(@RequestHeader("Authorization") String authorizationHeader) {
     if (!authorizationHeader.startsWith("Bearer ")) {
-      System.out.println("Invalid Authorization header");
+      LOGGER.info("Invalid Authorization header");
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
     String token = authorizationHeader.substring(7);
     int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
     Optional<User> user = userRepo.findById(user_id);
     if (user.isEmpty()) {
-      System.out.println("No user found with given email");
+      LOGGER.info("No user found with given email");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     List<NegotiationChatsDTO> conversations = userService.getActiveChats(user.get());
     if (conversations.isEmpty()) {
-      System.out.println("No active chats found");
+      LOGGER.info("No active chats found");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     return ResponseEntity.ok(conversations);
@@ -127,24 +131,24 @@ public class ChatController {
   })
   public ResponseEntity<ConversationDTO> getConversation(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("id") int id) {
     if (!authorizationHeader.startsWith("Bearer ")) {
-      System.out.println("Invalid Authorization header");
+      LOGGER.info("Invalid Authorization header");
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
     String token = authorizationHeader.substring(7);
     int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
     Optional<User> user = userRepo.findById(user_id);
     if (user.isEmpty()) {
-      System.out.println("No user found with given email");
+      LOGGER.info("No user found with given email");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     Optional<Conversation> conversation = conversationRepo.findById(id);
     if (conversation.isEmpty()) {
-      System.out.println("No conversation found with given id");
+      LOGGER.info("No conversation found with given id");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     if (conversation.get().getBuyer() != user.get() && conversation.get().getSeller() != user.get()) {
-      System.out.println("User is not part of the conversation");
+      LOGGER.info("User is not part of the conversation");
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
     Conversation conv = conversation.get();
@@ -209,24 +213,24 @@ public class ChatController {
   })
   public ResponseEntity<Integer> createConversationFromListing(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("listingId") int listingId) {
     if (!authorizationHeader.startsWith("Bearer ")) {
-      System.out.println("Invalid Authorization header");
+      LOGGER.info("Invalid Authorization header");
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
     String token = authorizationHeader.substring(7);
     int user_id = Integer.parseInt(jwt.extractIdFromJwt(token));
     Optional<User> user = userRepo.findById(user_id);
     if (user.isEmpty()) {
-      System.out.println("No user found with given email");
+      LOGGER.info("No user found with given email");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     Optional<Listing> listing = listingRepo.findById(listingId);
     if (listing.isEmpty()) {
-      System.out.println("No listing found with given id");
+      LOGGER.info("No listing found with given id");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     Optional<Conversation> conversation = conversationRepo.findByListingAndBuyer(listing.get(), user.get());
     if (conversation.isPresent()) {
-      System.out.println("User is already in a conversation with the same listing");
+      LOGGER.info("User is already in a conversation with the same listing");
       return ResponseEntity.ok(conversation.get().getId());
     }
     Conversation newConversation = new Conversation(user.get(), listing.get());

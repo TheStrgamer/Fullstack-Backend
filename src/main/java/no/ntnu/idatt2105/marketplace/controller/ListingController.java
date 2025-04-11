@@ -93,7 +93,12 @@ public class ListingController {
         ),
         @ApiResponse(
                 responseCode = "200",
-                description = "Returned Listing with the given id"
+                description = "Returned Listing with the given id",
+                content = @Content(
+                        mediaType = "application/json",
+                        array = @ArraySchema(
+                                schema = @Schema(implementation = ListingDTO.class))
+                )
         )
     })
     public ResponseEntity<?> getListingById(
@@ -104,9 +109,6 @@ public class ListingController {
                     example = "123"
             ) @PathVariable String id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
-//            return listingRepo.findById(Integer.valueOf(id))
-//                    .map(listing -> ResponseEntity.ok(listingService.toDTO(listing)))
-//                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
             int listingId = Integer.parseInt(id);
             Optional<Listing> listingOpt = listingRepo.findById(listingId);
             if (listingOpt.isEmpty()) {
@@ -179,7 +181,12 @@ public class ListingController {
     )
     @ApiResponse(
             responseCode = "200",
-            description = "Successfully returned a list of all categories"
+            description = "Successfully returned a list of all categories",
+            content = @Content(
+                    mediaType = "application/json",
+                    array = @ArraySchema(
+                            schema = @Schema(implementation = CategoriesDTO.class))
+            )
     )
     public ResponseEntity<?> getListingCategories() {
         return ResponseEntity.ok(listingService.getAllCategories());
@@ -192,14 +199,59 @@ public class ListingController {
     )
     @ApiResponse(
             responseCode = "200",
-            description = "Successfully returned a list of all conditions"
+            description = "Successfully returned a list of all conditions",
+            content = @Content(
+                    mediaType = "application/json",
+                    array = @ArraySchema(
+                            schema = @Schema(implementation = ConditionsDTO.class))
+            )
     )
     public ResponseEntity<?> getListingConditions() {
         return ResponseEntity.ok(listingService.getAllConditions());
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createListing(@RequestBody ListingCreate listing, @RequestHeader("Authorization") String authHeader) {
+    @Operation(
+            summary = "Creates a listing item",
+            description = "Create a new listing with the provided data"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Listing created successfully",
+                    content = @Content(schema = @Schema(implementation = ListingDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Missing required fields or category/condition not found",
+                    content = @Content(schema = @Schema(implementation = String.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid token or user not found",
+                    content = @Content(schema = @Schema(implementation = String.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error while creating listing",
+                    content = @Content(schema = @Schema(implementation = String.class))
+            )
+    })
+    public ResponseEntity<?> createListing(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Listing creation data",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = ListingCreate.class))
+            )
+            @RequestBody ListingCreate listing,
+
+            @Parameter(
+                    name = "Authorization",
+                    description = "JWT token prefixed with 'Bearer '",
+                    required = true,
+                    example = "Bearer eyJhbGciOiJIUzI1N..."
+            )
+            @RequestHeader("Authorization") String authHeader) {
         try {
             LOGGER.info("Received listing data: {}", listing);
 
@@ -351,7 +403,7 @@ public class ListingController {
                     )
             ) @RequestBody ListingUpdate updatedListingData) {
         try {
-//            LOGGER.info(updatedListingData.toString());
+            LOGGER.info(updatedListingData.toString());
             // validate token
             if (!authorizationHeader.startsWith("Bearer ")) {
                 LOGGER.info("Invalid Authorization header");
@@ -476,12 +528,48 @@ public class ListingController {
         int user_id = Integer.parseInt(jwtTokenService.extractIdFromJwt(token));
 
         if (!listingService.userHasPermission(id, user_id)) {
-            System.out.println("Request denied to delete listing, due to insufficient permission");
+            LOGGER.info("Request denied to delete listing, due to insufficient permission");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         listingService.delete(id);
-        System.out.println("Successfully deleted listing with id: " + id);
+        LOGGER.info("Successfully deleted listing with id: " + id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/search")
+    @Operation(
+            summary = "Search listings by title",
+            description = "Returns a list of listings where the title contains the given query string (case-insensitive)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "List of matching listings",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ListingDTO.class))
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid or missing query parameter"
+            )
+    })
+    public ResponseEntity<List<ListingDTO>> searchListingsByTitle(
+            @Parameter(
+                    name = "query",
+                    description = "The search string to look for in listing titles",
+                    required = true,
+                    example = "jakke"
+            )
+            @RequestParam("query") String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<ListingDTO> results = listingService.searchByTitle(query.trim());
+        return ResponseEntity.ok(results);
+    }
+
 }

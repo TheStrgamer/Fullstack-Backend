@@ -10,6 +10,8 @@ import no.ntnu.idatt2105.marketplace.repo.ConversationRepo;
 import no.ntnu.idatt2105.marketplace.repo.MessageRepo;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
@@ -34,6 +36,7 @@ public class ChatSocketController extends TextWebSocketHandler {
   private JWT_token jwt;
   private MessageRepo messageRepo;
 
+  private static final Logger LOGGER = LogManager.getLogger(ListingController.class);
 
   @Autowired
   public ChatSocketController(ConversationRepo conversationRepo, UserRepo userRepo, JWT_token jwt, MessageRepo messageRepo) {
@@ -49,7 +52,7 @@ public class ChatSocketController extends TextWebSocketHandler {
    */
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-    System.out.println("Connection established: " + session.getId());
+    LOGGER.info ("Connection established: " + session.getId());
     String chatId = (String) session.getAttributes().get("chatId");
     String userId = (String) session.getAttributes().get("userId");
 
@@ -68,15 +71,15 @@ public class ChatSocketController extends TextWebSocketHandler {
    */
   @Override
   protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-    System.out.println("Received message: " + message.getPayload());
+    LOGGER.info("Received message: " + message.getPayload());
     String chatId = (String) session.getAttributes().get("chatId");
 
     ObjectMapper objectMapper = new ObjectMapper();
     MessageSendDTO payload = objectMapper.readValue(message.getPayload(), MessageSendDTO.class);
-    //System.out.println("Payload: " + payload);
-    //System.out.println("Payload message: " + payload.getMessage());
-    //System.out.println("Payload convId: " + payload.getConversationId());
-    //System.out.println("Payload token: " + payload.getToken());
+    //LOGGER.info("Payload: " + payload);
+    //LOGGER.info("Payload message: " + payload.getMessage());
+    //LOGGER.info("Payload convId: " + payload.getConversationId());
+    //LOGGER.info("Payload token: " + payload.getToken());
 
     Conversation conversation = conversationRepo.findById(Integer.parseInt(chatId)).orElse(null);
     if (conversation == null) {
@@ -104,7 +107,7 @@ public class ChatSocketController extends TextWebSocketHandler {
         if (userID.equals(userId)) { //don't want to send the message to the sender
           continue;
         }
-        System.out.println("Sending message to session: " + webSocketSession.getId());
+        LOGGER.info("Sending message to session: " + webSocketSession.getId());
         webSocketSession.sendMessage(new TextMessage("ADD MESSAGE "+messagePayload));
       } catch (IOException e) {
         e.printStackTrace();
@@ -121,7 +124,7 @@ public class ChatSocketController extends TextWebSocketHandler {
   @Override
   public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
     try {
-      System.out.println("Connection closed: " + session.getId());
+      LOGGER.info("Connection closed: " + session.getId());
       String chatId = (String) session.getAttributes().get("chatId");
       String userId = (String) session.getAttributes().get("userId");
 
@@ -174,27 +177,6 @@ public class ChatSocketController extends TextWebSocketHandler {
           webSocketSession.sendMessage(new TextMessage("UPDATE OFFER " + offerId + " TO " + status));
         } catch (IOException e) {
           System.out.println("Error sending offer update message to session: " + webSocketSession.getId());
-          e.printStackTrace();
-        }
-      }
-    }
-  }
-
-  /**
-   * Function to change the status of an offer to all clients in a chat
-   * Called by other controllers
-   * @param chatId the id of the chat
-   * @param offerId the id of the offer to update
-   * @param status the new status of the offer
-   */
-  public void updateOfferMessage(String chatId, int offerId, int status) {
-    if (chatSessions.containsKey(chatId)) {
-      for (WebSocketSession webSocketSession : chatSessions.get(chatId).values()) {
-        try {
-          System.out.println("Sending offer update message to session: " + webSocketSession.getId());
-          webSocketSession.sendMessage(
-              new TextMessage("UPDATE STATUS " + offerId + " TO " + status));
-        } catch (IOException e) {
           e.printStackTrace();
         }
       }
