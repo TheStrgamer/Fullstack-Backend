@@ -280,7 +280,8 @@ public class ListingService {
 
         // 3. Fallback til tilfeldige hvis ingen data
         if (categoryScores.isEmpty()) {
-            return getRandomListings(count);
+            return getRandomListings(count).stream().filter(listing -> listing.getCreatorId() != currentUser.getId())
+                    .collect(Collectors.toList());
         }
 
         // 4. Filtrer ut brukerens egne annonser
