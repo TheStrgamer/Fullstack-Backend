@@ -11,13 +11,22 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import java.io.IOException;
 import java.util.Collections;
-
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
-import no.ntnu.idatt2105.marketplace.model.user.User;
 
+/**
+ * Filter for validating JWT tokens in incoming HTTP requests.
+ * Extracts JWT tokens from Authorization headers, validates them,
+ * and sets appropriate authentication in the Spring Security context.
+ * This filter runs once per request, except for WebSocket connections.
+ *
+ * @author Konrad Seime
+ * @version 1.0
+ * @since 1.0
+ * @see JWT_token
+ * @see OncePerRequestFilter
+ */
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
   private static final Logger LOGGER = LogManager.getLogger(JWTAuthorizationFilter.class);
@@ -26,6 +35,11 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
   /**
    * Makes it so that the filter does not run for WebSocket requests.
+   *
+   * @param request the current HTTP request
+   * @return true if the filter should not be applied, false otherwise
+   * @throws ServletException if an exception occurs that interrupts the filter chain
+   * @since 1.0
    */
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
@@ -33,6 +47,17 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
     return path.startsWith("/ws/chat/");
   }
 
+  /**
+   * Main filter method that processes each HTTP request.
+   * Extracts the JWT token, validates it, and sets up authentication if valid.
+   *
+   * @param request the HTTP request being processed
+   * @param response the HTTP response of the request
+   * @param filterChain the filter chain for invoking the next filter
+   * @throws ServletException if an exception occurs that interrupts the filter chain
+   * @throws IOException if an I/O exception occurs during the processing
+   * @since 1.0
+   */
   @Override
   protected void doFilterInternal(
       HttpServletRequest request,
@@ -60,6 +85,13 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
     filterChain.doFilter(request, response);
   }
 
+  /**
+   * Extracts the JWT token from the Authorization header of the request.
+   *
+   * @param request the HTTP request containing the Authorization header
+   * @return the extracted JWT token, or null if no valid token is found
+   * @since 1.0
+   */
   private String extractToken(HttpServletRequest request) {
     final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
     if (header == null || !header.startsWith("Bearer ")) {
@@ -69,6 +101,13 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
     return header.substring(7);
   }
 
+  /**
+   * Validates the JWT token and extracts the user ID from it.
+   *
+   * @param token the JWT token to validate
+   * @return the user ID extracted from the token, or null if the token is invalid or expired
+   * @since 1.0
+   */
   private String validateTokenAndGetUserId(final String token) {
     try {
       jwtTokenService.validateJwtToken(token);
@@ -86,6 +125,12 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
     }
   }
 
+  /**
+   * Sets up authentication in the Spring Security context for the given user ID.
+   *
+   * @param userId the ID of the authenticated user
+   * @since 1.0
+   */
   private void setAuthentication(String userId) {
     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
         userId, null, Collections.emptyList()

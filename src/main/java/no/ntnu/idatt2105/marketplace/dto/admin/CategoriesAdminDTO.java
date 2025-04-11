@@ -4,21 +4,36 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import no.ntnu.idatt2105.marketplace.model.listing.Categories;
 
 /**
- * Data Transfer Object (DTO) for exposing detailed category information relevant to admin operations.
- * This includes ID, name, description, and the number of listings in the category.
+ * Data Transfer Object (DTO) used by administrators to view category information.
+ * This includes the category's ID, name, description, and the number of listings
+ * that belong to the category.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
+ * @see Categories
  */
-@Schema(description = "Gives all information about a category relevant for admin operations")
+@Schema(description = "Gives all information about a user relevant for admin operations")
 public class CategoriesAdminDTO {
 
-  /** The unique identifier of the category. */
+  /**
+   * The unique identifier of the category.
+   */
   @Schema(description = "Category id", example = "123456789")
   private int id;
 
-  /** The name of the category. */
+  /**
+   * The name of the category.
+   */
   @Schema(description = "Category name", example = "Foo")
   private String name;
 
-  /** The description of the category. */
+  /**
+   * A short description of the category.
+   */
   @Schema(description = "Category description", example = "Boo")
   private String description;
 
@@ -27,48 +42,45 @@ public class CategoriesAdminDTO {
   private int listings;
 
   /**
-   * Gets the ID of the category.
+   * Returns the ID of the category.
    *
-   * @return The category ID.
+   * @return the category ID
+   * @since 1.0
    */
-  public int getId() {
-    return id;
-  }
+  public int getId() { return id; }
 
   /**
-   * Gets the name of the category.
+   * Returns the name of the category.
    *
-   * @return The category name.
+   * @return the category name
+   * @since 1.0
    */
-  public String getName() {
-    return name;
-  }
+  public String getName() { return name; }
 
   /**
-   * Gets the description of the category.
+   * Returns the description of the category.
    *
-   * @return The category description.
+   * @return the category description
+   * @since 1.0
    */
-  public String getDescription() {
-    return description;
-  }
+  public String getDescription() { return description; }
 
   /**
-   * Gets the number of listings in this category.
+   * Returns the number of listings in this category.
    *
-   * @return The number of listings.
+   * @return the number of listings
+   * @since 1.0
    */
-  public int getListings() {
-    return listings;
-  }
+  public int getListings() { return listings; }
 
   /**
-   * Constructs a new {@code CategoriesAdminDTO} with specified values.
+   * Constructs a new {@code CategoriesAdminDTO} with all fields explicitly set.
    *
-   * @param id          The ID of the category.
-   * @param name        The name of the category.
-   * @param description The description of the category.
-   * @param listings    The number of listings in this category.
+   * @param id          the ID of the category
+   * @param name        the name of the category
+   * @param description the description of the category
+   * @param listings    the number of listings in this category
+   * @since 1.0
    */
   public CategoriesAdminDTO(int id, String name, String description, int listings) {
     this.id = id;
@@ -78,10 +90,13 @@ public class CategoriesAdminDTO {
   }
 
   /**
-   * Constructs a new {@code CategoriesAdminDTO} from a {@link Categories} entity and listing count.
+   * Constructs a new {@code CategoriesAdminDTO} using a {@link Categories} object
+   * and the number of listings in that category.
    *
-   * @param category The {@link Categories} entity to convert.
-   * @param listings The number of listings in this category.
+   * @param category the category object
+   * @param listings the number of listings in the category
+   * @since 1.0
+   * @see Categories
    */
   public CategoriesAdminDTO(Categories category, int listings) {
     this.id = category.getId();
