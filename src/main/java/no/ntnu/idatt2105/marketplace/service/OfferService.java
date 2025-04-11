@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import no.ntnu.idatt2105.marketplace.dto.negotiation.OfferDTO;
+import no.ntnu.idatt2105.marketplace.dto.other.TransactionDTO;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
+import no.ntnu.idatt2105.marketplace.model.other.Transaction;
 import no.ntnu.idatt2105.marketplace.model.negotiation.Conversation;
 import no.ntnu.idatt2105.marketplace.model.negotiation.Offer;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.ConversationRepo;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
 import no.ntnu.idatt2105.marketplace.repo.OfferRepo;
+import no.ntnu.idatt2105.marketplace.repo.TransactionRepo;
 import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +30,13 @@ public class OfferService {
   private OfferRepo offerRepo;
 
   @Autowired
+  private UserRepo userRepo;
+
+  @Autowired
   private ConversationRepo conversationRepo;
 
   @Autowired
-  private UserRepo userRepo;
+  private TransactionRepo transactionRepo;
 
   @Autowired
   private ListingRepo listingRepo;
@@ -94,7 +100,7 @@ public class OfferService {
     System.out.println("User: " + user.getId() + " Listing: " + listingId + " Conversation: " + conversationId);
     Optional<Listing> listing = listingRepo.findById(listingId);
     Optional<Conversation> conversation = conversationRepo.findById(conversationId);
-    if (listing.isEmpty() || user == null) {
+    if (listing.isEmpty()) {
       System.out.println("Listing or user not found");
       return false;
     }
@@ -168,12 +174,12 @@ public class OfferService {
       System.out.println("Offer not found");
       throw new IllegalArgumentException("Offer not found");
     }
-    System.out.println("Offer: " + offer.toString());
+    System.out.println("Offer: " + offer);
     if (!userCanAcceptOrRejectOffer(user, offerId)) {
       System.out.println("User is not authorized to accept this offer");
       throw new IllegalArgumentException("User is not authorized to accept this offer");
     }
-    System.out.println("Offer: " + offer.toString());
+    System.out.println("Offer: " + offer);
     offer.setStatus(1);
     offerRepo.save(offer);
   }
@@ -270,5 +276,85 @@ public class OfferService {
         .findFirst()
         .orElseThrow(() -> new IllegalArgumentException("Conversation not found"))
         .getId();
+  }
+
+
+  /**
+   * Purchases a listing.
+   *
+   * @param user the user purchasing the listing
+   * @param listing the listing to purchase
+   */
+  private void purchaseListingHelper(User user, Listing listing) {
+    if (listing.getSale_status() == 1) {
+      throw new IllegalArgumentException("Listing is already sold");
+    }
+    if (listing.getCreator() == user) {
+      throw new IllegalArgumentException("User cannot purchase their own listing");
+    }
+    listing.setSale_status(1);
+    listing.closeAllConversations();
+    listing.closeOffers();
+    listingRepo.save(listing);
+    offerRepo.saveAll(listing.getOffers());
+    conversationRepo.saveAll(listing.getConversations());
+  }
+
+  /**
+   * Purchases a listing.
+   * Can be done if the offer is accepted.
+   *
+   * @param token     the JWT token of the user purchasing the listing
+   * @param offerId   the ID of the offer to purchase
+   */
+  public void purchaseListingWithOffer(String token, int offerId) {
+    User user = jwt.getUserByToken(token);
+    if (user == null) {
+      throw new IllegalArgumentException("User not found");
+    }
+    Offer offer = offerRepo.findById(offerId);
+    if (offer == null) {
+      throw new IllegalArgumentException("Offer not found");
+    }
+    if (offer.getStatus() != 1) {
+      throw new IllegalArgumentException("Offer is not accepted");
+    }
+    if (user != offer.getCreator() && user != offer.getBuyer()) {
+      throw new IllegalArgumentException("User is not authorized to purchase this listing");
+    }
+    Listing listing = listingRepo.findById(offer.getListing().getId()).orElse(null);
+    if (listing == null) {
+      throw new IllegalArgumentException("Listing not found");
+    }
+    purchaseListingHelper(user, listing);
+    Transaction transaction = new Transaction(
+        user,
+        offer.getListing(),
+        offer.getCurrent_offer(),
+        new java.util.Date(),
+        new java.util.Date(),
+        "completed"
+    );
+    transactionRepo.save(transaction);
+  }
+
+
+  /**
+   * Purchases a listing.
+   * Can be done by the user who created the offer.
+   *
+   * @param token     the JWT token of the user purchasing the listing
+   * @param listingId the ID of the listing to purchase
+   */
+  public void purchaseListing(String token, int listingId) {
+    User user = jwt.getUserByToken(token);
+    if (user == null) {
+      throw new IllegalArgumentException("User not found");
+    }
+    Listing listing = listingRepo.findById(listingId).orElse(null);
+    if (listing == null) {
+      throw new IllegalArgumentException("Listing not found");
+    }
+    purchaseListingHelper(user, listing);
   }
 }

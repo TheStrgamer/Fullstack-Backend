@@ -1,8 +1,14 @@
 package no.ntnu.idatt2105.marketplace.dto.negotiation;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Data transfer object representing a message to be sent in a negotiation")
 public class MessageSendDTO {
+  @Schema(description = "The message content", example = "Hello, how are you?")
   private String message;
+  @Schema(description = "Unique ID of the conversation", example = "1")
   private int conversationId;
+  @Schema(description = "JWT token for authentication", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
   private String token;
 
   public MessageSendDTO() {}

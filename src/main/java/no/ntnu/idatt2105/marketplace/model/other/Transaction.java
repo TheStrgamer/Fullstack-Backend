@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import java.util.Date;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 import no.ntnu.idatt2105.marketplace.model.user.User;
-
 @Entity
 @Table(name = "transaction")
 public class Transaction {
@@ -14,16 +13,16 @@ public class Transaction {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
 
-  @OneToOne
+  @ManyToOne
   @JoinColumn(name = "users_id", nullable = false)
-  private User buyer_id;
+  private User buyer;  // Change to ManyToOne for multiple transactions per user
 
-  @OneToOne
+  @ManyToOne
   @JoinColumn(name = "listing_id", nullable = false)
-  private Listing listing_id;
+  private Listing listing;  // Change to ManyToOne for multiple transactions per listing
 
   @Column(nullable = false)
-  private float final_price;
+  private int final_price;
 
   @Column(nullable = false)
   private Date created_at;
@@ -37,10 +36,9 @@ public class Transaction {
   // constructor
   public Transaction() {}
 
-  public Transaction(int id, User buyer_id, Listing listing_id, float final_price, Date created_at, Date updated_at, String status) {
-    this.id = id;
-    this.buyer_id = buyer_id;
-    this.listing_id = listing_id;
+  public Transaction(User buyer, Listing listing, int final_price, Date created_at, Date updated_at, String status) {
+    this.buyer = buyer;
+    this.listing = listing;
     this.final_price = final_price;
     this.created_at = created_at;
     this.updated_at = updated_at;
@@ -56,27 +54,27 @@ public class Transaction {
     this.id = id;
   }
 
-  public Listing getListing_id() {
-    return listing_id;
+  public Listing getListing() {
+    return listing;
   }
 
-  public void setListing_id(Listing listing_id) {
-    this.listing_id = listing_id;
+  public void setListing(Listing listing) {
+    this.listing = listing;
   }
 
-  public User getBuyer_id() {
-    return buyer_id;
+  public User getBuyer() {
+    return buyer;
   }
 
-  public void setBuyer_id(User byer_id) {
-    this.buyer_id = byer_id;
+  public void setBuyer(User buyer) {
+    this.buyer = buyer;
   }
 
-  public float getFinal_price() {
+  public int getFinal_price() {
     return final_price;
   }
 
-  public void setFinal_price(float final_price) {
+  public void setFinal_price(int final_price) {
     this.final_price = final_price;
   }
 

@@ -265,6 +265,12 @@ public class Listing {
     offers.clear();
   }
 
+  public void closeOffers() {
+    for (Offer offer : offers) {
+      offer.setStatus(3);
+    }
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -278,4 +284,7 @@ public class Listing {
     return Objects.hash(id);
   }
 
+  public List<Offer> getOffers() {
+    return offers;
+  }
 }

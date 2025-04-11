@@ -257,7 +257,7 @@ public class OfferController {
       required = true,
       example = "Bearer eyJhbGciOiJIUzI1N.iIsInR5cCI6IkpXVCJ9..."
   ) @RequestHeader("Authorization") String authorizationHeader,
-      @Parameter(description = "ID of the offer to reject", required = true)
+      @Parameter(description = "ID of the offer", required = true)
 
       @PathVariable String chatId ) {
     try {
@@ -276,8 +276,6 @@ public class OfferController {
     }
 
   }
-
-
 
 
 }
