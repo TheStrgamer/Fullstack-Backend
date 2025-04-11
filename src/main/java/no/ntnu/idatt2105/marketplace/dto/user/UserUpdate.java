@@ -7,6 +7,13 @@ import no.ntnu.idatt2105.marketplace.model.other.Images;
  * Data Transfer Object for updating user profile information.
  * Used when a user wants to modify personal details such as name, email, phone number,
  * or profile picture.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
  */
 @Schema(description = "Data transfer object representing user update data")
 public class UserUpdate {

@@ -6,6 +6,14 @@ import java.util.List;
 /**
  * Data Transfer Object for updating a listing in the marketplace.
  * Contains editable fields such as title, category, pricing, description, and image references.
+ *
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
  */
 @Schema(description = "DTO for updating a listing")
 public class ListingUpdate {

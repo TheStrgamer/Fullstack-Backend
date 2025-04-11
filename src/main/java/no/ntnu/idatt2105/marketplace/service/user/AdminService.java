@@ -16,6 +16,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service class responsible for managing operations related to Admins.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
+ */
 @Service
 public class AdminService {
 

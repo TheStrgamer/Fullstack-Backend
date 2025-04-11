@@ -1,11 +1,19 @@
 package no.ntnu.idatt2105.marketplace.dto.admin;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 import no.ntnu.idatt2105.marketplace.model.user.User;
 
 /**
  * Data Transfer Object (DTO) used by administrators to update or manage user information.
  * Includes both user profile data and role designation.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
  */
 @Schema(description = "Gives all information about a user relevant for admin operations")
 public class UserUploadAdminDTO {

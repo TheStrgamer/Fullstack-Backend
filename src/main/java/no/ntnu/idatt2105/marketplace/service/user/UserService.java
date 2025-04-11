@@ -32,6 +32,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * validation of credentials, favorites handling, and user-related listing data.
  * <p>
  * Uses repositories to access and manipulate user and listing information in the database.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
+ *
+ * @see User
  */
 @Service
 public class UserService {

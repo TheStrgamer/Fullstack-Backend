@@ -7,6 +7,13 @@ import no.ntnu.idatt2105.marketplace.model.user.User;
 /**
  * Response object containing non-sensitive user information,
  * typically used for frontend rendering or profile viewing.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
  */
 @Schema(description = "Response object containing non-sensitive user information")
 public class UserResponseObject {

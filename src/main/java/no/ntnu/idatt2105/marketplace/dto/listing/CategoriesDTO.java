@@ -2,11 +2,20 @@ package no.ntnu.idatt2105.marketplace.dto.listing;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import no.ntnu.idatt2105.marketplace.model.listing.Categories;
+import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 
 /**
  * Data Transfer Object (DTO) used for transferring category data between client and server.
  * This class represents a category entry in the marketplace, including optional reference
  * to a parent category for hierarchical organization.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
+ * @see Categories
  */
 @Schema(description = "DTO for transferring a category entry")
 public class CategoriesDTO {

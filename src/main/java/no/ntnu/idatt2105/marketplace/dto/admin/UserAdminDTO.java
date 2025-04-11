@@ -6,6 +6,14 @@ import no.ntnu.idatt2105.marketplace.model.user.User;
 /**
  * Data Transfer Object (DTO) for exposing administrative-level details about users,
  * including role and the number of listings they have.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
+ * @see User
  */
 @Schema(description = "Gives all information about a user relevant for admin operations")
 public class UserAdminDTO {

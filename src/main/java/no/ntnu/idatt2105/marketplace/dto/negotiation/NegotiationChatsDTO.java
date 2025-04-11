@@ -8,6 +8,13 @@ import no.ntnu.idatt2105.marketplace.model.user.User;
  * Data Transfer Object (DTO) representing an overview of a negotiation chat.
  * It includes information about the conversation ID, other user's profile picture,
  * their name, the last message sent, and the timestamp of the last update.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
  */
 public class NegotiationChatsDTO {
   private int id;

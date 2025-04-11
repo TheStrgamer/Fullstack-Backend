@@ -1,10 +1,19 @@
 package no.ntnu.idatt2105.marketplace.dto.listing;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import no.ntnu.idatt2105.marketplace.model.listing.Condition;
 
 /**
  * Data Transfer Object (DTO) for transferring condition data related to listings.
  * Typically used when sending or receiving condition details in API responses or forms.
+ *
+ * @author Jonas Reiher
+ * @author Erlend Eide Zindel
+ * @author Konrad Seime
+ * @author Eskild Smestu
+ * @version 1.0
+ * @since 1.0
+ * @see Condition
  */
 @Schema(description = "DTO for transferring a condition entry associated with listings")
 public class ConditionsDTO {
