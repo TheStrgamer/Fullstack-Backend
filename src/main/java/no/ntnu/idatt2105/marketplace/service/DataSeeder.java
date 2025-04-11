@@ -123,7 +123,7 @@ public class DataSeeder implements CommandLineRunner {
         if (userRepo.findByEmail("test@example.com").isPresent()) return;
 
         Role role = roleRepo.findByName("USER").orElseThrow();
-        Categories cat = categoriesRepo.findByName("Electronics").orElseThrow();
+        Categories cat = categoriesRepo.findByName("Elektronikk").orElseThrow();
         Condition condition = conditionRepo.findByName("Used").orElseThrow();
 
         Images profileImg = imagesRepo.findByFilepathToImage("/images/profileImages/default-profile.png").orElseThrow();
@@ -185,8 +185,8 @@ public class DataSeeder implements CommandLineRunner {
 
         // Hent felles data
         Role role = roleRepo.findByName("USER").orElseThrow();
-        Categories clothing = categoriesRepo.findByName("Clothing").orElseThrow();
-        Categories electronics = categoriesRepo.findByName("Electronics").orElseThrow();
+        Categories clothing = categoriesRepo.findByName("Klær").orElseThrow();
+        Categories electronics = categoriesRepo.findByName("Elektronikk").orElseThrow();
         Condition used = conditionRepo.findByName("Used").orElseThrow();
 
         // Opprett ny bruker
