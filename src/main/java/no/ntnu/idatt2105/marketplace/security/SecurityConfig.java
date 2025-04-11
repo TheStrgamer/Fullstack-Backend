@@ -50,6 +50,7 @@ public class SecurityConfig {
                         "/api/listings/categories",
                         "/api/listings/conditions",
                         "/api/listings/recommended",
+                        "/api/listings/search",
                         "/api/categories",
                         "/api/categories/**",
                         "/h2-console/**",             // for databasetilgang

@@ -490,4 +490,40 @@ public class ListingController {
         LOGGER.info("Successfully deleted listing with id: " + id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/search")
+    @Operation(
+            summary = "Search listings by title",
+            description = "Returns a list of listings where the title contains the given query string (case-insensitive)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "List of matching listings",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ListingDTO.class))
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid or missing query parameter"
+            )
+    })
+    public ResponseEntity<List<ListingDTO>> searchListingsByTitle(
+            @Parameter(
+                    name = "query",
+                    description = "The search string to look for in listing titles",
+                    required = true,
+                    example = "jakke"
+            )
+            @RequestParam("query") String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<ListingDTO> results = listingService.searchByTitle(query.trim());
+        return ResponseEntity.ok(results);
+    }
+
 }
