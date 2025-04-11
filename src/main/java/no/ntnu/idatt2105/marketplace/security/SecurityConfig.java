@@ -26,6 +26,7 @@ public class SecurityConfig {
                         "/api/listings/random",
                         "/api/listings/categories",
                         "/api/listings/conditions",
+                        "/api/listings/recommended",
                         "/api/categories",
                         "/api/categories/**",
                         "/h2-console/**",             // for databasetilgang
@@ -39,15 +40,6 @@ public class SecurityConfig {
                         "/swagger-ui.html",
                     "/ws/**")
                 .permitAll()
-                .requestMatchers(
-                        "api/users/register",
-                        "api/users/login",
-                        "/api/users/",
-                        "/api/listings/all",
-                        "/api/listings/id/**",
-                        "api/users",
-                        "/api/listings/recommended",
-                    "/ws/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

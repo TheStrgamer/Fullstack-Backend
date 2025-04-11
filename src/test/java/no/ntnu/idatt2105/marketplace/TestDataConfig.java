@@ -45,8 +45,8 @@ class TestDataConfig {
       User testUser = new User();
       testUser.setFirstname("Test");
       testUser.setSurname("User");
-      testUser.setEmail("test@test.com");
-      testUser.setPassword("password");
+      testUser.setEmail("takenEmail@test.com");
+      testUser.setPassword("taken");
       testUser.setPhonenumber("12345678");
       testUser.setProfile_picture(images);
       testUser.setRole(role);
