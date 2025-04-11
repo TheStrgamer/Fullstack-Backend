@@ -30,6 +30,8 @@ import no.ntnu.idatt2105.marketplace.service.listing.ListingService;
 import no.ntnu.idatt2105.marketplace.service.images.ImagesService;
 import no.ntnu.idatt2105.marketplace.service.security.JWT_token;
 import no.ntnu.idatt2105.marketplace.service.user.UserService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,6 +80,7 @@ public class AdminController {
   @Autowired
   private AdminService adminService;
 
+  private static final Logger LOGGER = LogManager.getLogger(ListingController.class);
 
   @GetMapping("/amIAdmin")
   @Operation(
@@ -115,7 +118,7 @@ public class AdminController {
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
-    System.out.println("User is an admin");
+    LOGGER.info("User is an admin");
     return ResponseEntity.ok(true);
   }
 
@@ -161,7 +164,7 @@ public class AdminController {
     }
     List<User> users = userRepo.findAll();
     if (users.isEmpty()) {
-      System.out.println("No users found");
+      LOGGER.info("No users found");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     ArrayList<UserAdminDTO> userDTOList = new ArrayList<>();
@@ -381,7 +384,7 @@ public class AdminController {
     }
     List<Listing> listings = listingRepo.findAll();
     if (listings.isEmpty()) {
-      System.out.println("No listings found");
+      LOGGER.info("No listings found");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     ArrayList<ListingAdminDTO> listingDTOList = new ArrayList<>();
@@ -466,7 +469,7 @@ public class AdminController {
     }
     List<Categories> categories = categoriesRepo.findAll();
     if (categories.isEmpty()) {
-      System.out.println("No category found");
+      LOGGER.info("No category found");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     ArrayList<CategoriesAdminDTO> categoryDTOList = new ArrayList<>();
@@ -518,7 +521,7 @@ public class AdminController {
     }
     Optional<Categories> category = categoriesRepo.findById(Integer.parseInt(id));
     if (category.isEmpty()) {
-      System.out.println("No category found");
+      LOGGER.info("No category found");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     CategoriesAdminDTO categoryDTO = new CategoriesAdminDTO(category.get(), listingRepo.findAllByCategory(category.get()).size());
@@ -568,13 +571,13 @@ public class AdminController {
     String name = category.getName();
     boolean nameExists = categoriesRepo.findByName(name).isPresent();
     if (nameExists) {
-      System.out.println("Category with name " + name + " already exists");
+      LOGGER.info("Category with name " + name + " already exists");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
     String description = category.getDescription();
     Categories newCategory = new Categories(name, description, null);
     categoriesRepo.save(newCategory);
-    System.out.println("Category " + name + " created successfully");
+    LOGGER.info("Category " + name + " created successfully");
     return ResponseEntity.ok(true);
   }
 
@@ -620,12 +623,12 @@ public class AdminController {
     }
     Optional<Categories> foundCategory = categoriesRepo.findById(Integer.parseInt(id));
     if (foundCategory.isEmpty()) {
-      System.out.println("No category with id " + id + " found");
+      LOGGER.info("No category with id " + id + " found");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
     String newName = category.getName();
     if (categoriesRepo.findByName(newName).isPresent() && !foundCategory.get().getName().equals(newName)) {
-      System.out.println("Category with name " + newName + " already exists");
+      LOGGER.info("Category with name " + newName + " already exists");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
     String newDescription = category.getDescription();
@@ -680,12 +683,12 @@ public class AdminController {
     }
     Optional<Categories> category = categoriesRepo.findById(Integer.parseInt(id));
     if (category.isEmpty()) {
-      System.out.println("Category with id " + id + " not found");
+      LOGGER.info("Category with id " + id + " not found");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category with id " + id + " not found");
     }
     Categories cat = category.get();
     if (cat.getName().equals("Other")) {
-      System.out.println("Cannot delete category 'Other'");
+      LOGGER.info("Cannot delete category 'Other'");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
           .body("Cannot delete category 'Other'");
     }
@@ -696,7 +699,7 @@ public class AdminController {
       listingRepo.save(l);
     }
     categoriesRepo.delete(cat);
-    System.out.println("Category " + cat.getName() + " deleted successfully");
+    LOGGER.info("Category " + cat.getName() + " deleted successfully");
     return ResponseEntity.ok("Category " + cat.getName() + " deleted successfully");
   }
 
