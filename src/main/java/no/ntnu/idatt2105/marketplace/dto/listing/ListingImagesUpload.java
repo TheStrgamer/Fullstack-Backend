@@ -70,4 +70,12 @@ public class ListingImagesUpload {
   public void setImages(List<MultipartFile> images) {
     this.images = images;
   }
+
+  @Override
+  public String toString() {
+    return "ListingImagesUpload{" +
+            "id=" + id +
+            ", images=" + images +
+            '}';
+  }
 }

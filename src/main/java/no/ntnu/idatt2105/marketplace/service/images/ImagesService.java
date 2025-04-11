@@ -3,8 +3,10 @@ package no.ntnu.idatt2105.marketplace.service.images;
 import no.ntnu.idatt2105.marketplace.controller.ListingController;
 import no.ntnu.idatt2105.marketplace.model.listing.Listing;
 import no.ntnu.idatt2105.marketplace.model.other.Images;
+import no.ntnu.idatt2105.marketplace.model.user.User;
 import no.ntnu.idatt2105.marketplace.repo.ImagesRepo;
 import no.ntnu.idatt2105.marketplace.repo.ListingRepo;
+import no.ntnu.idatt2105.marketplace.repo.UserRepo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,9 @@ public class ImagesService {
   @Autowired
   private ListingRepo listingRepo;
 
+  @Autowired
+  private UserRepo userRepo;
+
   private static final Logger LOGGER = LogManager.getLogger(ListingController.class);
 
 
@@ -78,25 +83,23 @@ public class ImagesService {
   }
 
 
-
-  /**
-   * Deletes an image from the database
-   * @param image_id the is of the image to be deleted
-   */
-  public void deleteImage(int image_id) {
-    imagesRepo.deleteById(image_id);
-  }
-
-
-
-  /**
-   * Deletes an image from the database
-   * @param image the {@link Images} instance of the image to be deleted
-   */
-  public void deleteImage(Images image) {
-    imagesRepo.deleteById(image.getId());
-  }
-
+//  /**
+//   * Deletes an image from the database
+//   * @param image_id the is of the image to be deleted
+//   */
+//  public void deleteImage(int image_id) {
+//    imagesRepo.deleteById(image_id);
+//  }
+//
+//
+//
+//  /**
+//   * Deletes an image from the database
+//   * @param image the {@link Images} instance of the image to be deleted
+//   */
+//  public void deleteImage(Images image) {
+//    imagesRepo.deleteById(image.getId());
+//  }
 
 
   /**
@@ -105,9 +108,15 @@ public class ImagesService {
    * @return the created image as a {@link Images}
    * @throws Exception if provided {@link MultipartFile} is empty
    */
-  public Images saveUserProfilePicture(MultipartFile file) throws Exception {
-    Images image = createDBImageFromRequest(file, "profilePictures");
-    return imagesRepo.save(image);
+  public Images saveUserProfilePicture(MultipartFile file, String user_email) throws Exception {
+    Images image = createDBImageFromRequest(file, "profileImages");
+    image = imagesRepo.save(image); // Save first to get ID
+
+    User user = userRepo.findByEmail(user_email).orElseThrow();
+    user.setProfile_picture(image);
+    userRepo.save(user);
+
+    return image;
   }
 
 
