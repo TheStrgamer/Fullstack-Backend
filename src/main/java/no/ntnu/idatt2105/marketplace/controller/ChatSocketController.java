@@ -139,7 +139,7 @@ public class ChatSocketController extends TextWebSocketHandler {
    * @param chatId the id of the chat
    * @param offer the offer to send
    */
-  public void sendOfferMessage(String chatId, OfferDTO offer) {
+  public void sendOfferCreateMessage(String chatId, OfferDTO offer) {
     System.out.println("Available chat id sessions: " + chatSessions.keySet());
     if (chatSessions.containsKey(chatId)) {
       for (WebSocketSession webSocketSession : chatSessions.get(chatId).values()) {
@@ -152,6 +152,28 @@ public class ChatSocketController extends TextWebSocketHandler {
           System.out.println("Sending offer message to session: " + webSocketSession.getId());
           webSocketSession.sendMessage(new TextMessage("CREATE OFFER " + payload));
         } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+
+  /**
+   * Function to send offer update message to all clients in a chat
+   * Called by other controllers
+   * @param chatId the id of the chat
+   * @param offerId the id of the offer to update
+   * @param status the new status of the offer
+   */
+  public void sendOfferUpdateMessage(String chatId, String offerId, int status) {
+    System.out.println("Available chat id sessions: " + chatSessions.keySet() + " chatId: " + chatId);
+    if (chatSessions.containsKey(chatId)) {
+      for (WebSocketSession webSocketSession : chatSessions.get(chatId).values()) {
+        try {
+          System.out.println("Sending offer update message to session: " + webSocketSession.getId());
+          webSocketSession.sendMessage(new TextMessage("UPDATE OFFER " + offerId + " TO " + status));
+        } catch (IOException e) {
+          System.out.println("Error sending offer update message to session: " + webSocketSession.getId());
           e.printStackTrace();
         }
       }

@@ -67,7 +67,7 @@ public class UserService {
             negotiation.getBuyer() == user ? negotiation.getSeller() : negotiation.getBuyer(),
             negotiation.getLatestMessage(),
             negotiation.getUpdatedAt()
-        )).toList();
+            )).toList();
   }
 
 

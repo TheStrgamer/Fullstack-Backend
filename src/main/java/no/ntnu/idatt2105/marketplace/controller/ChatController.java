@@ -175,7 +175,9 @@ public class ChatController {
         otherUserName,
         lastUpdate,
         messages,
-        status
+        status,
+        isSeller,
+        conv.getListing().getTitle()
     );
     return ResponseEntity.ok(conversationDTO);
   }

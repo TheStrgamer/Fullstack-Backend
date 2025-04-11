@@ -47,8 +47,8 @@ public class OfferService {
     if (offer == null || user == null) {
       throw new IllegalArgumentException("User or Offer not found");
     }
-    if (offer.getBuyer() != user ||
-        offer.getListing().getCreator() != user) {
+    if (offer.getBuyer() != user &&
+        offer.getCreator() != user) {
       throw new IllegalArgumentException("User is not authorized to access this offer");
     }
   }
@@ -58,6 +58,7 @@ public class OfferService {
     try {
       validateUserInOffer(user, offerId);
     } catch (IllegalArgumentException e) {
+      System.out.println("User is not authorized to access this offer");
       throw new IllegalArgumentException("User is not authorized to access this offer");
     }
     return user;
@@ -73,8 +74,12 @@ public class OfferService {
   private boolean userCanAcceptOrRejectOffer(User user, int offerId) {
     Offer offer = offerRepo.findById(offerId);
     if (offer == null || user == null) {
+      System.out.println("Offer or user not found");
+      System.out.println("Offer: " + offer);
+      System.out.println("User: " + user);
       return false;
     }
+    System.out.println("User: " + user.getId() + " Offer: " + offer.getId() + " creator: " + offer.getCreator().getId() + " buyer: " + offer.getBuyer().getId());
     return user != offer.getCreator();
   }
 
@@ -157,13 +162,18 @@ public class OfferService {
    */
   public void acceptOffer(String token, int offerId) {
     User user = getUserAndValidate(token, offerId);
+    System.out.println("User: " + user.toString() + " Offer: " + offerId);
     Offer offer = offerRepo.findById(offerId);
     if (offer == null) {
+      System.out.println("Offer not found");
       throw new IllegalArgumentException("Offer not found");
     }
+    System.out.println("Offer: " + offer.toString());
     if (!userCanAcceptOrRejectOffer(user, offerId)) {
+      System.out.println("User is not authorized to accept this offer");
       throw new IllegalArgumentException("User is not authorized to accept this offer");
     }
+    System.out.println("Offer: " + offer.toString());
     offer.setStatus(1);
     offerRepo.save(offer);
   }
@@ -179,9 +189,11 @@ public class OfferService {
     User user = getUserAndValidate(token, offerId);
     Offer offer = offerRepo.findById(offerId);
     if (offer == null) {
+      System.out.println("Offer not found");
       throw new IllegalArgumentException("Offer not found");
     }
     if (!userCanAcceptOrRejectOffer(user, offerId)) {
+      System.out.println("User is not authorized to reject this offer");
       throw new IllegalArgumentException("User is not authorized to reject this offer");
     }
     offer.setStatus(2);
@@ -200,10 +212,11 @@ public class OfferService {
     if (offer == null) {
       throw new IllegalArgumentException("Offer not found");
     }
-    if (user != offer.getBuyer()) {
+    if (user != offer.getCreator()) {
       throw new IllegalArgumentException("User is not authorized to remove this offer");
     }
-    offerRepo.delete(offer);
+    offer.setStatus(3);
+    offerRepo.save(offer);
   }
 
   /**
@@ -240,5 +253,22 @@ public class OfferService {
     }
     return offerDTOs;
 
+  }
+
+  /**
+   * Get chat id from offer
+   */
+  public int getChatIdFromOffer(int offerId) {
+    Offer offer = offerRepo.findById(offerId);
+    if (offer == null) {
+      throw new IllegalArgumentException("Offer not found");
+    }
+    return offer.getListing().getConversations()
+        .stream()
+        .filter(conversation -> (conversation.getBuyer() == offer.getBuyer() && conversation.getSeller() == offer.getCreator())
+            || (conversation.getSeller() == offer.getBuyer() && conversation.getBuyer() == offer.getCreator()))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("Conversation not found"))
+        .getId();
   }
 }

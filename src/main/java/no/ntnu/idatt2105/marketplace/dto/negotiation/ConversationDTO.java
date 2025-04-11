@@ -8,16 +8,21 @@ public class ConversationDTO {
   private int id;
   private String other_user_picture;
   private String other_user_name;
+  private boolean amISeller;
+  private String listingTitle;
   private String last_message;
   private String last_update;
   private List<MessageDTO> messages;
   private int status;
 
   public ConversationDTO(int id, String other_user_picture, String other_user_name,
-      String last_update, List<MessageDTO> messages, int status) {
+      String last_update, List<MessageDTO> messages, int status, boolean amISeller,
+      String listingTitle) {
     this.id = id;
     this.other_user_picture = other_user_picture;
     this.other_user_name = other_user_name;
+    this.amISeller = amISeller;
+    this.listingTitle = listingTitle;
     this.last_update = last_update;
     this.messages = messages;
     this.status = status;
@@ -78,6 +83,10 @@ public class ConversationDTO {
   public void setStatus(int status) {
     this.status = status;
   }
+  public boolean isAmISeller() { return amISeller; }
+  public void setAmISeller(boolean amISeller) { this.amISeller = amISeller; }
+  public String getListingTitle() { return listingTitle; }
+  public void setListingTitle(String listingTitle) { this.listingTitle = listingTitle; }
 
   @Override
   public String toString() {

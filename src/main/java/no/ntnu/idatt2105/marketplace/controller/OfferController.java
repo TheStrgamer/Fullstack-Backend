@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import no.ntnu.idatt2105.marketplace.dto.negotiation.OfferDTO;
 import no.ntnu.idatt2105.marketplace.dto.negotiation.OfferSendDTO;
-import no.ntnu.idatt2105.marketplace.model.negotiation.Offer;
 import no.ntnu.idatt2105.marketplace.service.OfferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,7 +67,7 @@ public class OfferController {
     try {
       String token = authorizationHeader.substring(7);
       OfferDTO offer = offerService.createOffer(token, offerSendDTO.getListingId(), offerSendDTO.getCurrentOffer(), offerSendDTO.getNegotiationId());
-      chatSocketController.sendOfferMessage(offerSendDTO.getNegotiationIdString(), offer);
+      chatSocketController.sendOfferCreateMessage(offerSendDTO.getNegotiationIdString(), offer);
       return ResponseEntity.ok(offer.getId());
     } catch (IllegalArgumentException e) {
       System.out.println("Error creating offer: " + e.getMessage());
@@ -117,10 +116,14 @@ public class OfferController {
     try {
       String token = authorizationHeader.substring(7);
       offerService.removeOffer(token, id);
+      String chatId = String.valueOf(offerService.getChatIdFromOffer(id));
+      chatSocketController.sendOfferUpdateMessage(chatId, String.valueOf(id), 3);
       return ResponseEntity.ok("Offer removed successfully");
     } catch (IllegalArgumentException e) {
+      System.out.println("Error removing offer: " + e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     } catch (Exception e) {
+      System.out.println("Error removing offer: " + e.getMessage());
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing offer");
     }
   }
@@ -161,11 +164,16 @@ public class OfferController {
 
     try {
       String token = authorizationHeader.substring(7);
+      System.out.println("Offer ID: " + id);
       offerService.acceptOffer(token, id);
+      String chatId = String.valueOf(offerService.getChatIdFromOffer(id));
+      chatSocketController.sendOfferUpdateMessage(chatId, String.valueOf(id), 1);
       return ResponseEntity.ok("Offer accepted successfully");
     } catch (IllegalArgumentException e) {
+      System.out.println("Error accepting offer: " + e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     } catch (Exception e) {
+      System.out.println("Error accepting offer: " + e.getMessage());
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error accepting offer");
     }
   }
@@ -207,10 +215,14 @@ public class OfferController {
     try {
       String token = authorizationHeader.substring(7);
       offerService.rejectOffer(token, id);
+      String chatId = String.valueOf(offerService.getChatIdFromOffer(id));
+      chatSocketController.sendOfferUpdateMessage(chatId, String.valueOf(id), 2);
       return ResponseEntity.ok("Offer rejected successfully");
     } catch (IllegalArgumentException e) {
+      System.out.println("Error rejecting offer: " + e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     } catch (Exception e) {
+      System.out.println("Error rejecting offer: " + e.getMessage());
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error rejecting offer");
     }
   }

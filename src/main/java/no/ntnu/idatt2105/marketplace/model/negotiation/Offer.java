@@ -35,7 +35,7 @@ public class Offer {
   @Column(nullable = false)
   private Date updated_at;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne()
   @JoinColumn(name = "created_by", nullable = false)
   private User creator;
 
